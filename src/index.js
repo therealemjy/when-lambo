@@ -89,7 +89,7 @@ async function checkPair(args) {
       +state.tick
     );
 
-    console.log(pool.token0Price());
+    console.log(pool.token0Price.invert().toSignificant(18));
   }
 
   const uniswapRes = await main();
