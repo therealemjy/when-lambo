@@ -3,11 +3,12 @@
   "version": "0.0.1",
   "description": "",
   "main": "src/index.js",
+  "type": "module",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node --experimental-json-modules src/index.js",
     "test": "node test.js"
   },
   "author": "ChainSkills",
@@ -27,6 +28,8 @@
     "web3": "^1.6.0"
   },
   "devDependencies": {
+    "@uniswap/sdk-core": "^3.0.1",
+    "@uniswap/v3-sdk": "3.3.2",
     "request": "^2.81.0"
   }
 }
