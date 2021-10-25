@@ -1,134 +1,84 @@
-import dotenv from "dotenv";
+require("dotenv").config();
 
-import Web3 from "web3";
-import axios from "axios";
-import { Pool } from "@uniswap/v3-sdk";
-import { Token } from "@uniswap/sdk-core";
-import IUniswapV3PoolJSON from "@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json";
+const Web3 = require("web3");
+const { ChainId, Token, TokenAmount, Pair } = require("@uniswap/sdk");
+const abis = require("../abis");
+const { mainnet: addresses } = require("../addresses");
 
-dotenv.config();
-const UNISWAP_CONTRACT_ADDRESS = "0x2F62f2B4c5fcd7570a709DeC05D68EA19c82A9ec";
-
-// WEB3 CONFIG
-const web3 = new Web3(process.env.RPC_URL);
-
-const uniswapPoolContract = new web3.eth.Contract(
-  IUniswapV3PoolJSON.abi,
-  UNISWAP_CONTRACT_ADDRESS
+const web3 = new Web3(
+  new Web3.providers.WebsocketProvider(process.env.RPC_URL)
 );
 
-async function getPoolImmutables() {
-  const [factory, token0, token1, fee, tickSpacing, maxLiquidityPerTick] =
-    await Promise.all([
-      uniswapPoolContract.methods.factory().call(),
-      uniswapPoolContract.methods.token0().call(),
-      uniswapPoolContract.methods.token1().call(),
-      uniswapPoolContract.methods.fee().call(),
-      uniswapPoolContract.methods.tickSpacing().call(),
-      uniswapPoolContract.methods.maxLiquidityPerTick().call(),
-    ]);
+const kyber = new web3.eth.Contract(
+  abis.kyber.kyberNetworkProxy,
+  addresses.kyber.kyberNetworkProxy
+);
 
-  const immutables = {
-    factory,
-    token0,
-    token1,
-    fee,
-    tickSpacing,
-    maxLiquidityPerTick,
-  };
-  return immutables;
-}
+const AMOUNT_ETH = 1;
+const RECENT_ETH_PRICE = 230;
+const AMOUNT_ETH_WEI = web3.utils.toWei(AMOUNT_ETH.toString());
+const AMOUNT_DAI_WEI = web3.utils.toWei(
+  (AMOUNT_ETH * RECENT_ETH_PRICE).toString()
+);
 
-async function getPoolState() {
-  const [liquidity, slot] = await Promise.all([
-    uniswapPoolContract.methods.liquidity().call(),
-    uniswapPoolContract.methods.slot0().call(),
-  ]);
-
-  const PoolState = {
-    liquidity,
-    sqrtPriceX96: slot[0],
-    tick: slot[1],
-    observationIndex: slot[2],
-    observationCardinality: slot[3],
-    observationCardinalityNext: slot[4],
-    feeProtocol: slot[5],
-    unlocked: slot[6],
-  };
-
-  return PoolState;
-}
-
-let maxDiff = 0;
-
-async function checkPair() {
-  async function getUniswapPrice() {
-    const [immutables, state] = await Promise.all([
-      getPoolImmutables(),
-      getPoolState(),
-    ]);
-
-    const TokenA = new Token(1, immutables.token0, 18, "SHIB");
-    const TokenB = new Token(1, immutables.token1, 18, "ETH");
-
-    const pool = new Pool(
-      TokenA,
-      TokenB,
-      +immutables.fee,
-      state.sqrtPriceX96.toString(),
-      state.liquidity.toString(),
-      +state.tick
-    );
-
-    return pool.token0Price.toSignificant(18);
-  }
-
-  const uniswapPrice = await getUniswapPrice();
-  const zrxRes = await axios.get(
-    "https://api.0x.org/swap/v1/price?sellToken=0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce&buyToken=ETH&sellAmount=1000000000000000000"
+const init = async () => {
+  const [dai, weth] = await Promise.all(
+    [addresses.tokens.dai, addresses.tokens.weth].map((tokenAddress) =>
+      Token.fetchData(ChainId.MAINNET, tokenAddress)
+    )
   );
+  const daiWeth = await Pair.fetchData(dai, weth);
 
-  const currentDiff = Math.abs(100 - (zrxRes.data.price * 100) / uniswapPrice);
+  const monitorPrices = async () => {
+    const kyberResults = await Promise.all([
+      kyber.methods
+        .getExpectedRate(
+          addresses.tokens.dai,
+          "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          AMOUNT_DAI_WEI
+        )
+        .call(),
+      kyber.methods
+        .getExpectedRate(
+          "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          addresses.tokens.dai,
+          AMOUNT_ETH_WEI
+        )
+        .call(),
+    ]);
+    const kyberRates = {
+      buy: parseFloat(1 / (kyberResults[0].expectedRate / 10 ** 18)),
+      sell: parseFloat(kyberResults[1].expectedRate / 10 ** 18),
+    };
+    console.log("Kyber ETH/DAI");
+    console.log(kyberRates);
 
-  if (maxDiff < currentDiff) {
-    maxDiff = currentDiff;
-  }
+    const uniswapResults = await Promise.all([
+      daiWeth.getOutputAmount(new TokenAmount(dai, AMOUNT_DAI_WEI)),
+      daiWeth.getOutputAmount(new TokenAmount(weth, AMOUNT_ETH_WEI)),
+    ]);
+    const uniswapRates = {
+      buy: parseFloat(
+        AMOUNT_DAI_WEI / (uniswapResults[0][0].toExact() * 10 ** 18)
+      ),
+      sell: parseFloat(uniswapResults[1][0].toExact() / AMOUNT_ETH),
+    };
+    console.log("Uniswap ETH/DAI");
+    console.log(uniswapRates);
+  };
 
-  console.table([
-    {
-      UNISWAP: uniswapPrice,
-      "0x": zrxRes.data.price,
-      Diff: currentDiff,
-      MaxDiff: maxDiff,
-    },
-  ]);
-}
+  await monitorPrices();
 
-let priceMonitor;
-let monitoringPrice = false;
+  web3.eth
+    .subscribe("newBlockHeaders")
+    .on("data", async (block) => {
+      console.log(`New block received. Block # ${block.number}`);
 
-async function monitorPrice() {
-  if (monitoringPrice) {
-    return;
-  }
+      monitorPrices();
+    })
+    .on("error", (error) => {
+      console.log(error);
+    });
+};
 
-  monitoringPrice = true;
-
-  try {
-    // ADD YOUR CUSTOM TOKEN PAIRS HERE!!!
-
-    await checkPair();
-  } catch (error) {
-    console.error(error);
-    monitoringPrice = false;
-    clearInterval(priceMonitor);
-    return;
-  }
-
-  monitoringPrice = false;
-}
-
-// Check markets every n seconds
-priceMonitor = setInterval(async () => {
-  await monitorPrice();
-}, 3000);
+init();

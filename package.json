@@ -1,36 +1,20 @@
 {
-  "name": "bot-test",
-  "version": "0.0.1",
+  "name": "10-connect-to-blockchain-with-web3",
+  "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
-  "type": "module",
-  "directories": {
-    "test": "test"
-  },
+  "main": "run-arbitrage.js",
   "scripts": {
-    "start": "node --experimental-json-modules src/index.js",
-    "test": "node test.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --experimental-json-modules src/index.js"
   },
-  "author": "ChainSkills",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
   "dependencies": {
+    "@studydefi/money-legos": "^2.3.3",
     "@truffle/hdwallet-provider": "^1.0.35",
-    "axios": "^0.19.2",
-    "console.table": "^0.10.0",
+    "@uniswap/sdk": "^2.0.5",
     "dotenv": "^8.2.0",
-    "ejs": "^2.5.6",
-    "express": "^4.15.2",
-    "infura-web3-provider": "0.0.3",
-    "jsbi": "3.1.4",
-    "lodash": "^4.17.15",
-    "moment": "^2.25.3",
-    "moment-timezone": "^0.5.28",
-    "numeral": "^2.0.6",
-    "web3": "^1.6.0"
-  },
-  "devDependencies": {
-    "@uniswap/sdk-core": "^3.0.1",
-    "@uniswap/v3-sdk": "3.3.2",
-    "request": "^2.81.0"
+    "web3": "^1.2.9"
   }
 }
