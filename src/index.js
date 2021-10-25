@@ -7,7 +7,7 @@ import { Token } from "@uniswap/sdk-core";
 import IUniswapV3PoolJSON from "@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json";
 
 dotenv.config();
-const UNISWAP_CONTRACT_ADDRESS = "0x60594a405d53811d3bc4766596efd80fd545a270";
+const UNISWAP_CONTRACT_ADDRESS = "0x2F62f2B4c5fcd7570a709DeC05D68EA19c82A9ec";
 
 // WEB3 CONFIG
 const web3 = new Web3(process.env.RPC_URL);
@@ -59,25 +59,16 @@ async function getPoolState() {
   return PoolState;
 }
 
-async function checkPair(args) {
-  // const {
-  //   inputTokenSymbol,
-  //   inputTokenAddress,
-  //   outputTokenSymbol,
-  //   outputTokenAddress,
-  //   inputAmount,
-  // } = args;
+let maxDiff = 0;
 
-  // const zrXRes = await axios.get(
-  //   "https://api.0x.org/swap/v1/price?sellToken=WETH&buyToken=DAI&sellAmount=1000000000000000000"
-  // );
-  async function main() {
+async function checkPair() {
+  async function getUniswapPrice() {
     const [immutables, state] = await Promise.all([
       getPoolImmutables(),
       getPoolState(),
     ]);
 
-    const TokenA = new Token(1, immutables.token0, 18, "DAI");
+    const TokenA = new Token(1, immutables.token0, 18, "SHIB");
     const TokenB = new Token(1, immutables.token1, 18, "ETH");
 
     const pool = new Pool(
@@ -89,19 +80,28 @@ async function checkPair(args) {
       +state.tick
     );
 
-    console.log(pool.token0Price.invert().toSignificant(18));
+    return pool.token0Price.toSignificant(18);
   }
 
-  const uniswapRes = await main();
+  const uniswapPrice = await getUniswapPrice();
+  const zrxRes = await axios.get(
+    "https://api.0x.org/swap/v1/price?sellToken=0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce&buyToken=ETH&sellAmount=1000000000000000000"
+  );
 
-  // console.table([
-  //   {
-  //     "Input Token": inputTokenSymbol,
-  //     "Output Token": outputTokenSymbol,
-  //     "Input Amount": web3.utils.fromWei(inputAmount, "Ether"),
-  //     "Uniswap Return": web3.utils.fromWei(uniswapResult, "Ether"),
-  //   },
-  // ]);
+  const currentDiff = Math.abs(100 - (zrxRes.data.price * 100) / uniswapPrice);
+
+  if (maxDiff < currentDiff) {
+    maxDiff = currentDiff;
+  }
+
+  console.table([
+    {
+      UNISWAP: uniswapPrice,
+      "0x": zrxRes.data.price,
+      Diff: currentDiff,
+      MaxDiff: maxDiff,
+    },
+  ]);
 }
 
 let priceMonitor;
@@ -112,19 +112,12 @@ async function monitorPrice() {
     return;
   }
 
-  console.log("Checking prices...");
   monitoringPrice = true;
 
   try {
     // ADD YOUR CUSTOM TOKEN PAIRS HERE!!!
 
-    await checkPair({
-      inputTokenSymbol: "ETH",
-      inputTokenAddress: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-      outputTokenSymbol: "MANA",
-      outputTokenAddress: "0x0f5d2fb29fb7d3cfee444a200298f468908cc942",
-      inputAmount: web3.utils.toWei("1", "ETHER"),
-    });
+    await checkPair();
   } catch (error) {
     console.error(error);
     monitoringPrice = false;
