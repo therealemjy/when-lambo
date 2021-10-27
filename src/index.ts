@@ -30,8 +30,12 @@ const sushiswap = new web3.eth.Contract(
   addresses.sushiswap.router
 );
 
-const DAI_IN_DECIMALS = 1 * 10 ** 18;
+// Update with the token you want to trade
+const TRADED_TOKEN_ADDRESS = addresses.tokens.dai;
+const TRADED_TOKEN_DECIMALS = 18;
+
 const WETH_IN_DECIMALS = 1 * 10 ** 18;
+const TRADED_TOKEN_IN_DECIMALS = 1 * 10 ** TRADED_TOKEN_DECIMALS;
 
 const init = async () => {
   const monitorPrices = async () => {
@@ -44,7 +48,7 @@ const init = async () => {
         // returns value in decimals of dest token (DAI decimals)
         .getExpectedRate(
           addresses.tokens.weth,
-          addresses.tokens.dai,
+          TRADED_TOKEN_ADDRESS,
           // Return always the price of 1 token given the amount of source token
           // you want to exchange
           WETH_DECIMALS_AMOUNT.toString()
@@ -55,14 +59,14 @@ const init = async () => {
       uniswap.methods
         .getAmountsOut(WETH_DECIMALS_AMOUNT.toString(), [
           addresses.tokens.weth,
-          addresses.tokens.dai,
+          TRADED_TOKEN_ADDRESS,
         ])
         .call(),
       // Sushiswap
       sushiswap.methods
         .getAmountsOut(WETH_DECIMALS_AMOUNT.toString(), [
           addresses.tokens.weth,
-          addresses.tokens.dai,
+          TRADED_TOKEN_ADDRESS,
         ])
         .call(),
     ]);
@@ -130,20 +134,20 @@ const init = async () => {
     const toBuyResults = await Promise.all([
       kyber.methods
         .getExpectedRate(
-          addresses.tokens.dai,
+          TRADED_TOKEN_ADDRESS,
           addresses.tokens.weth,
           highestBuyableDaiDecAmountBn.toFixed()
         )
         .call(),
       uniswap.methods
         .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [
-          addresses.tokens.dai,
+          TRADED_TOKEN_ADDRESS,
           addresses.tokens.weth,
         ])
         .call(),
       sushiswap.methods
         .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [
-          addresses.tokens.dai,
+          TRADED_TOKEN_ADDRESS,
           addresses.tokens.weth,
         ])
         .call(),
@@ -155,7 +159,7 @@ const init = async () => {
     // Price of 1 DAI decimal in WETH decimals
     const kyberDaiDecToWethDecRate = new BigNumber(
       kyberDaiToWethDecRate
-    ).dividedBy(DAI_IN_DECIMALS);
+    ).dividedBy(TRADED_TOKEN_IN_DECIMALS);
 
     // Total amount of WETH decimals we get from selling all the DAI decimals we
     // just bought
