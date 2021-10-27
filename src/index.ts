@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import "console.table";
 import Web3 from "web3";
 import abis from "../abis";
 import exchangesAddresses from "../addresses";
@@ -41,7 +42,7 @@ let isMonitoring = false;
 
 const monitorPrices = async (borrowedWethDecAmounts: string) => {
   if (isMonitoring) {
-    console.log("Block skipped! Price monitoring ongoing.");
+    console.log("Block skipped ☠️ Price monitoring ongoing.");
     return;
   }
 
@@ -78,7 +79,6 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
   ]);
 
   // Kyber
-
   // Price of 1 WETH in Traded Token decimals
   // Kyber expectedRate === includes slippage Kyber worstRate === worst
   // slippage you can get on top of the expectedRate, transaction would fail
@@ -108,12 +108,6 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
     toSellResults[2][1].toString()
   );
 
-  console.log("Selling prices: WETH decimals to Traded Token decimals");
-  console.log("Kyber:", kyberWethToDaiDecAmountBn.toFixed());
-  console.log("Uniswap V2:", uniswapV2WethToDaiDecAmountBn.toFixed());
-  console.log("Sushiswap:", sushiswapWethToDaiDecAmountBn.toFixed());
-  console.log("---------------");
-
   // Find the highest amount of Traded Token decimals we can get
   const isKyberBestSeller = kyberWethToDaiDecAmountBn.isGreaterThan(
     uniswapV2WethToDaiDecAmountBn
@@ -124,13 +118,6 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
 
   // TODO: we should apply a safe slippage to that value so that the final
   // calculated profit is safer
-
-  console.log("Selling platform:", isKyberBestSeller ? "Kyber" : "Uniswap v2");
-  console.log(
-    "Amount (Traded Token decimals):",
-    highestBuyableDaiDecAmountBn.toFixed()
-  );
-  console.log("---------------");
 
   // Check which platform gives us the highest amount of ETH decimals back
   // from selling our Traded Token decimals
@@ -183,12 +170,6 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
   // TODO: we should apply a safe slippage to that value so that the final
   // calculated profit is safer
 
-  console.log("Buying prices: Traded Token decimals to WETH decimals");
-  console.log("Kyber:", kyberDaiDecToWethDecAmountBn.toFixed(0));
-  console.log("Uniswap V2:", uniswapV2DaiToWethDecAmountBn.toFixed());
-  console.log("Sushiswap:", sushiswapDaiToWethDecAmountBn.toFixed());
-  console.log("---------------");
-
   // Calculate profits
   const kyberProfitBn =
     kyberDaiDecToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT);
@@ -210,21 +191,37 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
     .multipliedBy(100)
     .toFixed(2);
 
-  console.log("Potential profits in WETH decimals:");
-  console.log(
-    "Kyber:",
-    kyberProfitBn.toFixed() + " (" + kyberProfitPercent + "%)"
-  );
-  console.log(
-    "Uniswap V2:",
-    uniswapV2ProfitBn.toFixed() + " (" + uniswapV2ProfitPercent + "%)"
-  );
-  console.log(
-    "Sushiswap:",
-    sushiswapProfitBn.toFixed() + " (" + sushiswapProfitPercent + "%)"
-  );
-
   isMonitoring = false;
+
+  console.table([
+    {
+      Platform: "Kyber",
+      "Selling price (in Traded Token decimals)":
+        kyberWethToDaiDecAmountBn.toFixed(),
+      "Buying price (in WETH decimals)":
+        kyberDaiDecToWethDecAmountBn.toFixed(0),
+      "Potential profit (in WETH DECIMALS)": kyberProfitBn.toFixed(0),
+      "Potential profit (%)": kyberProfitPercent + "%",
+    },
+    {
+      Platform: "Uniswap V2",
+      "Selling price (in Traded Token decimals)":
+        uniswapV2WethToDaiDecAmountBn.toFixed(),
+      "Buying price (in WETH decimals)":
+        uniswapV2DaiToWethDecAmountBn.toFixed(),
+      "Potential profit (in WETH DECIMALS)": uniswapV2ProfitBn.toFixed(),
+      "Potential profit (%)": uniswapV2ProfitPercent + "%",
+    },
+    {
+      Platform: "Sushiswap",
+      "Selling price (in Traded Token decimals)":
+        sushiswapWethToDaiDecAmountBn.toFixed(),
+      "Buying price (in WETH decimals)":
+        sushiswapDaiToWethDecAmountBn.toFixed(),
+      "Potential profit (in WETH DECIMALS)": sushiswapProfitBn.toFixed(),
+      "Potential profit (%)": sushiswapProfitPercent + "%",
+    },
+  ]);
 };
 
 const WETH_DECIMALS_AMOUNT = 1 * WETH_IN_DECIMALS;
@@ -237,9 +234,7 @@ const init = async () => {
   web3.eth
     .subscribe("newBlockHeaders")
     .on("data", async (block) => {
-      console.log(`---------------`);
       console.log(`New block received. Block # ${block.number}`);
-      console.log(`---------------`);
       monitorPrices(borrowedWethDec);
     })
     .on("error", (error) => {
