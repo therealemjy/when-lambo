@@ -31,7 +31,7 @@ const init = async () => {
   const daiWeth = await Pair.fetchData(dai, weth);
 
   const monitorPrices = async () => {
-    const WETH_DECIMALS_AMOUNT = WETH_IN_DECIMALS;
+    const WETH_DECIMALS_AMOUNT = 1 * WETH_IN_DECIMALS;
 
     const toSellResults = await Promise.all([
       kyber.methods
@@ -72,8 +72,9 @@ const init = async () => {
       kyberWethDecToDaiDecSellRate
     ).multipliedBy(WETH_DECIMALS_AMOUNT);
 
+    const uniswapV2WethToDaiAmount = toSellResults[1][0].toExact().toString();
     const uniswapV2WethToDaiDecAmountBn = new BigNumber(
-      toSellResults[1][0].toExact().toString()
+      uniswapV2WethToDaiAmount
     ).multipliedBy(DAI_IN_DECIMALS);
 
     console.log("Selling prices: WETH decimals to DAI decimals");
@@ -127,7 +128,7 @@ const init = async () => {
 
     // Total amount of WETH decimals we get from selling all the DAI decimals we
     // just bought
-    const kyberDaiDecToWethDecAmount = new BigNumber(
+    const kyberDaiDecToWethDecAmountBn = new BigNumber(
       kyberDaiDecToWethDecRate
     ).multipliedBy(highestBuyableDaiDecAmountBn);
 
@@ -139,7 +140,7 @@ const init = async () => {
     // calculated profit is safer
 
     console.log("Buying prices: DAI decimals to WETH decimals");
-    console.log("Kyber:", kyberDaiDecToWethDecAmount.toFixed(0));
+    console.log("Kyber:", kyberDaiDecToWethDecAmountBn.toFixed(0));
     console.log("Uniswap V2:", uniswapV2DaiToWethDecAmountBn.toFixed());
     console.log("---------------");
 
@@ -147,7 +148,7 @@ const init = async () => {
     console.log("Potential profits in WETH decimals:");
     console.log(
       "Kyber:",
-      kyberDaiDecToWethDecAmount.minus(WETH_DECIMALS_AMOUNT).toFixed(0)
+      kyberDaiDecToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT).toFixed(0)
     );
     console.log(
       "Uniswap V2:",
