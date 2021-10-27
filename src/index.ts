@@ -20,7 +20,7 @@ const kyber = new web3.eth.Contract(
 );
 
 const DAI_IN_DECIMALS = 1 * 10 ** 18;
-const ETH_IN_DECIMALS = 1 * 10 ** 18;
+const WETH_IN_DECIMALS = 1 * 10 ** 18;
 
 const init = async () => {
   const [dai, weth] = await Promise.all(
@@ -31,14 +31,13 @@ const init = async () => {
   const daiWeth = await Pair.fetchData(dai, weth);
 
   const monitorPrices = async () => {
-    const WETH_DECIMALS_AMOUNT = ETH_IN_DECIMALS;
-    const WETH_AMOUNT = WETH_DECIMALS_AMOUNT / ETH_IN_DECIMALS;
+    const WETH_DECIMALS_AMOUNT = WETH_IN_DECIMALS;
 
     const toSellResults = await Promise.all([
       kyber.methods
         // How much DAI do we get for 1weth?
         // eg: 4000
-        // returns value in decimals of dest token (DAI)
+        // returns value in decimals of dest token (DAI decimals)
         .getExpectedRate(
           addresses.tokens.weth,
           addresses.tokens.dai,
@@ -62,27 +61,37 @@ const init = async () => {
     // slippage when calculating pessimistic rates.
     const kyberWethToDaiDecSellRate = toSellResults[0].expectedRate;
 
-    const kyberWethToDaiDecSellAmountBn = new BigNumber(
+    // Price of 1 WETH decimal in DAI decimals
+    const kyberWethDecToDaiDecSellRate = new BigNumber(
       kyberWethToDaiDecSellRate
-    ).multipliedBy(WETH_AMOUNT);
+    ).dividedBy(WETH_IN_DECIMALS);
+
+    // Total amount of DAI decimals we get from selling all the WETH decimals we
+    // borrowed
+    const kyberWethToDaiDecAmountBn = new BigNumber(
+      kyberWethDecToDaiDecSellRate
+    ).multipliedBy(WETH_DECIMALS_AMOUNT);
 
     const uniswapWethToDaiDecAmountBn = new BigNumber(
       toSellResults[1][0].toExact().toString()
     ).multipliedBy(DAI_IN_DECIMALS);
 
     console.log("Selling prices: WETH decimals to DAI decimals");
-    console.log("Kyber:", kyberWethToDaiDecSellAmountBn.toFixed());
+    console.log("Kyber:", kyberWethToDaiDecAmountBn.toFixed());
     console.log("Uniswap:", uniswapWethToDaiDecAmountBn.toFixed());
     console.log("---------------");
 
-    // Find the highest amount of DAI we can get
-    const isKyberBestSeller = kyberWethToDaiDecSellAmountBn.isGreaterThan(
+    // Find the highest amount of DAI decimals we can get
+    const isKyberBestSeller = kyberWethToDaiDecAmountBn.isGreaterThan(
       uniswapWethToDaiDecAmountBn
     );
     const highestBuyableDaiDecAmountBn = isKyberBestSeller
-      ? kyberWethToDaiDecSellAmountBn
+      ? kyberWethToDaiDecAmountBn
       : uniswapWethToDaiDecAmountBn;
     const bestBuyerPlatform = isKyberBestSeller ? "kyber" : "uniswap";
+
+    // TODO: we should apply a safe slippage to that value so that the final
+    // calculated profit is safer
 
     console.log("Selling platform:", bestBuyerPlatform);
     console.log(
@@ -107,21 +116,25 @@ const init = async () => {
     ]);
 
     // Price of 1 DAI in WETH decimals
-    const kyberDaiToWethDecSellRate = toBuyResults[0].expectedRate;
+    const kyberDaiToWethDecRate = toBuyResults[0].expectedRate;
 
     // Price of 1 DAI decimal in WETH decimals
-    const kyberDaiDecToWethDecSellRate =
-      kyberDaiToWethDecSellRate / DAI_IN_DECIMALS;
+    const kyberDaiDecToWethDecRate = new BigNumber(
+      kyberDaiToWethDecRate
+    ).dividedBy(DAI_IN_DECIMALS);
 
     // Total amount of WETH decimals we get from selling all the DAI decimals we
     // just bought
     const kyberDaiDecToWethDecAmount = new BigNumber(
-      kyberDaiDecToWethDecSellRate
+      kyberDaiDecToWethDecRate
     ).multipliedBy(highestBuyableDaiDecAmountBn);
 
     const uniswapDaiToWethDecAmountBn = new BigNumber(
       toBuyResults[1][0].toExact()
-    ).multipliedBy(ETH_IN_DECIMALS);
+    ).multipliedBy(WETH_IN_DECIMALS);
+
+    // TODO: we should apply a safe slippage to that value so that the final
+    // calculated profit is safer
 
     console.log("Buying prices: DAI decimals to WETH decimals");
     console.log("Kyber:", kyberDaiDecToWethDecAmount.toFixed(0));
