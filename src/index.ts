@@ -33,8 +33,7 @@ const init = async () => {
   const daiWeth = await Pair.fetchData(dai, weth);
 
   const monitorPrices = async () => {
-    const WETH_AMOUNT = 1;
-    const WETH_DECIMALS_AMOUNT = 1 * ETH_IN_DECIMALS;
+    const WETH_DECIMALS_AMOUNT = ETH_IN_DECIMALS;
 
     const toSellResults = await Promise.all([
       kyber.methods
@@ -48,41 +47,45 @@ const init = async () => {
           WETH_DECIMALS_AMOUNT.toString()
         )
         .call(),
-      // How many DAI decimals do we get for a given amount of source token decimal?
+      // How many DAI do we get for a given amount of source token decimal?
       // returns in token's decimal
       daiWeth.getOutputAmount(
         new TokenAmount(weth, WETH_DECIMALS_AMOUNT.toString())
       ),
     ]);
 
-    // Kyber expectedRate === includes slippage
-    // Kyber worstRate === worst slippage you can get on top of the expectedRate, transaction would fail if this threshold is reached
+    // Kyber expectedRate === includes slippage Kyber worstRate === worst
+    // slippage you can get on top of the expectedRate, transaction would fail
+    // if this threshold is reached. Note the worstRate is calculated using a
+    // fixed slippage of 3%, so we should instead use our own notion of safe
+    // slippage when calculating pessimistic rates
     const kyberWethToDaiDecSellRate = toSellResults[0].expectedRate;
 
-    const kyberWethToDaiSellAmountBn = new BigNumber(kyberWethToDaiDecSellRate)
-      .times(WETH_AMOUNT)
-      .dividedBy(DAI_IN_DECIMALS);
+    const kyberWethToDaiDecSellAmountBn = new BigNumber(
+      kyberWethToDaiDecSellRate
+    ).multipliedBy(WETH_DECIMALS_AMOUNT / ETH_IN_DECIMALS);
 
-    const uniswapWethToDaiAmountBn = new BigNumber(
+    const uniswapWethToDaiDecAmountBn = new BigNumber(
       toSellResults[1][0].toExact().toString()
-    );
+    ).multipliedBy(DAI_IN_DECIMALS);
 
     console.log("Selling prices: ETH to DAI decimals");
-    console.log("Kyber:", kyberWethToDaiSellAmountBn.toFixed());
-    console.log("Uniswap:", uniswapWethToDaiAmountBn.toFixed());
+    console.log("Kyber:", kyberWethToDaiDecSellAmountBn.toFixed());
+    console.log("Uniswap:", uniswapWethToDaiDecAmountBn.toFixed());
     console.log("---------------");
 
-    // const isKyberGreater = kyberWethToDaiSellAmountBn.isGreaterThan(
-    //   uniswapWethToDaiDecAmountBn
-    // );
-    // const buyingPlatform = isKyberGreater ? "kyber" : "uniswap";
-    // const finalAmountDaiDec = isKyberGreater
-    //   ? kyberWethToDaiDecSellAmountBn.toFixed()
-    //   : uniswapWethToDaiDecAmountBn.toFixed();
+    // Find the highest value we can get
+    const isKyberBestSeller = kyberWethToDaiDecSellAmountBn.isGreaterThan(
+      uniswapWethToDaiDecAmountBn
+    );
+    const highestBuyableDaiAmountBn = isKyberBestSeller
+      ? kyberWethToDaiDecSellAmountBn
+      : uniswapWethToDaiDecAmountBn;
+    const bestBuyerPlatform = isKyberBestSeller ? "kyber" : "uniswap";
 
-    // console.log("Selling platform:", buyingPlatform);
-    // console.log("Amount (DAI decimals):", finalAmountDaiDec);
-    // console.log("---------------");
+    console.log("Selling platform:", bestBuyerPlatform);
+    console.log("Amount (DAI decimals):", highestBuyableDaiAmountBn.toFixed());
+    console.log("---------------");
 
     // const toBuyResults = await Promise.all([
     //   // kyber.methods
