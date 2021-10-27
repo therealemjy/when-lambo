@@ -5,7 +5,7 @@
   "main": "run-arbitrage.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --experimental-json-modules src/index.js"
+    "start": "ts-node src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +18,10 @@
     "dotenv": "^8.2.0",
     "ethers": "^5.5.1",
     "jsbi": "^4.0.0",
+    "typescript": "^4.4.4",
     "web3": "^1.2.9"
+  },
+  "devDependencies": {
+    "ts-node": "^10.4.0"
   }
 }

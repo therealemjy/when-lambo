@@ -1,16 +1,17 @@
 require("dotenv").config();
 
-const Web3 = require("web3");
-const abis = require("../abis");
-const { ChainId, Token, TokenAmount, Pair } = require("@uniswap/sdk");
-const { mainnet: addresses } = require("../addresses");
-const BigNumber = require("bignumber.js");
+import Web3 from "web3";
+import abis from "../abis";
+import { ChainId, Token, TokenAmount, Pair } from "@uniswap/sdk";
+import { mainnet as addresses } from "../addresses";
+import BigNumber from "bignumber.js";
 
 const web3 = new Web3(
   new Web3.providers.WebsocketProvider(process.env.RPC_URL)
 );
 
 const kyber = new web3.eth.Contract(
+  // @ts-ignore
   abis.kyber.kyberNetworkProxy,
   addresses.kyber.kyberNetworkProxy
 );
@@ -32,23 +33,6 @@ const init = async () => {
     const WETH_AMOUNT = 1;
     const WETH_DECIMALS_AMOUNT = 1 * ETH_IN_DECIMALS;
 
-    // const kyberResults = await Promise.all([
-    //   kyber.methods
-    //     .getExpectedRate(
-    //       addresses.tokens.dai,
-    //       "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    //       DAI_IN_DECIMALS.toString() + "00000"
-    //     )
-    //     .call(),
-    // kyber.methods
-    //   .getExpectedRate(
-    //     "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    //     addresses.tokens.dai,
-    //     ETH_IN_DECIMALS.toString() + "00000"
-    //   )
-    //   .call(),
-    // ]);
-
     const toSellResults = await Promise.all([
       kyber.methods
         .getExpectedRate(
@@ -63,42 +47,43 @@ const init = async () => {
     ]);
 
     const kyberWethToDaiDecSellRate = toSellResults[0].expectedRate;
-    const kyberWethToDaiDecSellAmountBn = new BigNumber(
-      kyberWethToDaiDecSellRate
-    ).times(WETH_AMOUNT);
+    const kyberWethToDaiSellAmountBn = new BigNumber(kyberWethToDaiDecSellRate)
+      .times(WETH_AMOUNT)
+      .dividedBy(DAI_IN_DECIMALS);
 
-    const uniswapWethToDaiAmount = toSellResults[1][0].toExact();
-    const uniswapWethToDaiDecAmountBn = new BigNumber(
-      uniswapWethToDaiAmount
-    ).times(ETH_IN_DECIMALS);
+    const uniswapWethToDaiAmountBn = new BigNumber(
+      toSellResults[1][0].toExact().toString()
+    );
 
     console.log("Selling prices: ETH to DAI decimals");
-    console.log("Kyber:", kyberWethToDaiDecSellAmountBn.toFixed());
-    console.log("Uniswap:", uniswapWethToDaiDecAmountBn.toFixed());
+    console.log("Kyber:", kyberWethToDaiSellAmountBn.toFixed());
+    console.log("Uniswap:", uniswapWethToDaiAmountBn.toFixed());
     console.log("---------------");
 
-    const isKyberGreater = kyberWethToDaiDecSellAmountBn.isGreaterThan(
-      uniswapWethToDaiDecAmountBn
-    );
-    const buyingPlatform = isKyberGreater ? "kyber" : "uniswap";
-    const finalAmountDaiDec = isKyberGreater
-      ? kyberWethToDaiDecSellAmountBn.toFixed()
-      : uniswapWethToDaiDecAmountBn.toFixed();
+    // const isKyberGreater = kyberWethToDaiSellAmountBn.isGreaterThan(
+    //   uniswapWethToDaiDecAmountBn
+    // );
+    // const buyingPlatform = isKyberGreater ? "kyber" : "uniswap";
+    // const finalAmountDaiDec = isKyberGreater
+    //   ? kyberWethToDaiDecSellAmountBn.toFixed()
+    //   : uniswapWethToDaiDecAmountBn.toFixed();
 
-    console.log("Selling platform:", buyingPlatform);
-    console.log("Amount (DAI decimals):", finalAmountDaiDec);
-    console.log("---------------");
+    // console.log("Selling platform:", buyingPlatform);
+    // console.log("Amount (DAI decimals):", finalAmountDaiDec);
+    // console.log("---------------");
 
     // const toBuyResults = await Promise.all([
-    //   kyber.methods
-    //     .getExpectedRate(
-    //       addresses.tokens.dai,
-    //       addresses.tokens.weth,
-    //       finalAmountDaiDecimals
-    //     )
-    //     .call(),
-    //   daiWeth.getOutputAmount(new TokenAmount(dai, finalAmountDaiDecimals)),
+    //   // kyber.methods
+    //   //   .getExpectedRate(
+    //   //     addresses.tokens.dai,
+    //   //     addresses.tokens.weth,
+    //   //     finalAmountDaiDecimals
+    //   //   )
+    //   //   .call(),
+    //   daiWeth.getOutputAmount(new TokenAmount(dai, finalAmountDaiDec)),
     // ]);
+
+    // console.log(toBuyResults[0][0].toExact());
 
     // Kyber
     // const kyberBuyingRate = toBuyResults[0].expectedRate;
