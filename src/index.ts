@@ -3,7 +3,12 @@ dotenv.config();
 
 import Web3 from "web3";
 import abis from "../abis";
-import { ChainId, Token, TokenAmount, Pair } from "@uniswap/sdk";
+import {
+  ChainId as UniswapV2ChainId,
+  Token as UniswapV2Token,
+  TokenAmount as UniswapV2TokenAmount,
+  Pair as UniswapV2Pair,
+} from "@uniswap/sdk";
 import exchangesAddresses from "../addresses";
 import BigNumber from "bignumber.js";
 
@@ -19,16 +24,22 @@ const kyber = new web3.eth.Contract(
   addresses.kyber.kyberNetworkProxy
 );
 
+const sushiswap = new web3.eth.Contract(
+  // @ts-ignore
+  abis.sushiswap.sushi,
+  addresses.sushiswap.router
+);
+
 const DAI_IN_DECIMALS = 1 * 10 ** 18;
 const WETH_IN_DECIMALS = 1 * 10 ** 18;
 
 const init = async () => {
   const [dai, weth] = await Promise.all(
     [addresses.tokens.dai, addresses.tokens.weth].map((tokenAddress) =>
-      Token.fetchData(ChainId.MAINNET, tokenAddress)
+      UniswapV2Token.fetchData(UniswapV2ChainId.MAINNET, tokenAddress)
     )
   );
-  const daiWeth = await Pair.fetchData(dai, weth);
+  const daiWeth = await UniswapV2Pair.fetchData(dai, weth);
 
   const monitorPrices = async () => {
     const WETH_DECIMALS_AMOUNT = 1 * WETH_IN_DECIMALS;
@@ -49,9 +60,18 @@ const init = async () => {
       // How many DAI do we get for a given amount of source token decimal?
       // returns in token's decimal
       daiWeth.getOutputAmount(
-        new TokenAmount(weth, WETH_DECIMALS_AMOUNT.toString())
+        new UniswapV2TokenAmount(weth, WETH_DECIMALS_AMOUNT.toString())
       ),
+      // Sushiswap
+      sushiswap.methods
+        .getAmountsOut(WETH_DECIMALS_AMOUNT.toString(), [
+          addresses.tokens.weth,
+          addresses.tokens.dai,
+        ])
+        .call(),
     ]);
+
+    // Kyber
 
     // Price of 1 WETH in DAI decimals
     // Kyber expectedRate === includes slippage Kyber worstRate === worst
@@ -72,14 +92,21 @@ const init = async () => {
       kyberWethDecToDaiDecSellRate
     ).multipliedBy(WETH_DECIMALS_AMOUNT);
 
+    // Uniswap
     const uniswapV2WethToDaiAmount = toSellResults[1][0].toExact().toString();
     const uniswapV2WethToDaiDecAmountBn = new BigNumber(
       uniswapV2WethToDaiAmount
     ).multipliedBy(DAI_IN_DECIMALS);
 
+    // Sushiswap
+    const sushiswapWethToDaiDecAmountBn = new BigNumber(
+      toSellResults[2][1].toString()
+    );
+
     console.log("Selling prices: WETH decimals to DAI decimals");
     console.log("Kyber:", kyberWethToDaiDecAmountBn.toFixed());
     console.log("Uniswap V2:", uniswapV2WethToDaiDecAmountBn.toFixed());
+    console.log("Sushiswap:", sushiswapWethToDaiDecAmountBn.toFixed());
     console.log("---------------");
 
     // Find the highest amount of DAI decimals we can get
@@ -114,7 +141,7 @@ const init = async () => {
         )
         .call(),
       daiWeth.getOutputAmount(
-        new TokenAmount(dai, highestBuyableDaiDecAmountBn.toFixed())
+        new UniswapV2TokenAmount(dai, highestBuyableDaiDecAmountBn.toFixed())
       ),
     ]);
 

@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@studydefi/money-legos": "^2.3.3",
+    "@sushiswap/sdk": "^5.0.0-canary.87",
     "@truffle/hdwallet-provider": "^1.0.35",
     "@uniswap/sdk": "^2.0.5",
     "bignumber.js": "^9.0.1",
