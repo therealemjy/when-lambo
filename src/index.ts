@@ -1,13 +1,16 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
 import Web3 from "web3";
 import abis from "../abis";
 import { ChainId, Token, TokenAmount, Pair } from "@uniswap/sdk";
-import { mainnet as addresses } from "../addresses";
+import exchangesAddresses from "../addresses";
 import BigNumber from "bignumber.js";
 
+const { mainnet: addresses } = exchangesAddresses;
+
 const web3 = new Web3(
-  new Web3.providers.WebsocketProvider(process.env.RPC_URL)
+  new Web3.providers.WebsocketProvider(process.env.RPC_URL || "")
 );
 
 const kyber = new web3.eth.Contract(
@@ -19,7 +22,7 @@ const kyber = new web3.eth.Contract(
 const DAI_IN_DECIMALS = 1 * 10 ** 18;
 const ETH_IN_DECIMALS = 1 * 10 ** 18;
 
-const potentialETHAmounts = [1, 3, 5, 7];
+// const potentialETHAmounts = [1, 3, 5, 7];
 
 const init = async () => {
   const [dai, weth] = await Promise.all(
