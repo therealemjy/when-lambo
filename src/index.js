@@ -4,8 +4,7 @@ const Web3 = require("web3");
 const abis = require("../abis");
 const { ChainId, Token, TokenAmount, Pair } = require("@uniswap/sdk");
 const { mainnet: addresses } = require("../addresses");
-const JSBI = require("jsbi");
-const ethers = require("ethers");
+const BigNumber = require("bignumber.js");
 
 const web3 = new Web3(
   new Web3.providers.WebsocketProvider(process.env.RPC_URL)
@@ -30,6 +29,9 @@ const init = async () => {
   const daiWeth = await Pair.fetchData(dai, weth);
 
   const monitorPrices = async () => {
+    const WETH_AMOUNT = 1;
+    const WETH_DECIMALS_AMOUNT = 1 * ETH_IN_DECIMALS;
+
     // const kyberResults = await Promise.all([
     //   kyber.methods
     //     .getExpectedRate(
@@ -52,54 +54,75 @@ const init = async () => {
         .getExpectedRate(
           addresses.tokens.weth,
           addresses.tokens.dai,
-          ETH_IN_DECIMALS.toString()
+          WETH_DECIMALS_AMOUNT.toString()
         )
         .call(),
       daiWeth.getOutputAmount(
-        new TokenAmount(weth, ETH_IN_DECIMALS.toString())
+        new TokenAmount(weth, WETH_DECIMALS_AMOUNT.toString())
       ),
     ]);
 
-    const kyberEthToDaiAmount = toSellResults[0].expectedRate;
-    const uniswapEthToDaiAmount = (toSellResults[1][0].toExact() + "").replace(
-      ".",
-      ""
-    );
+    const kyberWethToDaiDecSellRate = toSellResults[0].expectedRate;
+    const kyberWethToDaiDecSellAmountBn = new BigNumber(
+      kyberWethToDaiDecSellRate
+    ).times(WETH_AMOUNT);
 
-    const buyingPlatform =
-      kyberEthToDaiAmount > uniswapEthToDaiAmount ? "kyber" : "uniswap";
-    const finalAmountDaiDecimals =
-      kyberEthToDaiAmount > uniswapEthToDaiAmount
-        ? kyberEthToDaiAmount
-        : uniswapEthToDaiAmount;
+    const uniswapWethToDaiAmount = toSellResults[1][0].toExact();
+    const uniswapWethToDaiDecAmountBn = new BigNumber(
+      uniswapWethToDaiAmount
+    ).times(ETH_IN_DECIMALS);
 
     console.log("Selling prices: ETH to DAI decimals");
-    console.log("Kyber:", kyberEthToDaiAmount);
-    console.log("Uniswap:", uniswapEthToDaiAmount);
+    console.log("Kyber:", kyberWethToDaiDecSellAmountBn.toFixed());
+    console.log("Uniswap:", uniswapWethToDaiDecAmountBn.toFixed());
     console.log("---------------");
+
+    const isKyberGreater = kyberWethToDaiDecSellAmountBn.isGreaterThan(
+      uniswapWethToDaiDecAmountBn
+    );
+    const buyingPlatform = isKyberGreater ? "kyber" : "uniswap";
+    const finalAmountDaiDec = isKyberGreater
+      ? kyberWethToDaiDecSellAmountBn.toFixed()
+      : uniswapWethToDaiDecAmountBn.toFixed();
 
     console.log("Selling platform:", buyingPlatform);
-    console.log("Amount (DAI decimals):", finalAmountDaiDecimals);
+    console.log("Amount (DAI decimals):", finalAmountDaiDec);
     console.log("---------------");
 
-    const toBuyResults = await Promise.all([
-      kyber.methods
-        .getExpectedRate(
-          addresses.tokens.dai,
-          addresses.tokens.weth,
-          finalAmountDaiDecimals
-        )
-        .call(),
-      daiWeth.getOutputAmount(new TokenAmount(dai, finalAmountDaiDecimals)),
-    ]);
+    // const toBuyResults = await Promise.all([
+    //   kyber.methods
+    //     .getExpectedRate(
+    //       addresses.tokens.dai,
+    //       addresses.tokens.weth,
+    //       finalAmountDaiDecimals
+    //     )
+    //     .call(),
+    //   daiWeth.getOutputAmount(new TokenAmount(dai, finalAmountDaiDecimals)),
+    // ]);
 
-    const kyberDaiToAthAmount = toBuyResults[0].expectedRate;
-    const uniswapDaiToEthAmount = toBuyResults[1][0].toExact();
+    // Kyber
+    // const kyberBuyingRate = toBuyResults[0].expectedRate;
 
-    console.log("Buying prices: DAI to ETH");
-    console.log("Kyber:", kyberDaiToAthAmount);
-    console.log("Uniswap:", uniswapDaiToEthAmount);
-    console.log("---------------");
+    // console.log("rate", kyberBuyingRate);
+
+    // const kyberDaiToEthAmount = ethers.BigNumber.from(kyberBuyingRate)
+    //   .mul(ethers.BigNumber.from(finalAmountDaiDecimals))
+    //   .div(ethers.BigNumber.from(DAI_IN_DECIMALS.toString()))
+    //   .toString();
+
+    // console.log(
+    //   ethers.BigNumber.from(kyberBuyingRate)
+    //     .mul(ethers.BigNumber.from(finalAmountDaiDecimals))
+    //     .toString()
+    // );
+    // console.log(DAI_IN_DECIMALS.toString());
+
+    // const uniswapDaiToEthAmount = toBuyResults[1][0].toExact();
+
+    // console.log("Buying prices: DAI to ETH");
+    // console.log("Kyber:", kyberDaiToEthAmount);
+    // console.log("Uniswap:", uniswapDaiToEthAmount);
+    // console.log("---------------");
 
     // const refRate = kyberResults[0].expectedRate;
     // const getSlippage = (rate) => 100 - (rate / refRate) * 100;
