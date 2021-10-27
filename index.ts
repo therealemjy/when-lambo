@@ -1,17 +1,15 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 
-import "console.table";
-import Web3 from "web3";
-import abis from "../abis";
-import exchangesAddresses from "../addresses";
-import BigNumber from "bignumber.js";
+import 'console.table';
+import Web3 from 'web3';
+import abis from './abis';
+import exchangesAddresses from './addresses';
+import BigNumber from 'bignumber.js';
 
 const { mainnet: addresses } = exchangesAddresses;
 
-const web3 = new Web3(
-  new Web3.providers.WebsocketProvider(process.env.RPC_URL || "")
-);
+const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.RPC_URL || ''));
 
 const kyber = new web3.eth.Contract(
   // @ts-ignore
@@ -42,7 +40,7 @@ let isMonitoring = false;
 
 const monitorPrices = async (borrowedWethDecAmounts: string) => {
   if (isMonitoring) {
-    console.log("Block skipped ☠️ Price monitoring ongoing.");
+    console.log('Block skipped ☠️ Price monitoring ongoing.');
     return;
   }
 
@@ -63,19 +61,9 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
       .call(),
     // How many Traded Token do we get for a given amount of source token decimal?
     // returns in token's decimal
-    uniswap.methods
-      .getAmountsOut(borrowedWethDecAmounts, [
-        addresses.tokens.weth,
-        TRADED_TOKEN_ADDRESS,
-      ])
-      .call(),
+    uniswap.methods.getAmountsOut(borrowedWethDecAmounts, [addresses.tokens.weth, TRADED_TOKEN_ADDRESS]).call(),
     // Sushiswap
-    sushiswap.methods
-      .getAmountsOut(borrowedWethDecAmounts, [
-        addresses.tokens.weth,
-        TRADED_TOKEN_ADDRESS,
-      ])
-      .call(),
+    sushiswap.methods.getAmountsOut(borrowedWethDecAmounts, [addresses.tokens.weth, TRADED_TOKEN_ADDRESS]).call(),
   ]);
 
   // Kyber
@@ -88,33 +76,21 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
   const kyberWethToDaiDecSellRate = toSellResults[0].expectedRate;
 
   // Price of 1 WETH decimal in DAI decimals
-  const kyberWethDecToDaiDecSellRate = new BigNumber(
-    kyberWethToDaiDecSellRate
-  ).dividedBy(WETH_IN_DECIMALS);
+  const kyberWethDecToDaiDecSellRate = new BigNumber(kyberWethToDaiDecSellRate).dividedBy(WETH_IN_DECIMALS);
 
   // Total amount of Traded Token decimals we get from selling all the WETH
   // decimals we borrowed
-  const kyberWethToDaiDecAmountBn = new BigNumber(
-    kyberWethDecToDaiDecSellRate
-  ).multipliedBy(WETH_DECIMALS_AMOUNT);
+  const kyberWethToDaiDecAmountBn = new BigNumber(kyberWethDecToDaiDecSellRate).multipliedBy(WETH_DECIMALS_AMOUNT);
 
   // Uniswap
-  const uniswapV2WethToDaiDecAmountBn = new BigNumber(
-    toSellResults[1][1].toString()
-  );
+  const uniswapV2WethToDaiDecAmountBn = new BigNumber(toSellResults[1][1].toString());
 
   // Sushiswap
-  const sushiswapWethToDaiDecAmountBn = new BigNumber(
-    toSellResults[2][1].toString()
-  );
+  const sushiswapWethToDaiDecAmountBn = new BigNumber(toSellResults[2][1].toString());
 
   // Find the highest amount of Traded Token decimals we can get
-  const isKyberBestSeller = kyberWethToDaiDecAmountBn.isGreaterThan(
-    uniswapV2WethToDaiDecAmountBn
-  );
-  const highestBuyableDaiDecAmountBn = isKyberBestSeller
-    ? kyberWethToDaiDecAmountBn
-    : uniswapV2WethToDaiDecAmountBn;
+  const isKyberBestSeller = kyberWethToDaiDecAmountBn.isGreaterThan(uniswapV2WethToDaiDecAmountBn);
+  const highestBuyableDaiDecAmountBn = isKyberBestSeller ? kyberWethToDaiDecAmountBn : uniswapV2WethToDaiDecAmountBn;
 
   // TODO: we should apply a safe slippage to that value so that the final
   // calculated profit is safer
@@ -123,23 +99,13 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
   // from selling our Traded Token decimals
   const toBuyResults = await Promise.all([
     kyber.methods
-      .getExpectedRate(
-        TRADED_TOKEN_ADDRESS,
-        addresses.tokens.weth,
-        highestBuyableDaiDecAmountBn.toFixed()
-      )
+      .getExpectedRate(TRADED_TOKEN_ADDRESS, addresses.tokens.weth, highestBuyableDaiDecAmountBn.toFixed())
       .call(),
     uniswap.methods
-      .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [
-        TRADED_TOKEN_ADDRESS,
-        addresses.tokens.weth,
-      ])
+      .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [TRADED_TOKEN_ADDRESS, addresses.tokens.weth])
       .call(),
     sushiswap.methods
-      .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [
-        TRADED_TOKEN_ADDRESS,
-        addresses.tokens.weth,
-      ])
+      .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [TRADED_TOKEN_ADDRESS, addresses.tokens.weth])
       .call(),
   ]);
 
@@ -147,36 +113,27 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
   const kyberDaiToWethDecRate = toBuyResults[0].expectedRate;
 
   // Price of 1 Traded Token decimal in WETH decimals
-  const kyberDaiDecToWethDecRate = new BigNumber(
-    kyberDaiToWethDecRate
-  ).dividedBy(TRADED_TOKEN_IN_DECIMALS);
+  const kyberDaiDecToWethDecRate = new BigNumber(kyberDaiToWethDecRate).dividedBy(TRADED_TOKEN_IN_DECIMALS);
 
   // Total amount of WETH decimals we get from selling all the Traded Token
   // decimals we just bought
-  const kyberDaiDecToWethDecAmountBn = new BigNumber(
-    kyberDaiDecToWethDecRate
-  ).multipliedBy(highestBuyableDaiDecAmountBn);
+  const kyberDaiDecToWethDecAmountBn = new BigNumber(kyberDaiDecToWethDecRate).multipliedBy(
+    highestBuyableDaiDecAmountBn
+  );
 
   // Uniswap
-  const uniswapV2DaiToWethDecAmountBn = new BigNumber(
-    toBuyResults[1][1].toString()
-  );
+  const uniswapV2DaiToWethDecAmountBn = new BigNumber(toBuyResults[1][1].toString());
 
   // Sushiswap
-  const sushiswapDaiToWethDecAmountBn = new BigNumber(
-    toBuyResults[2][1].toString()
-  );
+  const sushiswapDaiToWethDecAmountBn = new BigNumber(toBuyResults[2][1].toString());
 
   // TODO: we should apply a safe slippage to that value so that the final
   // calculated profit is safer
 
   // Calculate profits
-  const kyberProfitBn =
-    kyberDaiDecToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT);
-  const uniswapV2ProfitBn =
-    uniswapV2DaiToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT);
-  const sushiswapProfitBn =
-    sushiswapDaiToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT);
+  const kyberProfitBn = kyberDaiDecToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT);
+  const uniswapV2ProfitBn = uniswapV2DaiToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT);
+  const sushiswapProfitBn = sushiswapDaiToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT);
 
   const kyberProfitPercent = kyberProfitBn
     .dividedBy(kyberDaiDecToWethDecAmountBn.toFixed(0))
@@ -195,31 +152,25 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
 
   console.table([
     {
-      Platform: "Kyber",
-      "Selling price (in Traded Token decimals)":
-        kyberWethToDaiDecAmountBn.toFixed(),
-      "Buying price (in WETH decimals)":
-        kyberDaiDecToWethDecAmountBn.toFixed(0),
-      "Potential profit (in WETH DECIMALS)": kyberProfitBn.toFixed(0),
-      "Potential profit (%)": kyberProfitPercent + "%",
+      Platform: 'Kyber',
+      'Selling price (in Traded Token decimals)': kyberWethToDaiDecAmountBn.toFixed(),
+      'Buying price (in WETH decimals)': kyberDaiDecToWethDecAmountBn.toFixed(0),
+      'Potential profit (in WETH DECIMALS)': kyberProfitBn.toFixed(0),
+      'Potential profit (%)': kyberProfitPercent + '%',
     },
     {
-      Platform: "Uniswap V2",
-      "Selling price (in Traded Token decimals)":
-        uniswapV2WethToDaiDecAmountBn.toFixed(),
-      "Buying price (in WETH decimals)":
-        uniswapV2DaiToWethDecAmountBn.toFixed(),
-      "Potential profit (in WETH DECIMALS)": uniswapV2ProfitBn.toFixed(),
-      "Potential profit (%)": uniswapV2ProfitPercent + "%",
+      Platform: 'Uniswap V2',
+      'Selling price (in Traded Token decimals)': uniswapV2WethToDaiDecAmountBn.toFixed(),
+      'Buying price (in WETH decimals)': uniswapV2DaiToWethDecAmountBn.toFixed(),
+      'Potential profit (in WETH DECIMALS)': uniswapV2ProfitBn.toFixed(),
+      'Potential profit (%)': uniswapV2ProfitPercent + '%',
     },
     {
-      Platform: "Sushiswap",
-      "Selling price (in Traded Token decimals)":
-        sushiswapWethToDaiDecAmountBn.toFixed(),
-      "Buying price (in WETH decimals)":
-        sushiswapDaiToWethDecAmountBn.toFixed(),
-      "Potential profit (in WETH DECIMALS)": sushiswapProfitBn.toFixed(),
-      "Potential profit (%)": sushiswapProfitPercent + "%",
+      Platform: 'Sushiswap',
+      'Selling price (in Traded Token decimals)': sushiswapWethToDaiDecAmountBn.toFixed(),
+      'Buying price (in WETH decimals)': sushiswapDaiToWethDecAmountBn.toFixed(),
+      'Potential profit (in WETH DECIMALS)': sushiswapProfitBn.toFixed(),
+      'Potential profit (%)': sushiswapProfitPercent + '%',
     },
   ]);
 };
@@ -232,12 +183,12 @@ const init = async () => {
   monitorPrices(borrowedWethDec);
 
   web3.eth
-    .subscribe("newBlockHeaders")
-    .on("data", async (block) => {
+    .subscribe('newBlockHeaders')
+    .on('data', async (block) => {
       console.log(`New block received. Block # ${block.number}`);
       monitorPrices(borrowedWethDec);
     })
-    .on("error", (error) => {
+    .on('error', (error) => {
       console.log(error);
     });
 };
