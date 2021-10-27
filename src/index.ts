@@ -3,12 +3,6 @@ dotenv.config();
 
 import Web3 from "web3";
 import abis from "../abis";
-import {
-  ChainId as UniswapV2ChainId,
-  Token as UniswapV2Token,
-  TokenAmount as UniswapV2TokenAmount,
-  Pair as UniswapV2Pair,
-} from "@uniswap/sdk";
 import exchangesAddresses from "../addresses";
 import BigNumber from "bignumber.js";
 
@@ -24,6 +18,12 @@ const kyber = new web3.eth.Contract(
   addresses.kyber.kyberNetworkProxy
 );
 
+const uniswap = new web3.eth.Contract(
+  // @ts-ignore
+  abis.uniswap.uniswap,
+  addresses.uniswap.router
+);
+
 const sushiswap = new web3.eth.Contract(
   // @ts-ignore
   abis.sushiswap.sushi,
@@ -34,13 +34,6 @@ const DAI_IN_DECIMALS = 1 * 10 ** 18;
 const WETH_IN_DECIMALS = 1 * 10 ** 18;
 
 const init = async () => {
-  const [dai, weth] = await Promise.all(
-    [addresses.tokens.dai, addresses.tokens.weth].map((tokenAddress) =>
-      UniswapV2Token.fetchData(UniswapV2ChainId.MAINNET, tokenAddress)
-    )
-  );
-  const daiWeth = await UniswapV2Pair.fetchData(dai, weth);
-
   const monitorPrices = async () => {
     const WETH_DECIMALS_AMOUNT = 1 * WETH_IN_DECIMALS;
 
@@ -59,9 +52,12 @@ const init = async () => {
         .call(),
       // How many DAI do we get for a given amount of source token decimal?
       // returns in token's decimal
-      daiWeth.getOutputAmount(
-        new UniswapV2TokenAmount(weth, WETH_DECIMALS_AMOUNT.toString())
-      ),
+      uniswap.methods
+        .getAmountsOut(WETH_DECIMALS_AMOUNT.toString(), [
+          addresses.tokens.weth,
+          addresses.tokens.dai,
+        ])
+        .call(),
       // Sushiswap
       sushiswap.methods
         .getAmountsOut(WETH_DECIMALS_AMOUNT.toString(), [
@@ -93,10 +89,9 @@ const init = async () => {
     ).multipliedBy(WETH_DECIMALS_AMOUNT);
 
     // Uniswap
-    const uniswapV2WethToDaiAmount = toSellResults[1][0].toExact().toString();
     const uniswapV2WethToDaiDecAmountBn = new BigNumber(
-      uniswapV2WethToDaiAmount
-    ).multipliedBy(DAI_IN_DECIMALS);
+      toSellResults[1][1].toString()
+    );
 
     // Sushiswap
     const sushiswapWethToDaiDecAmountBn = new BigNumber(
@@ -140,9 +135,18 @@ const init = async () => {
           highestBuyableDaiDecAmountBn.toFixed()
         )
         .call(),
-      daiWeth.getOutputAmount(
-        new UniswapV2TokenAmount(dai, highestBuyableDaiDecAmountBn.toFixed())
-      ),
+      uniswap.methods
+        .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [
+          addresses.tokens.dai,
+          addresses.tokens.weth,
+        ])
+        .call(),
+      sushiswap.methods
+        .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [
+          addresses.tokens.dai,
+          addresses.tokens.weth,
+        ])
+        .call(),
     ]);
 
     // Price of 1 DAI in WETH decimals
@@ -159,9 +163,15 @@ const init = async () => {
       kyberDaiDecToWethDecRate
     ).multipliedBy(highestBuyableDaiDecAmountBn);
 
+    // Uniswap
     const uniswapV2DaiToWethDecAmountBn = new BigNumber(
-      toBuyResults[1][0].toExact()
-    ).multipliedBy(WETH_IN_DECIMALS);
+      toBuyResults[1][1].toString()
+    );
+
+    // Sushiswap
+    const sushiswapDaiToWethDecAmountBn = new BigNumber(
+      toBuyResults[2][1].toString()
+    );
 
     // TODO: we should apply a safe slippage to that value so that the final
     // calculated profit is safer
@@ -169,32 +179,57 @@ const init = async () => {
     console.log("Buying prices: DAI decimals to WETH decimals");
     console.log("Kyber:", kyberDaiDecToWethDecAmountBn.toFixed(0));
     console.log("Uniswap V2:", uniswapV2DaiToWethDecAmountBn.toFixed());
+    console.log("Sushiswap:", sushiswapDaiToWethDecAmountBn.toFixed());
     console.log("---------------");
 
     // Calculate profits
+    const kyberProfitBn =
+      kyberDaiDecToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT);
+    const uniswapV2ProfitBn =
+      uniswapV2DaiToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT);
+    const sushiswapProfitBn =
+      sushiswapDaiToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT);
+
+    const kyberProfitPercent = kyberProfitBn
+      .dividedBy(kyberDaiDecToWethDecAmountBn.toFixed(0))
+      .multipliedBy(100)
+      .toFixed(2);
+    const uniswapV2ProfitPercent = uniswapV2ProfitBn
+      .dividedBy(uniswapV2DaiToWethDecAmountBn.toFixed(0))
+      .multipliedBy(100)
+      .toFixed(2);
+    const sushiswapProfitPercent = sushiswapProfitBn
+      .dividedBy(sushiswapDaiToWethDecAmountBn.toFixed(0))
+      .multipliedBy(100)
+      .toFixed(2);
+
     console.log("Potential profits in WETH decimals:");
     console.log(
       "Kyber:",
-      kyberDaiDecToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT).toFixed(0)
+      kyberProfitBn.toFixed() + " (" + kyberProfitPercent + "%)"
     );
     console.log(
       "Uniswap V2:",
-      uniswapV2DaiToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT).toFixed(0)
+      uniswapV2ProfitBn.toFixed() + " (" + uniswapV2ProfitPercent + "%)"
+    );
+    console.log(
+      "Sushiswap:",
+      sushiswapProfitBn.toFixed() + " (" + sushiswapProfitPercent + "%)"
     );
   };
 
   monitorPrices();
 
-  // web3.eth
-  //   .subscribe("newBlockHeaders")
-  //   .on("data", async (block) => {
-  //     console.log(`New block received. Block # ${block.number}`);
+  web3.eth
+    .subscribe("newBlockHeaders")
+    .on("data", async (block) => {
+      console.log(`New block received. Block # ${block.number}`);
 
-  //     monitorPrices();
-  //   })
-  //   .on("error", (error) => {
-  //     console.log(error);
-  //   });
+      monitorPrices();
+    })
+    .on("error", (error) => {
+      console.log(error);
+    });
 };
 
 init();
