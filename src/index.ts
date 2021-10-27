@@ -38,18 +38,27 @@ const init = async () => {
 
     const toSellResults = await Promise.all([
       kyber.methods
+        // How much DAI do we get for 1weth?
+        // eg: 4000
+        // returns value in coin
         .getExpectedRate(
           addresses.tokens.weth,
           addresses.tokens.dai,
+          // Return always the price of 1 token given the amount of source token you want to exchange
           WETH_DECIMALS_AMOUNT.toString()
         )
         .call(),
+      // How many DAI decimals do we get for a given amount of source token decimal?
+      // returns in token's decimal
       daiWeth.getOutputAmount(
         new TokenAmount(weth, WETH_DECIMALS_AMOUNT.toString())
       ),
     ]);
 
+    // Kyber expectedRate === includes slippage
+    // Kyber worstRate === worst slippage you can get on top of the expectedRate, transaction would fail if this threshold is reached
     const kyberWethToDaiDecSellRate = toSellResults[0].expectedRate;
+
     const kyberWethToDaiSellAmountBn = new BigNumber(kyberWethToDaiDecSellRate)
       .times(WETH_AMOUNT)
       .dividedBy(DAI_IN_DECIMALS);
