@@ -72,28 +72,30 @@ const init = async () => {
       kyberWethDecToDaiDecSellRate
     ).multipliedBy(WETH_DECIMALS_AMOUNT);
 
-    const uniswapWethToDaiDecAmountBn = new BigNumber(
+    const uniswapV2WethToDaiDecAmountBn = new BigNumber(
       toSellResults[1][0].toExact().toString()
     ).multipliedBy(DAI_IN_DECIMALS);
 
     console.log("Selling prices: WETH decimals to DAI decimals");
     console.log("Kyber:", kyberWethToDaiDecAmountBn.toFixed());
-    console.log("Uniswap:", uniswapWethToDaiDecAmountBn.toFixed());
+    console.log("Uniswap V2:", uniswapV2WethToDaiDecAmountBn.toFixed());
     console.log("---------------");
 
     // Find the highest amount of DAI decimals we can get
     const isKyberBestSeller = kyberWethToDaiDecAmountBn.isGreaterThan(
-      uniswapWethToDaiDecAmountBn
+      uniswapV2WethToDaiDecAmountBn
     );
     const highestBuyableDaiDecAmountBn = isKyberBestSeller
       ? kyberWethToDaiDecAmountBn
-      : uniswapWethToDaiDecAmountBn;
-    const bestBuyerPlatform = isKyberBestSeller ? "kyber" : "uniswap";
+      : uniswapV2WethToDaiDecAmountBn;
 
     // TODO: we should apply a safe slippage to that value so that the final
     // calculated profit is safer
 
-    console.log("Selling platform:", bestBuyerPlatform);
+    console.log(
+      "Selling platform:",
+      isKyberBestSeller ? "Kyber" : "Uniswap v2"
+    );
     console.log(
       "Amount (DAI decimals):",
       highestBuyableDaiDecAmountBn.toFixed()
@@ -129,7 +131,7 @@ const init = async () => {
       kyberDaiDecToWethDecRate
     ).multipliedBy(highestBuyableDaiDecAmountBn);
 
-    const uniswapDaiToWethDecAmountBn = new BigNumber(
+    const uniswapV2DaiToWethDecAmountBn = new BigNumber(
       toBuyResults[1][0].toExact()
     ).multipliedBy(WETH_IN_DECIMALS);
 
@@ -138,7 +140,7 @@ const init = async () => {
 
     console.log("Buying prices: DAI decimals to WETH decimals");
     console.log("Kyber:", kyberDaiDecToWethDecAmount.toFixed(0));
-    console.log("Uniswap:", uniswapDaiToWethDecAmountBn.toFixed());
+    console.log("Uniswap V2:", uniswapV2DaiToWethDecAmountBn.toFixed());
     console.log("---------------");
 
     // Calculate profits
@@ -148,8 +150,8 @@ const init = async () => {
       kyberDaiDecToWethDecAmount.minus(WETH_DECIMALS_AMOUNT).toFixed(0)
     );
     console.log(
-      "Uniswap:",
-      uniswapDaiToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT).toFixed(0)
+      "Uniswap V2:",
+      uniswapV2DaiToWethDecAmountBn.minus(WETH_DECIMALS_AMOUNT).toFixed(0)
     );
   };
 
