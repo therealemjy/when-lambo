@@ -7,23 +7,24 @@
     "isolatedModules": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "strictPropertyInitialization": false,
-    "module": "es2020",
+    "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
-    "target": "esnext",
-    "lib": ["esnext"],
+    "target": "es6",
     "skipLibCheck": true,
     "rootDirs": ["./"],
     "baseUrl": "./",
+    "sourceMap": true,
+    "outDir": "dist",
     "paths": {
       "@src/*": ["./src/*"]
-    }
+    },
+    "lib": ["es2015"]
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist", "build"]
 }
