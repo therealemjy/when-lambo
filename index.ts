@@ -25,8 +25,6 @@ const web3 = new Web3(
   })
 );
 
-web3.eth.getNodeInfo().then(console.log);
-
 const kyber = new web3.eth.Contract(
   kyberNetworkProxyABI.kyberNetworkProxy as unknown as AbiItem,
   exchangeAddresses.kyber.networkProxy
@@ -39,7 +37,7 @@ const sushiswap = new web3.eth.Contract(
 );
 
 // Update with the token you want to trade
-const TRADED_TOKEN_ADDRESS = tokenAddresses.sushi;
+const TRADED_TOKEN_ADDRESS = tokenAddresses.wluna;
 const TRADED_TOKEN_DECIMALS = 18;
 
 const WETH_IN_DECIMALS = 1 * 10 ** 18;
