@@ -9,10 +9,8 @@
     "start": "tsc && node dist/index",
     "lint": "eslint .",
     "format": "npm-run-all format:*",
-    "format:js": "prettier --write \"**/*.js\"",
     "format:json": "prettier --write \"**/*.json\"",
-    "format:md": "prettier --write \"**/*.md\"",
-    "format:ts": "prettier --write \"**/*.ts{,x}\""
+    "format:ts": "prettier --write \"**/*.ts\""
   },
   "dependencies": {
     "bignumber.js": "^9.0.1",
@@ -22,6 +20,7 @@
     "web3": "^1.2.9"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^3.0.0",
     "console.table": "^0.10.0",
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",

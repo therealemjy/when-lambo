@@ -1,36 +1,38 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
-import 'console.table';
-import Web3 from 'web3';
-import abis from './abis';
-import exchangesAddresses from './addresses';
 import BigNumber from 'bignumber.js';
+import 'console.table';
+import dotenv from 'dotenv';
+import Web3 from 'web3';
 
-const { mainnet: addresses } = exchangesAddresses;
+import kyberNetworkProxyABI from './abis/kyberNetworkProxy.json';
+import sushiswapRouterABI from './abis/sushiswapRouter.json';
+import uniswapRouterABI from './abis/uniswapRouter.json';
+import exchangeAddresses from './addresses/mainnet/exchanges.json';
+import tokenAddresses from './addresses/mainnet/tokens.json';
+
+dotenv.config();
 
 const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.RPC_URL || ''));
 
 const kyber = new web3.eth.Contract(
   // @ts-ignore
-  abis.kyber.kyberNetworkProxy,
-  addresses.kyber.kyberNetworkProxy
+  kyberNetworkProxyABI.kyberNetworkProxy,
+  exchangeAddresses.kyber.networkProxy
 );
 
 const uniswap = new web3.eth.Contract(
   // @ts-ignore
-  abis.uniswap.uniswap,
-  addresses.uniswap.router
+  uniswapRouterABI.uniswap,
+  exchangeAddresses.uniswap.router
 );
 
 const sushiswap = new web3.eth.Contract(
   // @ts-ignore
-  abis.sushiswap.sushi,
-  addresses.sushiswap.router
+  sushiswapRouterABI.sushi,
+  exchangeAddresses.sushiswap.router
 );
 
 // Update with the token you want to trade
-const TRADED_TOKEN_ADDRESS = addresses.tokens.sushi;
+const TRADED_TOKEN_ADDRESS = tokenAddresses.sushi;
 const TRADED_TOKEN_DECIMALS = 18;
 
 const WETH_IN_DECIMALS = 1 * 10 ** 18;
@@ -52,7 +54,7 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
       // eg: 4000
       // returns value in decimals of dest token (Traded Token decimals)
       .getExpectedRate(
-        addresses.tokens.weth,
+        tokenAddresses.weth,
         TRADED_TOKEN_ADDRESS,
         // Return always the price of 1 token given the amount of source token
         // you want to exchange
@@ -61,9 +63,9 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
       .call(),
     // How many Traded Token do we get for a given amount of source token decimal?
     // returns in token's decimal
-    uniswap.methods.getAmountsOut(borrowedWethDecAmounts, [addresses.tokens.weth, TRADED_TOKEN_ADDRESS]).call(),
+    uniswap.methods.getAmountsOut(borrowedWethDecAmounts, [tokenAddresses.weth, TRADED_TOKEN_ADDRESS]).call(),
     // Sushiswap
-    sushiswap.methods.getAmountsOut(borrowedWethDecAmounts, [addresses.tokens.weth, TRADED_TOKEN_ADDRESS]).call(),
+    sushiswap.methods.getAmountsOut(borrowedWethDecAmounts, [tokenAddresses.weth, TRADED_TOKEN_ADDRESS]).call(),
   ]);
 
   // Kyber
@@ -99,13 +101,13 @@ const monitorPrices = async (borrowedWethDecAmounts: string) => {
   // from selling our Traded Token decimals
   const toBuyResults = await Promise.all([
     kyber.methods
-      .getExpectedRate(TRADED_TOKEN_ADDRESS, addresses.tokens.weth, highestBuyableDaiDecAmountBn.toFixed())
+      .getExpectedRate(TRADED_TOKEN_ADDRESS, tokenAddresses.weth, highestBuyableDaiDecAmountBn.toFixed())
       .call(),
     uniswap.methods
-      .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [TRADED_TOKEN_ADDRESS, addresses.tokens.weth])
+      .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [TRADED_TOKEN_ADDRESS, tokenAddresses.weth])
       .call(),
     sushiswap.methods
-      .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [TRADED_TOKEN_ADDRESS, addresses.tokens.weth])
+      .getAmountsOut(highestBuyableDaiDecAmountBn.toFixed(), [TRADED_TOKEN_ADDRESS, tokenAddresses.weth])
       .call(),
   ]);
 

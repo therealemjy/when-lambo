@@ -1,0 +1,11 @@
+{
+  "kyber": {
+    "networkProxy": "0x9AAb3f75489902f3a48495025729a0AF77d4b11e"
+  },
+  "uniswap": {
+    "router": "0X7A250D5630B4CF539739DF2C5DACB4C659F2488D"
+  },
+  "sushiswap": {
+    "router": "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F"
+  }
+}
