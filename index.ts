@@ -1,7 +1,10 @@
+// @ts-ignore
+import AWSWebsocketProvider from '@aws/web3-ws-provider';
 import BigNumber from 'bignumber.js';
 import 'console.table';
 import dotenv from 'dotenv';
 import Web3 from 'web3';
+import { AbiItem } from 'web3-utils';
 
 import kyberNetworkProxyABI from './abis/kyberNetworkProxy.json';
 import sushiswapRouterABI from './abis/sushiswapRouter.json';
@@ -11,23 +14,27 @@ import tokenAddresses from './addresses/mainnet/tokens.json';
 
 dotenv.config();
 
-const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.RPC_URL || ''));
+const web3 = new Web3(
+  new AWSWebsocketProvider(process.env.AWS_WS_RPC_URL, {
+    clientConfig: {
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+    },
+  })
+);
+
+web3.eth.getNodeInfo().then(console.log);
 
 const kyber = new web3.eth.Contract(
-  // @ts-ignore
-  kyberNetworkProxyABI.kyberNetworkProxy,
+  kyberNetworkProxyABI.kyberNetworkProxy as unknown as AbiItem,
   exchangeAddresses.kyber.networkProxy
 );
-
-const uniswap = new web3.eth.Contract(
-  // @ts-ignore
-  uniswapRouterABI.uniswap,
-  exchangeAddresses.uniswap.router
-);
+const uniswap = new web3.eth.Contract(uniswapRouterABI.uniswap as unknown as AbiItem, exchangeAddresses.uniswap.router);
 
 const sushiswap = new web3.eth.Contract(
-  // @ts-ignore
-  sushiswapRouterABI.sushi,
+  sushiswapRouterABI.sushi as unknown as AbiItem,
   exchangeAddresses.sushiswap.router
 );
 
