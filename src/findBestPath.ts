@@ -98,25 +98,8 @@ const findBestPath = async (
   console.log('BEST BUYING DEAL');
   console.log(JSON.parse(JSON.stringify(bestBuyingDeal)));
 
-  // TODO: we should apply a safe slippage to each value so that the final
-  // calculated profit is safer
-
-  // isMonitoring = false;
-
-  // // Calculate profits
-  // const table = buyingDeals.map((buyingDeal, index) => {
-  //   const [profitDec, profitPercent] = calculateProfit(buyingDeal.decimalAmount, refTokenDecimalAmount);
-
-  //   return {
-  //     Platform: getPlatformName(index),
-  //     [`Selling price (in ${tradedToken.symbol} decimals)`]: sellingDeals[0].toFixed(),
-  //     [`Buying price (in ${refToken.symbol} decimals)`]: toBuyResult.toFixed(0),
-  //     [`Potential profit (in ${refToken.symbol} DECIMALS)`]: profitDec.toFixed(0),
-  //     'Potential profit (%)': profitPercent + '%',
-  //   };
-  // });
-
-  // console.table(table);
+  // Return best path
+  return [bestSellingDeal, bestBuyingDeal];
 };
 
 export default findBestPath;
