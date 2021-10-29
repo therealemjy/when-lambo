@@ -4,7 +4,7 @@ import { Exchange } from '@src/exchanges/types';
 import calculateProfit from '@src/utils/calculateProfit';
 
 import findBestPath from './findBestPath';
-import { Token } from './types';
+import { Token, Path } from './types';
 
 let isMonitoring = false;
 
@@ -30,35 +30,35 @@ const monitorPrices = async (
 
   isMonitoring = true;
 
-  // TODO: find best path for all refTokenDecimalAmounts provided
-  const path = await findBestPath(
-    {
-      refTokenDecimalAmount: refTokenDecimalAmounts[0],
-      refToken,
-      tradedToken,
-    },
-    exchanges
+  const paths = await Promise.all(
+    refTokenDecimalAmounts.map((refTokenDecimalAmount) =>
+      findBestPath(
+        {
+          refTokenDecimalAmount,
+          refToken,
+          tradedToken,
+        },
+        exchanges
+      )
+    )
   );
-  if (!path) {
-    return;
-  }
-
-  const paths = [path];
 
   // Calculate profits
-  const table = paths.map((path) => {
-    const [profitDec, profitPercent] = calculateProfit(path[1].toTokenDecimalAmount, path[0].fromTokenDecimalAmount);
+  const table = paths
+    .filter((path): path is Path => path !== undefined)
+    .map((path) => {
+      const [profitDec, profitPercent] = calculateProfit(path[1].toTokenDecimalAmount, path[0].fromTokenDecimalAmount);
 
-    return {
-      [`${refToken.symbol} decimals borrowed`]: path[0].fromTokenDecimalAmount.toFixed(),
-      'Best selling exchange': path[0].exchangeName,
-      [`${tradedToken.symbol} decimals bought`]: path[0].toTokenDecimalAmount.toFixed(),
-      'Best buying exchange': path[1].exchangeName,
-      [`${refToken.symbol} decimals bought back`]: path[1].toTokenDecimalAmount.toFixed(0),
-      [`Profit (in ${refToken.symbol} decimals)`]: profitDec.toFixed(0),
-      'Profit (%)': profitPercent + '%',
-    };
-  });
+      return {
+        [`${refToken.symbol} decimals borrowed`]: path[0].fromTokenDecimalAmount.toFixed(),
+        'Best selling exchange': path[0].exchangeName,
+        [`${tradedToken.symbol} decimals bought`]: path[0].toTokenDecimalAmount.toFixed(),
+        'Best buying exchange': path[1].exchangeName,
+        [`${refToken.symbol} decimals bought back`]: path[1].toTokenDecimalAmount.toFixed(0),
+        [`Profit (in ${refToken.symbol} decimals)`]: profitDec.toFixed(0),
+        'Profit (%)': profitPercent + '%',
+      };
+    });
 
   console.table(table);
 };

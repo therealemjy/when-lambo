@@ -13,3 +13,5 @@ export interface Deal {
   toToken: Token;
   toTokenDecimalAmount: BigNumber;
 }
+
+export type Path = [Deal, Deal];

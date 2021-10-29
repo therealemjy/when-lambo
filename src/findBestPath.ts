@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import { Token, Exchange, Deal } from '@src/types';
+import { Token, Exchange, Deal, Path } from '@src/types';
 
 const findBestPath = async (
   {
@@ -16,7 +16,7 @@ const findBestPath = async (
     name: string;
     service: Exchange;
   }>
-) => {
+): Promise<Path | undefined> => {
   // Check how many tradedToken (e.g.: DAI) decimals we get from trading the
   // provided refToken (e.g.: WETH) decimals amount, on all monitored exchanges
   const sellingPromises = exchanges.map<Promise<Deal>>(async (exchange) => {

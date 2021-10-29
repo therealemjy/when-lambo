@@ -39,7 +39,7 @@ const init = async () => {
   ];
 
   // TODO: remove when deploying
-  monitorPrices(
+  await monitorPrices(
     {
       refTokenDecimalAmounts: borrowedWethDecimalAmounts,
       refToken: WETH,
