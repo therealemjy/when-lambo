@@ -24,15 +24,15 @@ class Kyber implements Exchange {
       .getExpectedRate(
         fromToken.address,
         toToken.address,
-        fromTokenDecimalAmount.toString()
+        fromTokenDecimalAmount.toFixed()
       );
 
 
     // Price of 1 fromToken in toToken decimals
-    const oneFromTokenSellRate =res[0].toString();
+    const oneFromTokenSellRate = res[0].toString();
 
     // Price of 1 fromToken decimal in toToken decimals
-    const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(fromToken.decimals);
+    const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(1 * 10 ** fromToken.decimals);
 
     // Total amount of toToken decimals we get from selling all the fromToken
     // decimals provided

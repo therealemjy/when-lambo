@@ -20,7 +20,7 @@ class Sushiswap implements Exchange {
   }
 
   getDecimalsOut: Exchange['getDecimalsOut'] = async ({ fromTokenDecimalAmount, fromToken, toToken }) => {
-    const res = await this.routerContract.getAmountsOut(fromTokenDecimalAmount.toString(), [fromToken.address, toToken.address]);
+    const res = await this.routerContract.getAmountsOut(fromTokenDecimalAmount.toFixed(), [fromToken.address, toToken.address]);
     return new BigNumber(res[1].toString());
   }
 }

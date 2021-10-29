@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
-import UniswapExchange from './src/exchanges/uniswap';
+import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import { DAI, WETH } from './src/tokens';
 
 dotenv.config();
@@ -24,7 +24,7 @@ const provider = new ethers.providers.Web3Provider(
 );
 
 // Instantiate exchange services
-const uniswapExchangeService = new UniswapExchange(provider);
+const uniswapV2ExchangeService = new UniswapV2Exchange(provider);
 const sushiswapExchangeService = new SushiswapExchange(provider);
 const kyberExchangeService = new KyberExchange(provider);
 
@@ -46,7 +46,7 @@ const monitorPrices = async (borrowedWethDecAmounts: BigNumber) => {
       toToken: DAI,
     }),
     // Uniswap
-    uniswapExchangeService.getDecimalsOut({
+    uniswapV2ExchangeService.getDecimalsOut({
       fromTokenDecimalAmount: borrowedWethDecAmounts,
       fromToken: WETH,
       toToken: DAI,
@@ -62,12 +62,6 @@ const monitorPrices = async (borrowedWethDecAmounts: BigNumber) => {
   const kyberWethToDaiDecAmountBn = toSellResults[0];
   const uniswapV2WethToDaiDecAmountBn = toSellResults[1];
   const sushiswapWethToDaiDecAmountBn = toSellResults[2];
-
-  console.log('1', kyberWethToDaiDecAmountBn.toString());
-  console.log('2', uniswapV2WethToDaiDecAmountBn.toString());
-  console.log('3', sushiswapWethToDaiDecAmountBn.toString());
-
-  return;
 
   // Find the highest amount of Traded Token decimals we can get
   // TODO: re-do to take all exchanges in count
@@ -87,7 +81,7 @@ const monitorPrices = async (borrowedWethDecAmounts: BigNumber) => {
       toToken: WETH,
     }),
     // Uniswap
-    uniswapExchangeService.getDecimalsOut({
+    uniswapV2ExchangeService.getDecimalsOut({
       fromTokenDecimalAmount: highestBuyableDaiDecAmountBn,
       fromToken: DAI,
       toToken: WETH,
