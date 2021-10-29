@@ -35,17 +35,18 @@ const findBestPath = async (
     };
   });
 
-  // TODO: use something else than Promise.all so if some of the requests fail
-  // then the other ones are still executed
-  const sellingDeals = await Promise.all(sellingPromises).catch((error) =>
+  const sellingDealsRes = await Promise.allSettled(sellingPromises).catch((error) =>
     console.error('Error while fetching selling prices', error)
   );
 
-  if (!sellingDeals) {
+  if (!sellingDealsRes) {
     return;
   }
-  // console.log('ALL SELLING DEALS');
-  // console.log(JSON.parse(JSON.stringify(sellingDeals)));
+
+  const sellingDeals = sellingDealsRes
+    .filter((res) => res.status === 'fulfilled')
+    // @ts-ignore Typescript's definition of Promise.allSettled isn't correct
+    .map((res) => res.value);
 
   // Find the highest amount of tradedToken decimals we can get from selling all
   // refTokenDecimalAmount
@@ -54,9 +55,6 @@ const findBestPath = async (
       ? sellingDeal
       : currentBestSellingDeal;
   }, sellingDeals[0]);
-
-  // console.log('BEST SELLING DEAL');
-  // console.log(JSON.parse(JSON.stringify(bestSellingDeal)));
 
   // TODO: we should apply a safe slippage to each value so that the final
   // calculated profit is safer
@@ -82,10 +80,12 @@ const findBestPath = async (
       };
     });
 
-  const buyingDeals = await Promise.all(buyingPromises);
+  const buyingDealsRes = await Promise.allSettled(buyingPromises);
 
-  // console.log('ALL BUYING DEALS');
-  // console.log(JSON.parse(JSON.stringify(buyingDeals)));
+  const buyingDeals = buyingDealsRes
+    .filter((res) => res.status === 'fulfilled')
+    // @ts-ignore Typescript's definition of Promise.allSettled isn't correct
+    .map((res) => res.value);
 
   // Find the highest amount of refToken decimals we can get back from selling
   // all tradedToken decimals
@@ -94,9 +94,6 @@ const findBestPath = async (
       ? buyingDeal
       : currentBestBuyingDeal;
   }, buyingDeals[0]);
-
-  // console.log('BEST BUYING DEAL');
-  // console.log(JSON.parse(JSON.stringify(bestBuyingDeal)));
 
   // Return best path
   return [bestSellingDeal, bestBuyingDeal];

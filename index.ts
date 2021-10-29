@@ -38,35 +38,22 @@ const init = async () => {
     new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(3), // 3 WETH
   ];
 
-  // TODO: remove when deploying
-  await monitorPrices(
-    {
-      refTokenDecimalAmounts: borrowedWethDecimalAmounts,
-      refToken: WETH,
-      tradedToken: DAI,
-    },
-    [
-      { name: 'Uniswap V2', service: uniswapV2ExchangeService },
-      { name: 'Sushiswap', service: sushiswapExchangeService },
-      { name: 'Kyber', service: kyberExchangeService },
-    ]
-  );
+  provider.addListener('block', async (blockNumber) => {
+    console.log(`New block received. Block # ${blockNumber}`);
 
-  // provider.addListener('block', (blockNumber) => {
-  //   console.log(`New block received. Block # ${blockNumber}`);
-  //   monitorPrices(
-  //     {
-  //       refTokenDecimalAmounts: [borrowedWethDec],
-  //       refToken: WETH,
-  //       tradedToken: DAI,
-  //     },
-  //     [
-  //       { name: 'Uniswap V2', service: uniswapV2ExchangeService },
-  //       { name: 'Sushiswap', service: sushiswapExchangeService },
-  //       { name: 'Kyber', service: kyberExchangeService },
-  //     ]
-  //   );
-  // });
+    await monitorPrices(
+      {
+        refTokenDecimalAmounts: borrowedWethDecimalAmounts,
+        refToken: WETH,
+        tradedToken: DAI,
+      },
+      [
+        { name: 'Uniswap V2', service: uniswapV2ExchangeService },
+        { name: 'Sushiswap', service: sushiswapExchangeService },
+        { name: 'Kyber', service: kyberExchangeService },
+      ]
+    );
+  });
 };
 
 init();
