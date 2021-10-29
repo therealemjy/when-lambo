@@ -27,6 +27,7 @@ const findBestPath = async (
     });
 
     return {
+      timestamp: new Date(),
       exchangeName: exchange.name,
       fromToken: refToken,
       fromTokenDecimalAmount: refTokenDecimalAmount,

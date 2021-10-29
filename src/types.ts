@@ -7,6 +7,7 @@ export type { Token };
 export type { Exchange };
 
 export interface Deal {
+  timestamp: Date;
   exchangeName: string;
   fromToken: Token;
   fromTokenDecimalAmount: BigNumber;

@@ -2,7 +2,7 @@ import * as https from 'https';
 
 // Doing it this way to avoid using 3rd party services
 // Verbose but works fine
-export function sendSlackMessage(message: any) {
+function sendSlackMessage(message: any) {
   return new Promise((resolve) => {
     const body = JSON.stringify(message);
 
@@ -41,3 +41,5 @@ export function sendSlackMessage(message: any) {
     postReq.end();
   });
 }
+
+export default sendSlackMessage;

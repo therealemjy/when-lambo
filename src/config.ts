@@ -8,6 +8,7 @@ export interface EnvConfig {
     accessKeyId: string;
     secretAccessKey: string;
   };
+  environment: 'development' | 'production';
 }
 
 const config: EnvConfig = {
@@ -16,6 +17,7 @@ const config: EnvConfig = {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
+  environment: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 };
 
 export default config;
