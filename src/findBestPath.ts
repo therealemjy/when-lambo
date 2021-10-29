@@ -44,8 +44,8 @@ const findBestPath = async (
   if (!sellingDeals) {
     return;
   }
-  console.log('ALL SELLING DEALS');
-  console.log(JSON.parse(JSON.stringify(sellingDeals)));
+  // console.log('ALL SELLING DEALS');
+  // console.log(JSON.parse(JSON.stringify(sellingDeals)));
 
   // Find the highest amount of tradedToken decimals we can get from selling all
   // refTokenDecimalAmount
@@ -55,8 +55,8 @@ const findBestPath = async (
       : currentBestSellingDeal;
   }, sellingDeals[0]);
 
-  console.log('BEST SELLING DEAL');
-  console.log(JSON.parse(JSON.stringify(bestSellingDeal)));
+  // console.log('BEST SELLING DEAL');
+  // console.log(JSON.parse(JSON.stringify(bestSellingDeal)));
 
   // TODO: we should apply a safe slippage to each value so that the final
   // calculated profit is safer
@@ -84,8 +84,8 @@ const findBestPath = async (
 
   const buyingDeals = await Promise.all(buyingPromises);
 
-  console.log('ALL BUYING DEALS');
-  console.log(JSON.parse(JSON.stringify(buyingDeals)));
+  // console.log('ALL BUYING DEALS');
+  // console.log(JSON.parse(JSON.stringify(buyingDeals)));
 
   // Find the highest amount of refToken decimals we can get back from selling
   // all tradedToken decimals
@@ -95,8 +95,8 @@ const findBestPath = async (
       : currentBestBuyingDeal;
   }, buyingDeals[0]);
 
-  console.log('BEST BUYING DEAL');
-  console.log(JSON.parse(JSON.stringify(bestBuyingDeal)));
+  // console.log('BEST BUYING DEAL');
+  // console.log(JSON.parse(JSON.stringify(bestBuyingDeal)));
 
   // Return best path
   return [bestSellingDeal, bestBuyingDeal];
