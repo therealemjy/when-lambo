@@ -5,6 +5,7 @@ import calculateProfit from '@src/utils/calculateProfit';
 
 import findBestPath from './findBestPath';
 import { Token, Path } from './types';
+import { sendSlackMessage } from './utils/sendSlackMessage';
 
 let isMonitoring = false;
 
@@ -43,24 +44,78 @@ const monitorPrices = async (
     )
   );
 
-  // Calculate profits
-  const table = paths
-    .filter((path): path is Path => path !== undefined)
-    .map((path) => {
-      const [profitDec, profitPercent] = calculateProfit(path[1].toTokenDecimalAmount, path[0].fromTokenDecimalAmount);
+  const validPaths = paths.filter((path): path is Path => path !== undefined);
 
-      return {
-        [`${refToken.symbol} decimals borrowed`]: path[0].fromTokenDecimalAmount.toFixed(),
-        'Best selling exchange': path[0].exchangeName,
-        [`${tradedToken.symbol} decimals bought`]: path[0].toTokenDecimalAmount.toFixed(),
-        'Best buying exchange': path[1].exchangeName,
-        [`${refToken.symbol} decimals bought back`]: path[1].toTokenDecimalAmount.toFixed(0),
-        [`Profit (in ${refToken.symbol} decimals)`]: profitDec.toFixed(0),
-        'Profit (%)': profitPercent + '%',
-      };
+  const tableLogs: any[] = [];
+  const slackBlocks: any[] = [];
+
+  // Calculate profits
+  for (const path of validPaths) {
+    const [profitDec, profitPercent] = calculateProfit(path[1].toTokenDecimalAmount, path[0].fromTokenDecimalAmount);
+    const decBorrowed = path[0].fromTokenDecimalAmount.toFixed();
+    const decBought = path[0].toTokenDecimalAmount.toFixed();
+    const decProfit = profitDec.toFixed(0);
+    const decBoughtBack = path[1].toTokenDecimalAmount.toFixed(0);
+    const bestSellingExchange = path[0].exchangeName;
+    const bestBuyingExchange = path[1].exchangeName;
+
+    tableLogs.push({
+      [`${refToken.symbol} decimals borrowed`]: decBorrowed,
+      'Best selling exchange': bestSellingExchange,
+      [`${tradedToken.symbol} decimals bought`]: decBought,
+      'Best buying exchange': bestBuyingExchange,
+      [`${refToken.symbol} decimals bought back`]: decBoughtBack,
+      [`Profit (in ${refToken.symbol} decimals)`]: decProfit,
+      'Profit (%)': profitPercent + '%',
     });
 
-  console.table(table);
+    slackBlocks.push([
+      {
+        type: 'section',
+        fields: [
+          {
+            type: 'mrkdwn',
+            text: `*${refToken.symbol} decimals borrowed:*\n  ${decBorrowed}`,
+          },
+          {
+            type: 'mrkdwn',
+            text: `*Best selling exchange:*\n${bestSellingExchange}`,
+          },
+          {
+            type: 'mrkdwn',
+            text: `*${tradedToken.symbol} decimals bought:*\n${decBought}`,
+          },
+          {
+            type: 'mrkdwn',
+            text: `*Best buying exchange:*\n${bestBuyingExchange}`,
+          },
+          {
+            type: 'mrkdwn',
+            text: `*${refToken.symbol} decimals bought back:*\n${decBoughtBack}`,
+          },
+          {
+            type: 'mrkdwn',
+            text: `*Profit (in ${refToken.symbol} decimals):*\n${decProfit}`,
+          },
+          {
+            type: 'mrkdwn',
+            text: `*Profit (%):*\n${profitPercent}%`,
+          },
+        ],
+      },
+      {
+        type: 'divider',
+      },
+    ]);
+  }
+
+  // Log in local
+  console.table(tableLogs);
+
+  // Send alerts to slack
+  await sendSlackMessage({
+    blocks: slackBlocks.flat(),
+  });
 };
 
 export default monitorPrices;
