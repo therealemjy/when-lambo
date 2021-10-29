@@ -1,5 +1,6 @@
 {
-  "uniswap": [
+  "address": "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
+  "abi": [
     {
       "inputs": [
         { "internalType": "address", "name": "_factory", "type": "address" },

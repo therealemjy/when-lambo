@@ -1,5 +1,6 @@
 {
-  "sushi": [
+  "address": "0x7A250D5630B4CF539739DF2C5DACB4C659F2488D",
+  "abi": [
     {
       "inputs": [
         { "internalType": "address", "name": "_factory", "type": "address" },

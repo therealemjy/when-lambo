@@ -21,6 +21,7 @@
     "ethers": "^5.5.1",
     "ts-node": "^10.4.0",
     "web3": "^1.2.9",
+    "web3-eth-contract": "^1.6.0",
     "web3-providers-ws": "^1.6.0",
     "websocket": "^1.0.34"
   },
