@@ -5,7 +5,7 @@ import 'console.table';
 import dotenv from 'dotenv';
 import { ethers } from 'ethers';
 
-import { Token } from '@src/tokens/types';
+import Token from '@src/tokens/Token';
 
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
@@ -32,6 +32,13 @@ const kyberExchangeService = new KyberExchange(provider);
 
 let isMonitoring = false;
 
+const calculateProfit = (revenueDec: BigNumber, expenseDec: BigNumber): [BigNumber, string] => {
+  const profitDec = revenueDec.minus(expenseDec);
+  const profitPercent = profitDec.dividedBy(revenueDec.toFixed(0)).multipliedBy(100).toFixed(2);
+
+  return [profitDec, profitPercent];
+};
+
 const monitorPrices = async ({
   refTokenDecimalAmount,
   refToken,
@@ -47,6 +54,17 @@ const monitorPrices = async ({
   }
 
   isMonitoring = true;
+
+  const getPlatformName = (dealIndex: number) => {
+    switch (dealIndex) {
+      case 0:
+        return 'Kyber';
+      case 1:
+        return 'Uniswap V2';
+      default:
+        return 'Sushiswap';
+    }
+  };
 
   // Check how many tradedToken (e.g.: DAI) decimals we get from trading all the
   // refToken (e.g.: WETH) decimals, on all monitored exchanges
@@ -71,21 +89,6 @@ const monitorPrices = async ({
     }),
   ]);
 
-  const kyberWethToDaiDecAmountBn = toSellResults[0];
-  const uniswapV2WethToDaiDecAmountBn = toSellResults[1];
-  const sushiswapWethToDaiDecAmountBn = toSellResults[2];
-
-  const getDealPlatformName = (dealIndex: number) => {
-    switch (dealIndex) {
-      case 0:
-        return 'Kyber';
-      case 1:
-        return 'Uniswap V2';
-      default:
-        return 'Sushiswap';
-    }
-  };
-
   // Find the highest amount of tradedToken decimals we can get
   const bestDeal = toSellResults.reduce<{
     platformName: string;
@@ -94,17 +97,17 @@ const monitorPrices = async ({
     (currentBestDeal, decAmount, index) =>
       decAmount.isGreaterThan(currentBestDeal.decAmount)
         ? {
-            platformName: getDealPlatformName(index),
+            platformName: getPlatformName(index),
             decAmount,
           }
         : currentBestDeal,
     {
-      platformName: getDealPlatformName(0),
+      platformName: getPlatformName(0),
       decAmount: toSellResults[0],
     }
   );
 
-  // TODO: we should apply a safe slippage to that value so that the final
+  // TODO: we should apply a safe slippage to each value so that the final
   // calculated profit is safer
 
   // Check which platform gives us the highest amount of ETH decimals back from
@@ -130,53 +133,25 @@ const monitorPrices = async ({
     }),
   ]);
 
-  const kyberDaiToWethDecAmountBn = toBuyResults[0];
-  const uniswapV2DaiToWethDecAmountBn = toBuyResults[1];
-  const sushiswapDaiToWethDecAmountBn = toBuyResults[2];
-
-  // TODO: we should apply a safe slippage to that value so that the final
+  // TODO: we should apply a safe slippage to each value so that the final
   // calculated profit is safer
-
-  // Calculate profits
-  const kyberProfitBn = kyberDaiToWethDecAmountBn.minus(refTokenDecimalAmount);
-  const uniswapV2ProfitBn = uniswapV2DaiToWethDecAmountBn.minus(refTokenDecimalAmount);
-  const sushiswapProfitBn = sushiswapDaiToWethDecAmountBn.minus(refTokenDecimalAmount);
-
-  const kyberProfitPercent = kyberProfitBn.dividedBy(kyberDaiToWethDecAmountBn.toFixed(0)).multipliedBy(100).toFixed(2);
-  const uniswapV2ProfitPercent = uniswapV2ProfitBn
-    .dividedBy(uniswapV2DaiToWethDecAmountBn.toFixed(0))
-    .multipliedBy(100)
-    .toFixed(2);
-  const sushiswapProfitPercent = sushiswapProfitBn
-    .dividedBy(sushiswapDaiToWethDecAmountBn.toFixed(0))
-    .multipliedBy(100)
-    .toFixed(2);
 
   isMonitoring = false;
 
-  console.table([
-    {
-      Platform: 'Kyber',
-      'Selling price (in Traded Token decimals)': kyberWethToDaiDecAmountBn.toFixed(),
-      'Buying price (in WETH decimals)': kyberDaiToWethDecAmountBn.toFixed(0),
-      'Potential profit (in WETH DECIMALS)': kyberProfitBn.toFixed(0),
-      'Potential profit (%)': kyberProfitPercent + '%',
-    },
-    {
-      Platform: 'Uniswap V2',
-      'Selling price (in Traded Token decimals)': uniswapV2WethToDaiDecAmountBn.toFixed(),
-      'Buying price (in WETH decimals)': uniswapV2DaiToWethDecAmountBn.toFixed(),
-      'Potential profit (in WETH DECIMALS)': uniswapV2ProfitBn.toFixed(),
-      'Potential profit (%)': uniswapV2ProfitPercent + '%',
-    },
-    {
-      Platform: 'Sushiswap',
-      'Selling price (in Traded Token decimals)': sushiswapWethToDaiDecAmountBn.toFixed(),
-      'Buying price (in WETH decimals)': sushiswapDaiToWethDecAmountBn.toFixed(),
-      'Potential profit (in WETH DECIMALS)': sushiswapProfitBn.toFixed(),
-      'Potential profit (%)': sushiswapProfitPercent + '%',
-    },
-  ]);
+  // Calculate profits
+  const table = toBuyResults.map((toBuyResult, index) => {
+    const [profitDec, profitPercent] = calculateProfit(toBuyResult, refTokenDecimalAmount);
+
+    return {
+      Platform: getPlatformName(index),
+      [`Selling price (in ${tradedToken.symbol} decimals)`]: toSellResults[0].toFixed(),
+      [`Buying price (in ${refToken.symbol} decimals)`]: toBuyResult.toFixed(0),
+      [`Potential profit (in ${refToken.symbol} DECIMALS)`]: profitDec.toFixed(0),
+      'Potential profit (%)': profitPercent + '%',
+    };
+  });
+
+  console.table(table);
 };
 
 // TODO: use environment variables for this
