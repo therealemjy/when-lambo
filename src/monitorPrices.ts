@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 import KyberExchange from '@src/exchanges/kyber';
 import SushiswapExchange from '@src/exchanges/sushiswap';
 import UniswapV2Exchange from '@src/exchanges/uniswapV2';
-import Token from '@src/tokens/Token';
+import { Token } from '@src/tokens';
 import calculateProfit from '@src/utils/calculateProfit';
 
 let isMonitoring = false;
