@@ -10,7 +10,7 @@ import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import monitorPrices from './src/monitorPrices';
-import { DAI, WETH } from './src/tokens';
+import { WETH, SHIB } from './src/tokens';
 
 const provider = new ethers.providers.Web3Provider(
   new AWSWebsocketProvider(config.aws.wsRpcUrl, {
@@ -45,7 +45,7 @@ const init = async () => {
       {
         refTokenDecimalAmounts: borrowedWethDecimalAmounts,
         refToken: WETH,
-        tradedToken: DAI,
+        tradedToken: SHIB,
       },
       [
         { name: 'Uniswap V2', service: uniswapV2ExchangeService },

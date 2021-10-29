@@ -5,7 +5,8 @@ import calculateProfit from '@src/utils/calculateProfit';
 
 import findBestPath from './findBestPath';
 import { Token, Path } from './types';
-import { sendSlackMessage } from './utils/sendSlackMessage';
+
+// import { sendSlackMessage } from './utils/sendSlackMessage';
 
 let isMonitoring = false;
 
@@ -44,6 +45,8 @@ const monitorPrices = async (
     )
   );
 
+  isMonitoring = false;
+
   const validPaths = paths.filter((path): path is Path => path !== undefined);
 
   const tableLogs: any[] = [];
@@ -51,7 +54,11 @@ const monitorPrices = async (
 
   // Calculate profits
   for (const path of validPaths) {
-    const [profitDec, profitPercent] = calculateProfit(path[1].toTokenDecimalAmount, path[0].fromTokenDecimalAmount);
+    const [profitDec, profitPercent] = calculateProfit({
+      revenueDec: path[1].toTokenDecimalAmount,
+      expenseDec: path[0].fromTokenDecimalAmount,
+    });
+
     const decBorrowed = path[0].fromTokenDecimalAmount.toFixed();
     const decBought = path[0].toTokenDecimalAmount.toFixed();
     const decProfit = profitDec.toFixed(0);
@@ -75,7 +82,7 @@ const monitorPrices = async (
         fields: [
           {
             type: 'mrkdwn',
-            text: `*${refToken.symbol} decimals borrowed:*\n  ${decBorrowed}`,
+            text: `*${refToken.symbol} decimals borrowed:*\n${decBorrowed}`,
           },
           {
             type: 'mrkdwn',
@@ -113,9 +120,9 @@ const monitorPrices = async (
   console.table(tableLogs);
 
   // Send alerts to slack
-  await sendSlackMessage({
-    blocks: slackBlocks.flat(),
-  });
+  // await sendSlackMessage({
+  //   blocks: slackBlocks.flat(),
+  // });
 };
 
 export default monitorPrices;
