@@ -19,7 +19,7 @@ class Kyber implements Exchange {
     );
   }
 
-  getDecimalsOut: Exchange['getDecimalsOut'] = async ({ fromTokenDecimalAmount, fromToken, toToken }) => {
+  getDecimalAmountOut: Exchange['getDecimalAmountOut'] = async ({ fromTokenDecimalAmount, fromToken, toToken }) => {
     const res = await this.networkProxy
       .getExpectedRate(
         fromToken.address,

@@ -5,6 +5,8 @@ import 'console.table';
 import dotenv from 'dotenv';
 import { ethers } from 'ethers';
 
+import Token from '@src/tokens/Token';
+
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
@@ -30,7 +32,22 @@ const kyberExchangeService = new KyberExchange(provider);
 
 let isMonitoring = false;
 
-const monitorPrices = async (borrowedWethDecAmounts: BigNumber) => {
+const calculateProfit = (revenueDec: BigNumber, expenseDec: BigNumber): [BigNumber, string] => {
+  const profitDec = revenueDec.minus(expenseDec);
+  const profitPercent = profitDec.dividedBy(revenueDec.toFixed(0)).multipliedBy(100).toFixed(2);
+
+  return [profitDec, profitPercent];
+};
+
+const monitorPrices = async ({
+  refTokenDecimalAmount,
+  refToken,
+  tradedToken,
+}: {
+  refTokenDecimalAmount: BigNumber;
+  refToken: Token;
+  tradedToken: Token;
+}) => {
   if (isMonitoring) {
     console.log('Block skipped! Price monitoring ongoing.');
     return;
@@ -38,114 +55,103 @@ const monitorPrices = async (borrowedWethDecAmounts: BigNumber) => {
 
   isMonitoring = true;
 
+  const getPlatformName = (dealIndex: number) => {
+    switch (dealIndex) {
+      case 0:
+        return 'Kyber';
+      case 1:
+        return 'Uniswap V2';
+      default:
+        return 'Sushiswap';
+    }
+  };
+
+  // Check how many tradedToken (e.g.: DAI) decimals we get from trading all the
+  // refToken (e.g.: WETH) decimals, on all monitored exchanges
   const toSellResults = await Promise.all([
     // Kyber
-    kyberExchangeService.getDecimalsOut({
-      fromTokenDecimalAmount: borrowedWethDecAmounts,
-      fromToken: WETH,
-      toToken: DAI,
+    kyberExchangeService.getDecimalAmountOut({
+      fromTokenDecimalAmount: refTokenDecimalAmount,
+      fromToken: refToken,
+      toToken: tradedToken,
     }),
     // Uniswap
-    uniswapV2ExchangeService.getDecimalsOut({
-      fromTokenDecimalAmount: borrowedWethDecAmounts,
-      fromToken: WETH,
-      toToken: DAI,
+    uniswapV2ExchangeService.getDecimalAmountOut({
+      fromTokenDecimalAmount: refTokenDecimalAmount,
+      fromToken: refToken,
+      toToken: tradedToken,
     }),
     // Sushiswap
-    sushiswapExchangeService.getDecimalsOut({
-      fromTokenDecimalAmount: borrowedWethDecAmounts,
-      fromToken: WETH,
-      toToken: DAI,
+    sushiswapExchangeService.getDecimalAmountOut({
+      fromTokenDecimalAmount: refTokenDecimalAmount,
+      fromToken: refToken,
+      toToken: tradedToken,
     }),
   ]);
 
-  const kyberWethToDaiDecAmountBn = toSellResults[0];
-  const uniswapV2WethToDaiDecAmountBn = toSellResults[1];
-  const sushiswapWethToDaiDecAmountBn = toSellResults[2];
+  // Find the highest amount of tradedToken decimals we can get
+  const bestDeal = toSellResults.reduce<{
+    platformName: string;
+    decAmount: BigNumber;
+  }>(
+    (currentBestDeal, decAmount, index) =>
+      decAmount.isGreaterThan(currentBestDeal.decAmount)
+        ? {
+            platformName: getPlatformName(index),
+            decAmount,
+          }
+        : currentBestDeal,
+    {
+      platformName: getPlatformName(0),
+      decAmount: toSellResults[0],
+    }
+  );
 
-  // Find the highest amount of Traded Token decimals we can get
-  // TODO: re-do to take all exchanges in count
-  const isKyberBestSeller = kyberWethToDaiDecAmountBn.isGreaterThan(uniswapV2WethToDaiDecAmountBn);
-  const highestBuyableDaiDecAmountBn = isKyberBestSeller ? kyberWethToDaiDecAmountBn : uniswapV2WethToDaiDecAmountBn;
-
-  // TODO: we should apply a safe slippage to that value so that the final
+  // TODO: we should apply a safe slippage to each value so that the final
   // calculated profit is safer
 
-  // Check which platform gives us the highest amount of ETH decimals back3
-  // from selling our Traded Token decimals
+  // Check which platform gives us the highest amount of ETH decimals back from
+  // selling all our tradedToken decimals
   const toBuyResults = await Promise.all([
     // Kyber
-    kyberExchangeService.getDecimalsOut({
-      fromTokenDecimalAmount: highestBuyableDaiDecAmountBn,
-      fromToken: DAI,
-      toToken: WETH,
+    kyberExchangeService.getDecimalAmountOut({
+      fromTokenDecimalAmount: bestDeal.decAmount,
+      fromToken: tradedToken,
+      toToken: refToken,
     }),
     // Uniswap
-    uniswapV2ExchangeService.getDecimalsOut({
-      fromTokenDecimalAmount: highestBuyableDaiDecAmountBn,
-      fromToken: DAI,
-      toToken: WETH,
+    uniswapV2ExchangeService.getDecimalAmountOut({
+      fromTokenDecimalAmount: bestDeal.decAmount,
+      fromToken: tradedToken,
+      toToken: refToken,
     }),
     // Sushiswap
-    sushiswapExchangeService.getDecimalsOut({
-      fromTokenDecimalAmount: highestBuyableDaiDecAmountBn,
-      fromToken: DAI,
-      toToken: WETH,
+    sushiswapExchangeService.getDecimalAmountOut({
+      fromTokenDecimalAmount: bestDeal.decAmount,
+      fromToken: tradedToken,
+      toToken: refToken,
     }),
   ]);
 
-  // Kyber
-  const kyberDaiToWethDecAmountBn = toBuyResults[0];
-
-  // Uniswap
-  const uniswapV2DaiToWethDecAmountBn = toBuyResults[1];
-
-  // Sushiswap
-  const sushiswapDaiToWethDecAmountBn = toBuyResults[2];
-
-  // TODO: we should apply a safe slippage to that value so that the final
+  // TODO: we should apply a safe slippage to each value so that the final
   // calculated profit is safer
-
-  // Calculate profits
-  const kyberProfitBn = kyberDaiToWethDecAmountBn.minus(borrowedWethDecAmounts);
-  const uniswapV2ProfitBn = uniswapV2DaiToWethDecAmountBn.minus(borrowedWethDecAmounts);
-  const sushiswapProfitBn = sushiswapDaiToWethDecAmountBn.minus(borrowedWethDecAmounts);
-
-  const kyberProfitPercent = kyberProfitBn.dividedBy(kyberDaiToWethDecAmountBn.toFixed(0)).multipliedBy(100).toFixed(2);
-  const uniswapV2ProfitPercent = uniswapV2ProfitBn
-    .dividedBy(uniswapV2DaiToWethDecAmountBn.toFixed(0))
-    .multipliedBy(100)
-    .toFixed(2);
-  const sushiswapProfitPercent = sushiswapProfitBn
-    .dividedBy(sushiswapDaiToWethDecAmountBn.toFixed(0))
-    .multipliedBy(100)
-    .toFixed(2);
 
   isMonitoring = false;
 
-  console.table([
-    {
-      Platform: 'Kyber',
-      'Selling price (in Traded Token decimals)': kyberWethToDaiDecAmountBn.toFixed(),
-      'Buying price (in WETH decimals)': kyberDaiToWethDecAmountBn.toFixed(0),
-      'Potential profit (in WETH DECIMALS)': kyberProfitBn.toFixed(0),
-      'Potential profit (%)': kyberProfitPercent + '%',
-    },
-    {
-      Platform: 'Uniswap V2',
-      'Selling price (in Traded Token decimals)': uniswapV2WethToDaiDecAmountBn.toFixed(),
-      'Buying price (in WETH decimals)': uniswapV2DaiToWethDecAmountBn.toFixed(),
-      'Potential profit (in WETH DECIMALS)': uniswapV2ProfitBn.toFixed(),
-      'Potential profit (%)': uniswapV2ProfitPercent + '%',
-    },
-    {
-      Platform: 'Sushiswap',
-      'Selling price (in Traded Token decimals)': sushiswapWethToDaiDecAmountBn.toFixed(),
-      'Buying price (in WETH decimals)': sushiswapDaiToWethDecAmountBn.toFixed(),
-      'Potential profit (in WETH DECIMALS)': sushiswapProfitBn.toFixed(),
-      'Potential profit (%)': sushiswapProfitPercent + '%',
-    },
-  ]);
+  // Calculate profits
+  const table = toBuyResults.map((toBuyResult, index) => {
+    const [profitDec, profitPercent] = calculateProfit(toBuyResult, refTokenDecimalAmount);
+
+    return {
+      Platform: getPlatformName(index),
+      [`Selling price (in ${tradedToken.symbol} decimals)`]: toSellResults[0].toFixed(),
+      [`Buying price (in ${refToken.symbol} decimals)`]: toBuyResult.toFixed(0),
+      [`Potential profit (in ${refToken.symbol} DECIMALS)`]: profitDec.toFixed(0),
+      'Potential profit (%)': profitPercent + '%',
+    };
+  });
+
+  console.table(table);
 };
 
 // TODO: use environment variables for this
@@ -155,11 +161,19 @@ const init = async () => {
   const borrowedWethDec = new BigNumber(WETH_DECIMALS_AMOUNT);
 
   // TODO: remove when deploying
-  monitorPrices(borrowedWethDec);
+  monitorPrices({
+    refTokenDecimalAmount: borrowedWethDec,
+    refToken: WETH,
+    tradedToken: DAI,
+  });
 
   provider.addListener('block', (blockNumber) => {
     console.log(`New block received. Block # ${blockNumber}`);
-    monitorPrices(borrowedWethDec);
+    monitorPrices({
+      refTokenDecimalAmount: borrowedWethDec,
+      refToken: WETH,
+      tradedToken: DAI,
+    });
   });
 };
 
