@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import { Token } from '@src/tokens';
+import { Token } from '@src/types';
 
 export interface Exchange {
   getDecimalAmountOut: (args: {

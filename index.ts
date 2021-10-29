@@ -32,37 +32,41 @@ const kyberExchangeService = new KyberExchange(provider);
 const WETH_DECIMALS_AMOUNT = '1000000000000000000'; // One WETH in decimals
 
 const init = async () => {
-  const borrowedWethDec = new BigNumber(WETH_DECIMALS_AMOUNT);
+  const borrowedWethDecimalAmounts = [
+    new BigNumber(WETH_DECIMALS_AMOUNT), // 1 WETH
+    new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(2), // 2 WETH
+    new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(3), // 3 WETH
+  ];
 
   // TODO: remove when deploying
   monitorPrices(
     {
-      refTokenDecimalAmount: borrowedWethDec,
+      refTokenDecimalAmounts: borrowedWethDecimalAmounts,
       refToken: WETH,
       tradedToken: DAI,
     },
-    {
-      uniswapV2ExchangeService,
-      sushiswapExchangeService,
-      kyberExchangeService,
-    }
+    [
+      { name: 'Uniswap V2', service: uniswapV2ExchangeService },
+      { name: 'Sushiswap', service: sushiswapExchangeService },
+      { name: 'Kyber', service: kyberExchangeService },
+    ]
   );
 
-  provider.addListener('block', (blockNumber) => {
-    console.log(`New block received. Block # ${blockNumber}`);
-    monitorPrices(
-      {
-        refTokenDecimalAmount: borrowedWethDec,
-        refToken: WETH,
-        tradedToken: DAI,
-      },
-      {
-        uniswapV2ExchangeService,
-        sushiswapExchangeService,
-        kyberExchangeService,
-      }
-    );
-  });
+  // provider.addListener('block', (blockNumber) => {
+  //   console.log(`New block received. Block # ${blockNumber}`);
+  //   monitorPrices(
+  //     {
+  //       refTokenDecimalAmounts: [borrowedWethDec],
+  //       refToken: WETH,
+  //       tradedToken: DAI,
+  //     },
+  //     [
+  //       { name: 'Uniswap V2', service: uniswapV2ExchangeService },
+  //       { name: 'Sushiswap', service: sushiswapExchangeService },
+  //       { name: 'Kyber', service: kyberExchangeService },
+  //     ]
+  //   );
+  // });
 };
 
 init();
