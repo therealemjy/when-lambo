@@ -23,6 +23,7 @@
     "aws-sdk": "^2.1016.0",
     "bignumber.js": "^9.0.1",
     "console.table": "^0.10.0",
+    "date-fns": "^2.25.0",
     "dotenv": "^8.2.0",
     "eslint-plugin-prettier": "^4.0.0",
     "ethers": "^5.5.1",

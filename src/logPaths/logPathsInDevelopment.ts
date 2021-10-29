@@ -1,3 +1,5 @@
+import formatDate from 'date-fns/format';
+
 import { Path } from '@src/types';
 import calculateProfit from '@src/utils/calculateProfit';
 
@@ -18,7 +20,7 @@ const logPathsInDevelopment = async (paths: Path[]) => {
     const bestBuyingExchange = path[1].exchangeName;
 
     tableRows.push({
-      Timestamp: path[0].timestamp,
+      Timestamp: formatDate(path[0].timestamp, 'd/M/yy HH:mm'),
       [`${path[0].fromToken.symbol} decimals borrowed`]: borrowedDec,
       'Best selling exchange': bestSellingExchange,
       [`${path[0].toToken.symbol} decimals bought`]: boughtDec,
