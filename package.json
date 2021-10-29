@@ -6,6 +6,11 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
+    "build:secure-copy": "scp -i ~/.ssh/when-lambo.pem ./build.zip ubuntu@ec2-3-91-241-119.compute-1.amazonaws.com:~/data",
+    "build": "tsc && npm run build:add-dependencies && npm run build:zip",
+    "build:add-dependencies": "rm -rf dist/node_modules && npm ls --only prod --parseable | tail -n +2 | xargs -n1 sh -c 'for arg do echo \"$arg\"; XDIR=$(echo \"$arg\" | xargs dirname | sed -E \"s/(.+node_modules)+(\\/@.+)?/dist\\/node_modules\\2/g\"); mkdir -p $XDIR; echo $XDIR; done' _ | xargs -n2 cp -r",
+    "build:zip": "zip -r build.zip dist/",
+    "deploy": "npm run build && npm run build:secure-copy",
     "start": "tsc && node dist/index",
     "lint": "eslint .",
     "format": "npm-run-all format:*",
@@ -22,12 +27,12 @@
     "ts-node": "^10.4.0",
     "web3": "^1.2.9",
     "web3-providers-ws": "^1.6.0",
-    "websocket": "^1.0.34"
+    "websocket": "^1.0.34",
+    "console.table": "^0.10.0"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^3.0.0",
     "@types/websocket": "^1.0.4",
-    "console.table": "^0.10.0",
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.2",
