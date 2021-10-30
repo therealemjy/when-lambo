@@ -5,7 +5,6 @@ import { ethers } from 'ethers';
 
 import './@moduleAliases';
 import config from './src/config';
-import OneInchExchange from './src/exchanges/1inch';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
@@ -27,8 +26,6 @@ const provider = new ethers.providers.Web3Provider(
 const uniswapV2ExchangeService = new UniswapV2Exchange(provider);
 const sushiswapExchangeService = new SushiswapExchange(provider);
 const kyberExchangeService = new KyberExchange(provider);
-// const curveExchangeService = new CurveExchange(provider);
-const oneInchExchangeService = new OneInchExchange();
 
 // TODO: use environment variables for this
 const WETH_DECIMALS_AMOUNT = '1000000000000000000'; // One WETH in decimals
@@ -54,8 +51,6 @@ const init = async () => {
         { name: 'Uniswap V2', service: uniswapV2ExchangeService },
         { name: 'Sushiswap', service: sushiswapExchangeService },
         { name: 'Kyber', service: kyberExchangeService },
-        { name: '1inch', service: oneInchExchangeService },
-        // { name: 'Curve', service: curveExchangeService },
       ]
     );
 

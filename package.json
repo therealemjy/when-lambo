@@ -14,7 +14,7 @@
     "dev": "tsc && NODE_ENV=development node dist/index",
     "start": "NODE_ENV=production node index.js",
     "tsc": "tsc",
-    "lint": "eslint .",
+    "lint": "eslint . --ext ts",
     "format": "npm-run-all format:*",
     "format:json": "prettier --write \"**/*.json\"",
     "format:ts": "prettier --write \"**/*.ts\""
@@ -29,23 +29,34 @@
     "dotenv": "^8.2.0",
     "eslint-plugin-prettier": "^4.0.0",
     "ethers": "^5.5.1",
+    "module-alias": "^2.2.2",
     "ts-node": "^10.4.0",
     "web3": "^1.2.9",
     "web3-eth-contract": "^1.6.0",
     "web3-providers-ws": "^1.6.0",
-    "websocket": "^1.0.34",
-    "module-alias": "^2.2.2"
+    "websocket": "^1.0.34"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.16.0",
+    "@babel/preset-typescript": "^7.16.0",
     "@trivago/prettier-plugin-sort-imports": "^3.0.0",
     "@types/websocket": "^1.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.2.0",
+    "@typescript-eslint/parser": "^5.2.0",
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-node": "^11.1.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^11.2.6",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.4.1",
     "typescript": "^4.4.4"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "npm run lint"
+    ]
   },
   "engines": {
     "node": ">=16.13.0"
