@@ -1,12 +1,20 @@
 module.exports = {
   root: true,
-  extends: ['eslint:recommended', 'plugin:react/recommended', 'prettier'],
+  env: {
+    node: true,
+  },
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
   plugins: ['prettier', '@typescript-eslint', 'import'],
   parser: '@typescript-eslint/parser',
   rules: {
     'no-shadow': 'off',
     'no-undef-init': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/ban-ts-comment': 'warn',
     '@typescript-eslint/no-shadow': ['error', { ignoreTypeValueShadow: true }],
     'import/no-anonymous-default-export': [
       'error',
@@ -24,8 +32,5 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
     sourceType: 'module', // Allows for the use of imports
-    ecmaFeatures: {
-      jsx: true, // Allows for the parsing of JSX
-    },
   },
 };

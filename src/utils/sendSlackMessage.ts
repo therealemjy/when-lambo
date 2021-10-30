@@ -26,9 +26,8 @@ function sendSlackMessage(message: any) {
       });
 
       res.on('end', () => {
-        const body = chunks.join('');
         resolve({
-          body: body,
+          body: chunks.join(''),
           statusCode: res.statusCode,
           statusMessage: res.statusMessage,
         });
