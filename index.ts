@@ -42,6 +42,7 @@ const init = async () => {
   ];
 
   provider.addListener('block', async (blockNumber) => {
+    console.time('monitorPrices');
     console.log(`New block received. Block # ${blockNumber}`);
 
     await monitorPrices(
@@ -58,6 +59,8 @@ const init = async () => {
         // { name: 'Curve', service: curveExchangeService },
       ]
     );
+
+    console.timeEnd('monitorPrices');
   });
 };
 
