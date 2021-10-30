@@ -36,13 +36,7 @@ const findBestPath = async (
     };
   });
 
-  const sellingDealsRes = await Promise.allSettled(sellingPromises).catch((error) =>
-    console.error('Error while fetching selling prices', error)
-  );
-
-  if (!sellingDealsRes) {
-    return;
-  }
+  const sellingDealsRes = await Promise.allSettled(sellingPromises);
 
   const sellingDeals = sellingDealsRes
     .filter((res) => res.status === 'fulfilled')
