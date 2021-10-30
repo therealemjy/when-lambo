@@ -28,6 +28,7 @@ const provider = new ethers.providers.Web3Provider(
 const uniswapV2ExchangeService = new UniswapV2Exchange(provider);
 const sushiswapExchangeService = new SushiswapExchange(provider);
 const kyberExchangeService = new KyberExchange(provider);
+// const curveExchangeService = new CurveExchange(provider);
 const oneInchExchangeService = new OneInchExchange();
 
 // TODO: use environment variables for this
@@ -54,6 +55,7 @@ const init = async () => {
         { name: 'Sushiswap', service: sushiswapExchangeService },
         { name: 'Kyber', service: kyberExchangeService },
         { name: '1inch', service: oneInchExchangeService },
+        // { name: 'Curve', service: curveExchangeService },
       ]
     );
   });
