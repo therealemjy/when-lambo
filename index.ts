@@ -1,10 +1,9 @@
-// @ts-ignore
 import AWSWebsocketProvider from '@aws/web3-ws-provider';
 import BigNumber from 'bignumber.js';
 import 'console.table';
 import { ethers } from 'ethers';
-import 'module-alias/register';
 
+import './@moduleAliases';
 import config from './src/config';
 import OneInchExchange from './src/exchanges/1inch';
 import KyberExchange from './src/exchanges/kyber';
