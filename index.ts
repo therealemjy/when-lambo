@@ -5,6 +5,7 @@ import { ethers } from 'ethers';
 
 import './@moduleAliases';
 import config from './src/config';
+// import CurveExchange from './src/exchanges/curve';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
@@ -26,6 +27,7 @@ const provider = new ethers.providers.Web3Provider(
 const uniswapV2ExchangeService = new UniswapV2Exchange(provider);
 const sushiswapExchangeService = new SushiswapExchange(provider);
 const kyberExchangeService = new KyberExchange(provider);
+// const curveExchangeService = new CurveExchange(provider);
 
 // TODO: use environment variables for this
 const WETH_DECIMALS_AMOUNT = '1000000000000000000'; // One WETH in decimals
@@ -47,11 +49,7 @@ const init = async () => {
         refToken: WETH,
         tradedToken: DAI,
       },
-      [
-        { name: 'Uniswap V2', service: uniswapV2ExchangeService },
-        { name: 'Sushiswap', service: sushiswapExchangeService },
-        { name: 'Kyber', service: kyberExchangeService },
-      ]
+      [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService]
     );
 
     console.timeEnd('monitorPrices');

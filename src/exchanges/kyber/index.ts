@@ -6,11 +6,17 @@ import { Exchange } from '@src/exchanges/types';
 import kyberNetworkProxy from './contracts/kyberNetworkProxy.json';
 
 class Kyber implements Exchange {
+  name: string;
+  estimatedGasForSwap: number;
+
   provider: ethers.providers.Web3Provider;
-  networkProxy: ethers.Contract;
+  networkProxy: ethers.Contract
 
   constructor(provider: ethers.providers.Web3Provider) {
     this.provider = provider;
+
+    this.name = 'Kyber';
+    this.estimatedGasForSwap = 0; // TODO: update
 
     this.networkProxy = new ethers.Contract(
       kyberNetworkProxy.address,

@@ -12,15 +12,12 @@ const findBestPath = async (
     refToken: Token;
     tradedToken: Token;
   },
-  exchanges: Array<{
-    name: string;
-    service: Exchange;
-  }>
+  exchanges: Exchange[]
 ): Promise<Path | undefined> => {
   // Check how many tradedToken (e.g.: DAI) decimals we get from trading the
   // provided refToken (e.g.: WETH) decimals amount, on all monitored exchanges
   const sellingPromises = exchanges.map<Promise<Deal>>(async (exchange) => {
-    const decimalAmount = await exchange.service.getDecimalAmountOut({
+    const decimalAmount = await exchange.getDecimalAmountOut({
       fromTokenDecimalAmount: refTokenDecimalAmount,
       fromToken: refToken,
       toToken: tradedToken,
@@ -60,7 +57,7 @@ const findBestPath = async (
     // Remove exchange the best selling deal was found on
     .filter((exchange) => exchange.name !== bestSellingDeal.exchangeName)
     .map(async (exchange) => {
-      const decimalAmount = await exchange.service.getDecimalAmountOut({
+      const decimalAmount = await exchange.getDecimalAmountOut({
         fromTokenDecimalAmount: bestSellingDeal.toTokenDecimalAmount,
         fromToken: tradedToken,
         toToken: refToken,
