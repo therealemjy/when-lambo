@@ -8,6 +8,7 @@ import config from './src/config';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
+import gasPriceWatcher from './src/gasPriceWatcher';
 import monitorPrices from './src/monitorPrices';
 import { WETH, DAI } from './src/tokens';
 
@@ -31,6 +32,9 @@ const kyberExchangeService = new KyberExchange(provider);
 const WETH_DECIMALS_AMOUNT = '1000000000000000000'; // One WETH in decimals
 
 const init = async () => {
+  // Pull gas prices every 5 seconds
+  gasPriceWatcher.updateEvery(5000);
+
   const borrowedWethDecimalAmounts = [
     new BigNumber(WETH_DECIMALS_AMOUNT), // 1 WETH
     new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(5), // 5 WETH
