@@ -40,7 +40,8 @@ const findBestPath = async ({
     refTokenDecimalAmount: bestSellingDeal.toTokenDecimalAmount,
     refToken: bestSellingDeal.toToken,
     tradedToken: bestSellingDeal.fromToken,
-    exchanges,
+    // Remove the exchange we got the best selling deal from
+    exchanges: exchanges.filter((exchange) => exchange.name !== bestSellingDeal.exchange.name),
     slippageAllowancePercent,
     gasPriceWei,
   });

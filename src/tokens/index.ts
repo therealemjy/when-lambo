@@ -29,3 +29,21 @@ export const AAVE = new Token({
   address: '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
   decimals: 18,
 });
+
+export const LINK = new Token({
+  symbol: 'LINK',
+  address: '0x514910771af9ca656af840dff83e8264ecf986ca',
+  decimals: 18,
+});
+
+export const SAND = new Token({
+  symbol: 'SAND',
+  address: '0x3845badade8e6dff049820680d1f14bd3903a5d0',
+  decimals: 18,
+});
+
+export const MANA = new Token({
+  symbol: 'MANA',
+  address: '0x0f5d2fb29fb7d3cfee444a200298f468908cc942',
+  decimals: 18,
+});

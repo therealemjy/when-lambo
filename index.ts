@@ -11,7 +11,7 @@ import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
-import { WETH, AAVE } from './src/tokens';
+import { WETH, MANA } from './src/tokens';
 
 const provider = new ethers.providers.Web3Provider(
   new AWSWebsocketProvider(config.aws.wsRpcUrl, {
@@ -66,7 +66,7 @@ const init = async () => {
     const paths = await monitorPrices({
       refTokenDecimalAmounts: borrowedWethDecimalAmounts,
       refToken: WETH,
-      tradedToken: AAVE,
+      tradedToken: MANA,
       exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService],
       slippageAllowancePercent: config.slippageAllowancePercent,
       gasPriceWei: global.currentGasPrices.rapid,
