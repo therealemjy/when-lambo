@@ -7,11 +7,13 @@ const findBestDeal = async ({
   refToken,
   tradedToken,
   exchanges,
+  slippageAllowancePercent,
 }: {
   refTokenDecimalAmount: BigNumber;
   refToken: Token;
   tradedToken: Token;
   exchanges: Exchange[];
+  slippageAllowancePercent: number;
 }): Promise<Deal | undefined> => {
   // Check how many tradedToken (e.g.: DAI) decimals we get from trading the
   // provided refToken (e.g.: WETH) decimals amount, on all monitored exchanges
@@ -29,6 +31,7 @@ const findBestDeal = async ({
       fromTokenDecimalAmount: refTokenDecimalAmount,
       toToken: tradedToken,
       toTokenDecimalAmount: decimalAmount,
+      slippageAllowancePercent,
     };
   });
 
@@ -45,7 +48,20 @@ const findBestDeal = async ({
     return deal.toTokenDecimalAmount.isGreaterThan(currentBestDeal.toTokenDecimalAmount) ? deal : currentBestDeal;
   }, deals[0]);
 
-  return bestDeal;
+  // Apply maximum slippage allowance, which means any deal found is calculated
+  // with the most pessimist outcome (given our slippage allowance). This way,
+  // if the worst possible outcome still yields a profit, we ensure our
+  // opportunities are safe to process as trades
+  const pessimisticToTokenDecimalAmount = new BigNumber(
+    bestDeal.toTokenDecimalAmount.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
+  );
+
+  const pessimisticBestDeal = {
+    ...bestDeal,
+    toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
+  };
+
+  return pessimisticBestDeal;
 };
 
 export default findBestDeal;

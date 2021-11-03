@@ -50,6 +50,7 @@ const init = async () => {
       refToken: WETH,
       tradedToken: DAI,
       exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService],
+      slippageAllowancePercent: config.slippageAllowancePercent,
     });
 
     console.timeEnd('monitorPrices');

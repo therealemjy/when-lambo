@@ -13,6 +13,7 @@ export interface Deal {
   fromTokenDecimalAmount: BigNumber;
   toToken: Token;
   toTokenDecimalAmount: BigNumber;
+  slippageAllowancePercent: number;
 }
 
 export type Path = [Deal, Deal];

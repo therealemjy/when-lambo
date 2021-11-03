@@ -13,11 +13,13 @@ const monitorPrices = async ({
   refToken,
   tradedToken,
   exchanges,
+  slippageAllowancePercent,
 }: {
   refTokenDecimalAmounts: BigNumber[];
   refToken: Token;
   tradedToken: Token;
   exchanges: Exchange[];
+  slippageAllowancePercent: number;
 }) => {
   if (isMonitoring) {
     console.log('Block skipped! Price monitoring ongoing.');
@@ -33,6 +35,7 @@ const monitorPrices = async ({
         refToken,
         tradedToken,
         exchanges,
+        slippageAllowancePercent,
       })
     )
   );

@@ -9,11 +9,13 @@ const findBestPath = async ({
   refToken,
   tradedToken,
   exchanges,
+  slippageAllowancePercent,
 }: {
   refTokenDecimalAmount: BigNumber;
   refToken: Token;
   tradedToken: Token;
   exchanges: Exchange[];
+  slippageAllowancePercent: number;
 }): Promise<Path | undefined> => {
   // Find the highest amount of tradedToken decimals we can get from selling all
   // refTokenDecimalAmount
@@ -22,14 +24,12 @@ const findBestPath = async ({
     refToken,
     tradedToken,
     exchanges,
+    slippageAllowancePercent,
   });
 
   if (!bestSellingDeal) {
     return undefined;
   }
-
-  // TODO: we should apply a safe slippage to each value so that the final
-  // calculated profit is safer
 
   // Find the highest amount of refToken decimals we can get back from selling
   // all tradedToken decimals
@@ -38,14 +38,12 @@ const findBestPath = async ({
     refToken: bestSellingDeal.toToken,
     tradedToken: bestSellingDeal.fromToken,
     exchanges,
+    slippageAllowancePercent,
   });
 
   if (!bestBuyingDeal) {
     return undefined;
   }
-
-  // TODO: we should apply a safe slippage to each value so that the final
-  // calculated profit is safer
 
   // Return best path
   return [bestSellingDeal, bestBuyingDeal];
