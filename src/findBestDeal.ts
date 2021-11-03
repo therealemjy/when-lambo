@@ -2,18 +2,17 @@ import BigNumber from 'bignumber.js';
 
 import { Token, Exchange, Deal } from '@src/types';
 
-const findBestDeal = async (
-  {
-    refTokenDecimalAmount,
-    refToken,
-    tradedToken,
-  }: {
-    refTokenDecimalAmount: BigNumber;
-    refToken: Token;
-    tradedToken: Token;
-  },
-  exchanges: Exchange[]
-): Promise<Deal | undefined> => {
+const findBestDeal = async ({
+  refTokenDecimalAmount,
+  refToken,
+  tradedToken,
+  exchanges,
+}: {
+  refTokenDecimalAmount: BigNumber;
+  refToken: Token;
+  tradedToken: Token;
+  exchanges: Exchange[];
+}): Promise<Deal | undefined> => {
   // Check how many tradedToken (e.g.: DAI) decimals we get from trading the
   // provided refToken (e.g.: WETH) decimals amount, on all monitored exchanges
   const dealPromises = exchanges.map<Promise<Deal>>(async (exchange) => {

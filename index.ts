@@ -45,14 +45,12 @@ const init = async () => {
     console.time('monitorPrices');
     console.log(`New block received. Block # ${blockNumber}`);
 
-    await monitorPrices(
-      {
-        refTokenDecimalAmounts: borrowedWethDecimalAmounts,
-        refToken: WETH,
-        tradedToken: DAI,
-      },
-      [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService]
-    );
+    await monitorPrices({
+      refTokenDecimalAmounts: borrowedWethDecimalAmounts,
+      refToken: WETH,
+      tradedToken: DAI,
+      exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService],
+    });
 
     console.timeEnd('monitorPrices');
   });

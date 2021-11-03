@@ -4,28 +4,25 @@ import { Token, Exchange, Path } from '@src/types';
 
 import findBestDeal from './findBestDeal';
 
-const findBestPath = async (
-  {
+const findBestPath = async ({
+  refTokenDecimalAmount,
+  refToken,
+  tradedToken,
+  exchanges,
+}: {
+  refTokenDecimalAmount: BigNumber;
+  refToken: Token;
+  tradedToken: Token;
+  exchanges: Exchange[];
+}): Promise<Path | undefined> => {
+  // Find the highest amount of tradedToken decimals we can get from selling all
+  // refTokenDecimalAmount
+  const bestSellingDeal = await findBestDeal({
     refTokenDecimalAmount,
     refToken,
     tradedToken,
-  }: {
-    refTokenDecimalAmount: BigNumber;
-    refToken: Token;
-    tradedToken: Token;
-  },
-  exchanges: Exchange[]
-): Promise<Path | undefined> => {
-  // Find the highest amount of tradedToken decimals we can get from selling all
-  // refTokenDecimalAmount
-  const bestSellingDeal = await findBestDeal(
-    {
-      refTokenDecimalAmount,
-      refToken,
-      tradedToken,
-    },
-    exchanges
-  );
+    exchanges,
+  });
 
   if (!bestSellingDeal) {
     return undefined;
@@ -36,14 +33,12 @@ const findBestPath = async (
 
   // Find the highest amount of refToken decimals we can get back from selling
   // all tradedToken decimals
-  const bestBuyingDeal = await findBestDeal(
-    {
-      refTokenDecimalAmount: bestSellingDeal.toTokenDecimalAmount,
-      refToken: bestSellingDeal.toToken,
-      tradedToken: bestSellingDeal.fromToken,
-    },
-    exchanges
-  );
+  const bestBuyingDeal = await findBestDeal({
+    refTokenDecimalAmount: bestSellingDeal.toTokenDecimalAmount,
+    refToken: bestSellingDeal.toToken,
+    tradedToken: bestSellingDeal.fromToken,
+    exchanges,
+  });
 
   if (!bestBuyingDeal) {
     return undefined;

@@ -8,18 +8,17 @@ import { Token, Path } from './types';
 
 let isMonitoring = false;
 
-const monitorPrices = async (
-  {
-    refTokenDecimalAmounts,
-    refToken,
-    tradedToken,
-  }: {
-    refTokenDecimalAmounts: BigNumber[];
-    refToken: Token;
-    tradedToken: Token;
-  },
-  exchanges: Exchange[]
-) => {
+const monitorPrices = async ({
+  refTokenDecimalAmounts,
+  refToken,
+  tradedToken,
+  exchanges,
+}: {
+  refTokenDecimalAmounts: BigNumber[];
+  refToken: Token;
+  tradedToken: Token;
+  exchanges: Exchange[];
+}) => {
   if (isMonitoring) {
     console.log('Block skipped! Price monitoring ongoing.');
     return;
@@ -29,14 +28,12 @@ const monitorPrices = async (
 
   const paths = await Promise.all(
     refTokenDecimalAmounts.map((refTokenDecimalAmount) =>
-      findBestPath(
-        {
-          refTokenDecimalAmount,
-          refToken,
-          tradedToken,
-        },
-        exchanges
-      )
+      findBestPath({
+        refTokenDecimalAmount,
+        refToken,
+        tradedToken,
+        exchanges,
+      })
     )
   );
 
