@@ -60,8 +60,6 @@ class Curve implements Exchange {
     // decimals provided
     const totalToTokenDecimals = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
 
-    console.log({oneFromTokenSellRate, oneFromTokenDecimalSellRate, totalToTokenDecimals})
-
     return totalToTokenDecimals
   }
 }

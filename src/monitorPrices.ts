@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 
+import config from '@src/config';
 import { Exchange } from '@src/exchanges/types';
 
 import findBestPath from './findBestPath';
@@ -21,8 +22,11 @@ const monitorPrices = async ({
   exchanges: Exchange[];
   slippageAllowancePercent: number;
 }) => {
-  if (isMonitoring) {
+  if (isMonitoring && config.environment === 'development') {
     console.log('Block skipped! Price monitoring ongoing.');
+  }
+
+  if (isMonitoring) {
     return;
   }
 

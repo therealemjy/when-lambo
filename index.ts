@@ -42,8 +42,10 @@ const init = async () => {
   ];
 
   provider.addListener('block', async (blockNumber) => {
-    console.time('monitorPrices');
-    console.log(`New block received. Block # ${blockNumber}`);
+    if (config.environment === 'development') {
+      console.time('monitorPrices');
+      console.log(`New block received. Block # ${blockNumber}`);
+    }
 
     await monitorPrices({
       refTokenDecimalAmounts: borrowedWethDecimalAmounts,
@@ -53,7 +55,9 @@ const init = async () => {
       slippageAllowancePercent: config.slippageAllowancePercent,
     });
 
-    console.timeEnd('monitorPrices');
+    if (config.environment === 'development') {
+      console.timeEnd('monitorPrices');
+    }
   });
 };
 

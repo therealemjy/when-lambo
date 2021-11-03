@@ -4,11 +4,11 @@ import { Path } from '@src/types';
 import logPathsInDevelopment from './logPathsInDevelopment';
 import logPathsInProduction from './logPathsInProduction';
 
-const logPaths = (paths: Path[]) => {
+const logPaths = async (paths: Path[]) => {
   if (config.environment === 'production') {
-    logPathsInProduction(paths);
+    await logPathsInProduction(paths);
   } else {
-    logPathsInDevelopment(paths);
+    await logPathsInDevelopment(paths);
   }
 };
 
