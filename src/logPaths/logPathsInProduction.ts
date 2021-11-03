@@ -6,9 +6,13 @@ const logPathsInProduction = async (paths: Path[]) => {
   const slackBlocks: any[] = [];
 
   for (const path of paths) {
+    const gasCost = path[0].estimatedGasCost.plus(path[1].estimatedGasCost);
+
     const [profitDec, profitPercent] = calculateProfit({
       revenueDec: path[1].toTokenDecimalAmount,
-      expenseDec: path[0].fromTokenDecimalAmount,
+      // Add gas cost to expense. Note that this logic only works because we
+      // start and end the path with WETH
+      expenseDec: path[0].fromTokenDecimalAmount.plus(gasCost),
     });
 
     // Only log profitable paths
@@ -17,8 +21,8 @@ const logPathsInProduction = async (paths: Path[]) => {
       const boughtDec = path[0].toTokenDecimalAmount.toFixed();
       const profitDecAmount = profitDec.toFixed(0);
       const boughtDecBack = path[1].toTokenDecimalAmount.toFixed(0);
-      const bestSellingExchange = path[0].exchangeName;
-      const bestBuyingExchange = path[1].exchangeName;
+      const bestSellingExchange = path[0].exchange.name;
+      const bestBuyingExchange = path[1].exchange.name;
 
       slackBlocks.push([
         {
@@ -47,6 +51,10 @@ const logPathsInProduction = async (paths: Path[]) => {
             {
               type: 'mrkdwn',
               text: `*${path[0].fromToken.symbol} decimals bought back:*\n${boughtDecBack}`,
+            },
+            {
+              type: 'mrkdwn',
+              text: `*Gas cost (in wei):*\n${gasCost.toFixed()}`,
             },
             {
               type: 'mrkdwn',

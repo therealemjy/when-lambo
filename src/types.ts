@@ -8,13 +8,13 @@ export type { Exchange };
 
 export interface Deal {
   timestamp: Date;
-  exchangeName: string;
+  exchange: Exchange;
   fromToken: Token;
   fromTokenDecimalAmount: BigNumber;
   toToken: Token;
   toTokenDecimalAmount: BigNumber;
   slippageAllowancePercent: number;
-  estimatedGasCostOfTransactionAmount: BigNumber;
+  estimatedGasCost: BigNumber;
 }
 
 export type Path = [Deal, Deal];

@@ -34,8 +34,8 @@ const findBestPath = async ({
     return undefined;
   }
 
-  // Find the highest amount of refToken decimals we can get back from selling
-  // all tradedToken decimals
+  // Find the highest amount of refToken decimals we can get back, considering
+  // the gas cost of the operation, from selling all tradedToken decimals
   const bestBuyingDeal = await findBestDeal({
     refTokenDecimalAmount: bestSellingDeal.toTokenDecimalAmount,
     refToken: bestSellingDeal.toToken,

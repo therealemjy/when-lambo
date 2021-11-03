@@ -1,13 +1,9 @@
 import BigNumber from 'bignumber.js';
 
-import config from '@src/config';
 import { Exchange } from '@src/exchanges/types';
 
 import findBestPath from './findBestPath';
-import logPaths from './logPaths';
 import { Token, Path } from './types';
-
-let isMonitoring = false;
 
 const monitorPrices = async ({
   refTokenDecimalAmounts,
@@ -24,16 +20,6 @@ const monitorPrices = async ({
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
 }) => {
-  if (isMonitoring && config.environment === 'development') {
-    console.log('Block skipped! Price monitoring ongoing.');
-  }
-
-  if (isMonitoring) {
-    return;
-  }
-
-  isMonitoring = true;
-
   const paths = await Promise.all(
     refTokenDecimalAmounts.map((refTokenDecimalAmount) =>
       findBestPath({
@@ -47,12 +33,8 @@ const monitorPrices = async ({
     )
   );
 
-  isMonitoring = false;
-
   const validPaths = paths.filter((path): path is Path => path !== undefined);
-
-  // Log the valid paths
-  logPaths(validPaths);
+  return validPaths;
 };
 
 export default monitorPrices;

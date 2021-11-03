@@ -9,6 +9,7 @@ import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
+import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
 import { WETH, DAI } from './src/tokens';
 
@@ -31,6 +32,8 @@ const kyberExchangeService = new KyberExchange(provider);
 // TODO: use environment variables for this
 const WETH_DECIMALS_AMOUNT = '1000000000000000000'; // One WETH in decimals
 
+let isMonitoring = false;
+
 const init = async () => {
   // Pull gas prices every 5 seconds
   gasPriceWatcher.updateEvery(5000);
@@ -39,6 +42,8 @@ const init = async () => {
     new BigNumber(WETH_DECIMALS_AMOUNT), // 1 WETH
     new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(5), // 5 WETH
     new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(10), // 10 WETH
+    new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(20), // 10 WETH
+    new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(30), // 10 WETH
   ];
 
   provider.addListener('block', async (blockNumber) => {
@@ -47,7 +52,17 @@ const init = async () => {
       console.log(`New block received. Block # ${blockNumber}`);
     }
 
-    await monitorPrices({
+    if (isMonitoring && config.environment === 'development') {
+      console.log('Block skipped! Price monitoring ongoing.');
+    }
+
+    if (isMonitoring) {
+      return;
+    }
+
+    isMonitoring = true;
+
+    const paths = await monitorPrices({
       refTokenDecimalAmounts: borrowedWethDecimalAmounts,
       refToken: WETH,
       tradedToken: DAI,
@@ -55,6 +70,10 @@ const init = async () => {
       slippageAllowancePercent: config.slippageAllowancePercent,
       gasPriceWei: global.currentGasPrices.rapid,
     });
+
+    isMonitoring = false;
+
+    logPaths(paths);
 
     if (config.environment === 'development') {
       console.timeEnd('monitorPrices');
