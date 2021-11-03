@@ -51,11 +51,7 @@ const init = async () => {
         refToken: WETH,
         tradedToken: DAI,
       },
-      [
-        { name: 'Uniswap V2', service: uniswapV2ExchangeService },
-        { name: 'Sushiswap', service: sushiswapExchangeService },
-        { name: 'Kyber', service: kyberExchangeService },
-      ]
+      [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService]
     );
 
     console.timeEnd('monitorPrices');

@@ -18,10 +18,7 @@ const monitorPrices = async (
     refToken: Token;
     tradedToken: Token;
   },
-  exchanges: Array<{
-    name: string;
-    service: Exchange;
-  }>
+  exchanges: Exchange[]
 ) => {
   if (isMonitoring) {
     console.log('Block skipped! Price monitoring ongoing.');
