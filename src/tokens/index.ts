@@ -47,3 +47,15 @@ export const MANA = new Token({
   address: '0x0f5d2fb29fb7d3cfee444a200298f468908cc942',
   decimals: 18,
 });
+
+export const LRC = new Token({
+  symbol: 'LRC',
+  address: '0xbbbbca6a901c926f240b89eacb641d8aec7aeafd',
+  decimals: 18,
+});
+
+export const VLX = new Token({
+  symbol: 'VLX',
+  address: '0x8c543aed163909142695f2d2acd0d55791a9edb9',
+  decimals: 18,
+});

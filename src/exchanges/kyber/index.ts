@@ -36,6 +36,10 @@ class Kyber implements Exchange {
     // Price of 1 fromToken in toToken decimals
     const oneFromTokenSellRate = res[0].toString();
 
+    if (parseInt(oneFromTokenSellRate) === 0) {
+      throw new Error('Token not found on Kyber exchange');
+    }
+
     // Price of 1 fromToken decimal in toToken decimals
     const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(1 * 10 ** fromToken.decimals);
 

@@ -64,6 +64,10 @@ const findBestDeal = async ({
     // @ts-ignore Typescript's definition of Promise.allSettled isn't correct
     .map((res) => res.value);
 
+  if (deals.length === 0) {
+    return undefined;
+  }
+
   // Find the highest amount of tradedToken decimals we can get from selling all
   // refTokenDecimalAmount
   const bestDeal = deals.reduce((currentBestDeal, deal) => {

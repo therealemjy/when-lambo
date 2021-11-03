@@ -11,7 +11,7 @@ import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
-import { WETH, MANA } from './src/tokens';
+import { WETH, VLX } from './src/tokens';
 
 const provider = new ethers.providers.Web3Provider(
   new AWSWebsocketProvider(config.aws.wsRpcUrl, {
@@ -32,19 +32,20 @@ const kyberExchangeService = new KyberExchange(provider);
 // TODO: use environment variables for this
 const WETH_DECIMALS_AMOUNT = '1000000000000000000'; // One WETH in decimals
 
+const borrowedWethDecimalAmounts = [
+  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(1),
+  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(2),
+  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(3),
+  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(4),
+];
+
+const TRADED_TOKEN = VLX;
+
 let isMonitoring = false;
 
 const init = async () => {
   // Pull gas prices every 5 seconds
   gasPriceWatcher.updateEvery(5000);
-
-  const borrowedWethDecimalAmounts = [
-    new BigNumber(WETH_DECIMALS_AMOUNT), // 1 WETH
-    new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(5), // 5 WETH
-    new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(10), // 10 WETH
-    new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(20), // 10 WETH
-    new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(30), // 10 WETH
-  ];
 
   provider.addListener('block', async (blockNumber) => {
     if (config.environment === 'development') {
@@ -66,7 +67,7 @@ const init = async () => {
     const paths = await monitorPrices({
       refTokenDecimalAmounts: borrowedWethDecimalAmounts,
       refToken: WETH,
-      tradedToken: MANA,
+      tradedToken: TRADED_TOKEN,
       exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService],
       slippageAllowancePercent: config.slippageAllowancePercent,
       gasPriceWei: global.currentGasPrices.rapid,
@@ -74,11 +75,11 @@ const init = async () => {
 
     isMonitoring = false;
 
-    logPaths(paths);
-
     if (config.environment === 'development') {
       console.timeEnd('monitorPrices');
     }
+
+    logPaths(paths);
   });
 };
 
