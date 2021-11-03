@@ -11,7 +11,7 @@ import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
-import { WETH, DAI } from './src/tokens';
+import { WETH, AAVE } from './src/tokens';
 
 const provider = new ethers.providers.Web3Provider(
   new AWSWebsocketProvider(config.aws.wsRpcUrl, {
@@ -48,12 +48,13 @@ const init = async () => {
 
   provider.addListener('block', async (blockNumber) => {
     if (config.environment === 'development') {
-      console.time('monitorPrices');
       console.log(`New block received. Block # ${blockNumber}`);
     }
 
     if (isMonitoring && config.environment === 'development') {
       console.log('Block skipped! Price monitoring ongoing.');
+    } else if (config.environment === 'development') {
+      console.time('monitorPrices');
     }
 
     if (isMonitoring) {
@@ -65,7 +66,7 @@ const init = async () => {
     const paths = await monitorPrices({
       refTokenDecimalAmounts: borrowedWethDecimalAmounts,
       refToken: WETH,
-      tradedToken: DAI,
+      tradedToken: AAVE,
       exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService],
       slippageAllowancePercent: config.slippageAllowancePercent,
       gasPriceWei: global.currentGasPrices.rapid,
