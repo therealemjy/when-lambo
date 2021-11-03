@@ -8,12 +8,14 @@ const findBestDeal = async ({
   tradedToken,
   exchanges,
   slippageAllowancePercent,
+  gasPriceWei,
 }: {
   refTokenDecimalAmount: BigNumber;
   refToken: Token;
   tradedToken: Token;
   exchanges: Exchange[];
   slippageAllowancePercent: number;
+  gasPriceWei: BigNumber;
 }): Promise<Deal | undefined> => {
   // Check how many tradedToken (e.g.: DAI) decimals we get from trading the
   // provided refToken (e.g.: WETH) decimals amount, on all monitored exchanges
@@ -32,6 +34,7 @@ const findBestDeal = async ({
       toToken: tradedToken,
       toTokenDecimalAmount: decimalAmount,
       slippageAllowancePercent,
+      estimatedGasCostOfTransactionAmount: gasPriceWei.multipliedBy(exchange.estimatedGasForSwap),
     };
   });
 

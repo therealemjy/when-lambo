@@ -10,12 +10,14 @@ const findBestPath = async ({
   tradedToken,
   exchanges,
   slippageAllowancePercent,
+  gasPriceWei,
 }: {
   refTokenDecimalAmount: BigNumber;
   refToken: Token;
   tradedToken: Token;
   exchanges: Exchange[];
   slippageAllowancePercent: number;
+  gasPriceWei: BigNumber;
 }): Promise<Path | undefined> => {
   // Find the highest amount of tradedToken decimals we can get from selling all
   // refTokenDecimalAmount
@@ -25,6 +27,7 @@ const findBestPath = async ({
     tradedToken,
     exchanges,
     slippageAllowancePercent,
+    gasPriceWei,
   });
 
   if (!bestSellingDeal) {
@@ -39,6 +42,7 @@ const findBestPath = async ({
     tradedToken: bestSellingDeal.fromToken,
     exchanges,
     slippageAllowancePercent,
+    gasPriceWei,
   });
 
   if (!bestBuyingDeal) {

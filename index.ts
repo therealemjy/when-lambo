@@ -53,6 +53,7 @@ const init = async () => {
       tradedToken: DAI,
       exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService],
       slippageAllowancePercent: config.slippageAllowancePercent,
+      gasPriceWei: global.currentGasPrices.rapid,
     });
 
     if (config.environment === 'development') {

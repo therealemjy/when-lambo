@@ -7,7 +7,7 @@ import sushiswapRouterContract from './contracts/sushiswapRouter.json';
 
 class Sushiswap implements Exchange {
   name: string;
-  estimatedGasForSwap: number;
+  estimatedGasForSwap: BigNumber;
 
   provider: ethers.providers.Web3Provider;
   routerContract: ethers.Contract;
@@ -16,7 +16,7 @@ class Sushiswap implements Exchange {
     this.provider = provider;
 
     this.name = 'Sushiswap';
-    this.estimatedGasForSwap = 109253;
+    this.estimatedGasForSwap = new BigNumber(109253);
 
     this.routerContract = new ethers.Contract(
       sushiswapRouterContract.address,

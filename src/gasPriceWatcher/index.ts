@@ -1,8 +1,9 @@
 import axios from 'axios';
+import BigNumber from 'bignumber.js';
 
 class GasPriceWatcher {
   constructor() {
-    console.log('⛽️ Gas price watcher has started');
+    console.log('Gas price watcher has started');
     this.getPrices();
   }
 
@@ -14,18 +15,18 @@ class GasPriceWatcher {
     try {
       const res = await axios.get<{
         data: {
-          rapid: number;
-          fast: number;
-          standard: number;
-          slow: number;
+          rapid: BigNumber;
+          fast: BigNumber;
+          standard: BigNumber;
+          slow: BigNumber;
         };
       }>('https://etherchain.org/api/gasnow');
 
       global.currentGasPrices = {
-        rapid: res.data.data.rapid,
-        fast: res.data.data.fast,
-        standard: res.data.data.standard,
-        slow: res.data.data.slow,
+        rapid: new BigNumber(res.data.data.rapid),
+        fast: new BigNumber(res.data.data.fast),
+        standard: new BigNumber(res.data.data.standard),
+        slow: new BigNumber(res.data.data.slow),
       };
     } catch (err) {
       console.log('Error while pulling data from gasnow', err);

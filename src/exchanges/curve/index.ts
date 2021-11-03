@@ -8,7 +8,7 @@ import swapContract from './contracts/swapContract.json';
 
 class Curve implements Exchange {
   name: string;
-  estimatedGasForSwap: number;
+  estimatedGasForSwap: BigNumber;
 
   provider: ethers.providers.Web3Provider;
   networkProxy: ethers.Contract;
@@ -19,7 +19,7 @@ class Curve implements Exchange {
     this.provider = provider;
 
     this.name = 'Curve';
-    this.estimatedGasForSwap = 114651;
+    this.estimatedGasForSwap = new BigNumber(114651);
 
     this.addressProvider = new ethers.Contract(
       addressProviderContract.address,
