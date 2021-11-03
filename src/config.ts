@@ -9,6 +9,7 @@ export interface EnvConfig {
     secretAccessKey: string;
   };
   environment: 'development' | 'production';
+  slippageAllowancePercent: number;
 }
 
 const config: EnvConfig = {
@@ -18,6 +19,7 @@ const config: EnvConfig = {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
   environment: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  slippageAllowancePercent: +process.env.SLIPPAGE_ALLOWANCE_PERCENT!,
 };
 
 export default config;
