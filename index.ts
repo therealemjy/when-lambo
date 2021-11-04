@@ -11,7 +11,7 @@ import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
-import { WETH, VLX } from './src/tokens';
+import { WETH, XYO } from './src/tokens';
 
 const provider = new ethers.providers.Web3Provider(
   new AWSWebsocketProvider(config.aws.wsRpcUrl, {
@@ -33,13 +33,14 @@ const kyberExchangeService = new KyberExchange(provider);
 const WETH_DECIMALS_AMOUNT = '1000000000000000000'; // One WETH in decimals
 
 const borrowedWethDecimalAmounts = [
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(1),
+  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(0.8),
+  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(1.2),
+  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(1.6),
   new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(2),
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(3),
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(4),
+  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(2.4),
 ];
 
-const TRADED_TOKEN = VLX;
+const TRADED_TOKEN = XYO;
 
 let isMonitoring = false;
 
