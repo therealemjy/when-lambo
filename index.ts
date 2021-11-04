@@ -1,7 +1,8 @@
 import AWSWebsocketProvider from '@aws/web3-ws-provider';
-import BigNumber from 'bignumber.js';
 import 'console.table';
 import { ethers } from 'ethers';
+
+import { Token } from '@src/types';
 
 import './@moduleAliases';
 import config from './src/config';
@@ -11,7 +12,7 @@ import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
-import { WETH, XYO } from './src/tokens';
+import { WETH } from './src/tokens';
 
 const provider = new ethers.providers.Web3Provider(
   new AWSWebsocketProvider(config.aws.wsRpcUrl, {
@@ -29,18 +30,11 @@ const uniswapV2ExchangeService = new UniswapV2Exchange(provider);
 const sushiswapExchangeService = new SushiswapExchange(provider);
 const kyberExchangeService = new KyberExchange(provider);
 
-// TODO: use environment variables for this
-const WETH_DECIMALS_AMOUNT = '1000000000000000000'; // One WETH in decimals
-
-const borrowedWethDecimalAmounts = [
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(0.8),
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(1.2),
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(1.6),
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(2),
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(2.4),
-];
-
-const TRADED_TOKEN = XYO;
+const tradedToken: Token = {
+  symbol: config.tradedToken.symbol,
+  address: config.tradedToken.address,
+  decimals: config.tradedToken.decimals,
+};
 
 let isMonitoring = false;
 
@@ -66,9 +60,9 @@ const init = async () => {
     isMonitoring = true;
 
     const paths = await monitorPrices({
-      refTokenDecimalAmounts: borrowedWethDecimalAmounts,
+      refTokenDecimalAmounts: config.tradedToken.weiAmounts,
       refToken: WETH,
-      tradedToken: TRADED_TOKEN,
+      tradedToken,
       exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService],
       slippageAllowancePercent: config.slippageAllowancePercent,
       gasPriceWei: global.currentGasPrices.rapid,

@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -10,6 +11,12 @@ export interface EnvConfig {
   };
   environment: 'development' | 'production';
   slippageAllowancePercent: number;
+  tradedToken: {
+    address: string;
+    symbol: string;
+    decimals: number;
+    weiAmounts: BigNumber[];
+  };
 }
 
 const config: EnvConfig = {
@@ -20,6 +27,12 @@ const config: EnvConfig = {
   },
   environment: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   slippageAllowancePercent: +process.env.SLIPPAGE_ALLOWANCE_PERCENT!,
+  tradedToken: {
+    address: process.env.TRADED_TOKEN_ADDRESS!,
+    symbol: process.env.TRADED_TOKEN_SYMBOL!,
+    decimals: +process.env.TRADED_TOKEN_DECIMALS!,
+    weiAmounts: process.env.TRADED_TOKEN_WEI_AMOUNTS!.split(',').map((amount) => new BigNumber(amount)),
+  },
 };
 
 export default config;
