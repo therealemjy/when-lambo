@@ -17,6 +17,11 @@ export interface EnvConfig {
     decimals: number;
     weiAmounts: BigNumber[];
   };
+  googleSpreadSheet: {
+    worksheetId: string;
+    clientEmail: string;
+    privateKeyBase64: string;
+  };
 }
 
 const config: EnvConfig = {
@@ -32,6 +37,11 @@ const config: EnvConfig = {
     symbol: process.env.TRADED_TOKEN_SYMBOL!,
     decimals: +process.env.TRADED_TOKEN_DECIMALS!,
     weiAmounts: process.env.TRADED_TOKEN_WEI_AMOUNTS!.split(',').map((amount) => new BigNumber(amount)),
+  },
+  googleSpreadSheet: {
+    worksheetId: process.env.GOOGLE_SPREADSHEET_WORKSHEET_ID!,
+    clientEmail: process.env.GOOGLE_SPREADSHEET_CLIENT_EMAIL!,
+    privateKeyBase64: process.env.GOOGLE_SPREADSHEET_PRIVATE_KEY_BASE_64!,
   },
 };
 

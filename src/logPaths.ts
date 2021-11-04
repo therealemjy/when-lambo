@@ -1,12 +1,12 @@
 import formatDate from 'date-fns/format';
-import { GoogleSpreadsheet } from 'google-spreadsheet';
+import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 
 import config from '@src/config';
 import { Path } from '@src/types';
 import calculateProfit from '@src/utils/calculateProfit';
 import sendSlackMessage from '@src/utils/sendSlackMessage';
 
-const logPaths = async (paths: Path[], spreadsheet: GoogleSpreadsheet) => {
+const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) => {
   const slackBlocks: any[] = [];
   const tableRows: any[] = [];
 
@@ -77,7 +77,7 @@ const logPaths = async (paths: Path[], spreadsheet: GoogleSpreadsheet) => {
 
     // Log all paths in Google spreadsheet in production
     if (config.environment === 'production') {
-      console.log(spreadsheet);
+      console.log(worksheet);
     }
     // Log all paths in the console in development
     else if (config.environment === 'development') {

@@ -37,26 +37,34 @@ const tradedToken: Token = {
   decimals: config.tradedToken.decimals,
 };
 
+const SPREAD_SHEET_TITLE = `WETH / ${tradedToken.symbol}`;
+
 let isMonitoring = false;
 
 const init = async () => {
   // Initialize Google Spreadsheet intance
   // TODO: use env variable
-  const spreadsheet = new GoogleSpreadsheet('1ka3JbjlSSjNnvwLhJ11c-mKwK2TJ622_elG9evOf4JI');
+  const spreadsheet = new GoogleSpreadsheet(config.googleSpreadSheet.worksheetId);
 
   // TODO: use env variables
   await spreadsheet.useServiceAccountAuth({
-    client_email: 'log-bot@when-lambo-331122.iam.gserviceaccount.com',
-    private_key:
-      '-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDfXp9b3qpxPXrZ\nQ4lt0KBQHC89YeGFC0CqV+SIihZBGkLgpJAkLb5pq/GNUIDQrkxaRihce7Kd5QuR\n4L8AVabLUpf5o/DMbwLHDsY1e4Jcoo/OEKmlIVSvUeJnlOOFt7PqVEc7PrN2O2B+\n5HBJFId0IfTj5Ujs8HUUCnwocKn2Wk2dZZICie7aaBMYj5Pp9rOY0JXHsphnUthP\nmFp0lgZA2QZLd2D/gbNuwaZep8LnEKFQNA5JrLUbFBhAhaMWk+lD1vks825WW8od\nWVmqynMWIbP9hUXTNaB5bt06120t+v9b3wXREWkKWNzk8JftDbIR61DOeNv99bWC\nrpbI6EtRAgMBAAECggEAOMDWdaW0IbSQv54oz2WYLfKTUCHMBp1Oz1kooEaRk/YD\nswcs9nxG6pt88r5XFG6MyM0VmTX2sqaNE4IKlZ+tkvCH2657Ur4L8x6+Xr1kaHwH\nVMCoEeRPm4IPJ+lNC98aj/nc5WEvgOViRatuGitkpS2xhqvtpQINhUuKs0246XYb\nhEhZAtZI/MMVLDFTi7PQlYPJTm/fZJwOy9zX/S6Z/ZrBlFV6SbuXNCGxgMuzXyee\ngSF7lhnPFCVy5B2UFaRVUI6ELrxU78ianM0G1cT6kzjXXdF7Hepa8ASY73bmLBTk\nf9iIz15ES337ApCHVpZh/xWF2zvtbRaA0R/9RLyuVwKBgQD/krZvJKR1slnSvQ5C\nXC00mi1H/mt4oXCsQ/NuNvPYIdFJthoC8DkA29wWZXefzT2e/Pxlzx1JqWsQzg4F\ncX0Yq1bEvO7Y1/yOQB6eO5crYFHk5QWvcD2Icn4MYwxRijc/aQl5aIZqKZITB+Tw\nXedEIvW9oAghHkXVGVbc58GxWwKBgQDfviOc20c7QpMhOoM4pcXNShKHnLDE49FB\nIdOliwZYw/deQzxpUWLlU99lNfdKCaic5C3Qv+f+gyPb6DGtK1IY/F9yZghDbO35\nqk0KXhmAFWKs4thzOlYJ9ES4Vfpbmn4+JG4eGANHekwE/brjhg2RgmVCnCzvl0jH\ntBoIKwYJwwKBgQCwqcO99EBSs2RvzgurR3hgIism1vGHQ2FVUutUxlusjUPUhjJY\n0aE1vMTYHm+gYQk1e38lCRQftSKzTRxYGuj0QowKFuersTF9S0le66ZFb6FsbfuO\nGDIQvcPv4A/F1Zr3FC5eZCh1/iJhUVWp6d9RNDFWUOcNrZVsBsYKkZFMfQKBgGrE\nB6hs9qOvlBfSHRXl/OqGQytVOQDrGUp0QtOG8MNg1+SyPtyeyotWJ47bXqKE02Hy\nfG5VdPX9TBo+xZ21w1pK65ziVWUfULvHaTXeS1rUWZ7YLKNnnfDoD/bKiEo4Aa/T\noHxZxw7PrADhttGlgUoDKCDN959o2ID7T0TAiwQTAoGBALnVMgVn6JFMzDWaAkgi\nlj+Ow9VK1OeepHeWrBAqOFq1ZyTK4yrgvRQaVLzyJOsXVc7tw+ABAr8Pj/x71Wuf\nrGrgZYb4MgbvwdfZ8soEMli9FrV68cScdh0lm04HEtnxNLAq49X8rcwa23pcRwR7\ndfhRxUlAWwb0Tigjj4Y++rmr\n-----END PRIVATE KEY-----\n',
+    client_email: config.googleSpreadSheet.clientEmail,
+    private_key: Buffer.from(config.googleSpreadSheet.privateKeyBase64, 'base64').toString('ascii'),
   });
-
   await spreadsheet.loadInfo();
 
-  console.log(spreadsheet.title);
+  const worksheet = spreadsheet.sheetsByTitle[SPREAD_SHEET_TITLE];
+
+  if (!worksheet) {
+    throw new Error(
+      `Worksheet "${SPREAD_SHEET_TITLE}" does not exist on spreadsheet "${spreadsheet.title}" (ID: ${config.googleSpreadSheet.worksheetId}). Create it then start the bot again.`
+    );
+  }
 
   // Pull gas prices every 5 seconds
   gasPriceWatcher.updateEvery(5000);
+
+  console.log('Price monitoring has started.');
 
   provider.addListener('block', async (blockNumber) => {
     if (config.environment === 'development') {
@@ -90,7 +98,7 @@ const init = async () => {
       console.timeEnd('monitorPrices');
     }
 
-    logPaths(paths, spreadsheet);
+    logPaths(paths, worksheet);
   });
 };
 
