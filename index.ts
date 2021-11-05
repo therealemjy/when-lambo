@@ -1,7 +1,9 @@
 import AWSWebsocketProvider from '@aws/web3-ws-provider';
-import BigNumber from 'bignumber.js';
 import 'console.table';
 import { ethers } from 'ethers';
+import { GoogleSpreadsheet } from 'google-spreadsheet';
+
+import { Token } from '@src/types';
 
 import './@moduleAliases';
 import config from './src/config';
@@ -11,7 +13,7 @@ import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
-import { WETH, VLX } from './src/tokens';
+import { WETH } from './src/tokens';
 
 const provider = new ethers.providers.Web3Provider(
   new AWSWebsocketProvider(config.aws.wsRpcUrl, {
@@ -29,23 +31,38 @@ const uniswapV2ExchangeService = new UniswapV2Exchange(provider);
 const sushiswapExchangeService = new SushiswapExchange(provider);
 const kyberExchangeService = new KyberExchange(provider);
 
-// TODO: use environment variables for this
-const WETH_DECIMALS_AMOUNT = '1000000000000000000'; // One WETH in decimals
+const tradedToken: Token = {
+  symbol: config.tradedToken.symbol,
+  address: config.tradedToken.address,
+  decimals: config.tradedToken.decimals,
+};
 
-const borrowedWethDecimalAmounts = [
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(1),
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(2),
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(3),
-  new BigNumber(WETH_DECIMALS_AMOUNT).multipliedBy(4),
-];
-
-const TRADED_TOKEN = VLX;
+const SPREAD_SHEET_TITLE = `WETH / ${tradedToken.symbol}`;
 
 let isMonitoring = false;
 
 const init = async () => {
+  // Initialize Google Spreadsheet intance
+  const spreadsheet = new GoogleSpreadsheet(config.googleSpreadSheet.worksheetId);
+
+  await spreadsheet.useServiceAccountAuth({
+    client_email: config.googleSpreadSheet.clientEmail,
+    private_key: Buffer.from(config.googleSpreadSheet.privateKeyBase64, 'base64').toString('ascii'),
+  });
+  await spreadsheet.loadInfo();
+
+  const worksheet = spreadsheet.sheetsByTitle[SPREAD_SHEET_TITLE];
+
+  if (!worksheet) {
+    throw new Error(
+      `Worksheet "${SPREAD_SHEET_TITLE}" does not exist on spreadsheet "${spreadsheet.title}" (ID: ${config.googleSpreadSheet.worksheetId}). Create it then start the bot again.`
+    );
+  }
+
   // Pull gas prices every 5 seconds
   gasPriceWatcher.updateEvery(5000);
+
+  console.log('Price monitoring has started.');
 
   provider.addListener('block', async (blockNumber) => {
     if (config.environment === 'development') {
@@ -65,9 +82,9 @@ const init = async () => {
     isMonitoring = true;
 
     const paths = await monitorPrices({
-      refTokenDecimalAmounts: borrowedWethDecimalAmounts,
+      refTokenDecimalAmounts: config.tradedToken.weiAmounts,
       refToken: WETH,
-      tradedToken: TRADED_TOKEN,
+      tradedToken,
       exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService],
       slippageAllowancePercent: config.slippageAllowancePercent,
       gasPriceWei: global.currentGasPrices.rapid,
@@ -79,7 +96,7 @@ const init = async () => {
       console.timeEnd('monitorPrices');
     }
 
-    logPaths(paths);
+    logPaths(paths, worksheet);
   });
 };
 

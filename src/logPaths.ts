@@ -1,23 +1,22 @@
 import formatDate from 'date-fns/format';
+import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 
 import config from '@src/config';
 import { Path } from '@src/types';
 import calculateProfit from '@src/utils/calculateProfit';
 import sendSlackMessage from '@src/utils/sendSlackMessage';
 
-const getLogValues = (path: Path) => ({
-  borrowedDec: path[0].fromTokenDecimalAmount.toFixed(),
-  boughtDec: path[0].toTokenDecimalAmount.toFixed(),
-  boughtDecBack: path[1].toTokenDecimalAmount.toFixed(0),
-  bestSellingExchange: path[0].exchange.name,
-  bestBuyingExchange: path[1].exchange.name,
-});
-
-const logPaths = async (paths: Path[]) => {
+const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) => {
   const slackBlocks: any[] = [];
   const tableRows: any[] = [];
 
   for (const path of paths) {
+    const timestamp = formatDate(path[0].timestamp, 'd/M/yy HH:mm');
+    const borrowedDec = path[0].fromTokenDecimalAmount.toFixed();
+    const boughtDec = path[0].toTokenDecimalAmount.toFixed(0);
+    const revenues = path[1].toTokenDecimalAmount.toFixed(0);
+    const bestSellingExchangeName = path[0].exchange.name;
+    const bestBuyingExchangeName = path[1].exchange.name;
     const gasCost = path[0].estimatedGasCost.plus(path[1].estimatedGasCost);
 
     const [profitDec, profitPercent] = calculateProfit({
@@ -27,17 +26,15 @@ const logPaths = async (paths: Path[]) => {
       expenseDec: path[0].fromTokenDecimalAmount.plus(gasCost),
     });
 
-    // Only log profitable paths in production
+    // Only log profitable paths to Slack in production
     if (config.environment === 'production' && profitDec.isGreaterThan(0)) {
-      const { borrowedDec, boughtDec, boughtDecBack, bestSellingExchange, bestBuyingExchange } = getLogValues(path);
-
       slackBlocks.push([
         {
           type: 'section',
           fields: [
             {
               type: 'mrkdwn',
-              text: `*Timestamp:*\n${path[0].timestamp}`,
+              text: `*Timestamp:*\n${timestamp}`,
             },
             {
               type: 'mrkdwn',
@@ -45,7 +42,7 @@ const logPaths = async (paths: Path[]) => {
             },
             {
               type: 'mrkdwn',
-              text: `*Best selling exchange:*\n${bestSellingExchange}`,
+              text: `*Best selling exchange:*\n${bestSellingExchangeName}`,
             },
             {
               type: 'mrkdwn',
@@ -53,11 +50,11 @@ const logPaths = async (paths: Path[]) => {
             },
             {
               type: 'mrkdwn',
-              text: `*Best buying exchange:*\n${bestBuyingExchange}`,
+              text: `*Best buying exchange:*\n${bestBuyingExchangeName}`,
             },
             {
               type: 'mrkdwn',
-              text: `*${path[0].fromToken.symbol} decimals bought back:*\n${boughtDecBack}`,
+              text: `*${path[0].fromToken.symbol} decimals bought back:*\n${revenues}`,
             },
             {
               type: 'mrkdwn',
@@ -79,17 +76,29 @@ const logPaths = async (paths: Path[]) => {
       ]);
     }
 
-    // Log all paths in development
-    if (config.environment === 'development') {
-      const { borrowedDec, boughtDec, boughtDecBack, bestSellingExchange, bestBuyingExchange } = getLogValues(path);
-
+    // Log all paths in Google spreadsheet in production
+    if (config.environment === 'production') {
+      await worksheet.addRow([
+        timestamp,
+        +borrowedDec,
+        bestSellingExchangeName,
+        +boughtDec,
+        bestBuyingExchangeName,
+        +revenues,
+        +gasCost.toFixed(),
+        +profitDec.toFixed(0),
+        `${profitPercent}%`,
+      ]);
+    }
+    // Log all paths in the console in development
+    else if (config.environment === 'development') {
       tableRows.push({
-        Timestamp: formatDate(path[0].timestamp, 'd/M/yy HH:mm'),
+        Timestamp: timestamp,
         [`${path[0].fromToken.symbol} decimals borrowed`]: borrowedDec,
-        'Best selling exchange': bestSellingExchange,
+        'Best selling exchange': bestSellingExchangeName,
         [`${path[0].toToken.symbol} decimals bought`]: boughtDec,
-        'Best buying exchange': bestBuyingExchange,
-        [`${path[0].fromToken.symbol} decimals bought back`]: boughtDecBack,
+        'Best buying exchange': bestBuyingExchangeName,
+        [`${path[0].fromToken.symbol} decimals bought back`]: revenues,
         'Gas cost (in wei)': gasCost.toFixed(),
         [`Profit (in ${path[0].fromToken.symbol} decimals)`]: profitDec.toFixed(0),
         'Profit (%)': profitPercent + '%',

@@ -59,3 +59,9 @@ export const VLX = new Token({
   address: '0x8c543aed163909142695f2d2acd0d55791a9edb9',
   decimals: 18,
 });
+
+export const XYO = new Token({
+  symbol: 'XYO',
+  address: '0x55296f69f40ea6d20e478533c15a6b08b654e758',
+  decimals: 18,
+});
