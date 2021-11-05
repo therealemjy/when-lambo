@@ -43,10 +43,8 @@ let isMonitoring = false;
 
 const init = async () => {
   // Initialize Google Spreadsheet intance
-  // TODO: use env variable
   const spreadsheet = new GoogleSpreadsheet(config.googleSpreadSheet.worksheetId);
 
-  // TODO: use env variables
   await spreadsheet.useServiceAccountAuth({
     client_email: config.googleSpreadSheet.clientEmail,
     private_key: Buffer.from(config.googleSpreadSheet.privateKeyBase64, 'base64').toString('ascii'),

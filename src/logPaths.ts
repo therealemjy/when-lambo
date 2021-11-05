@@ -11,8 +11,9 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
   const tableRows: any[] = [];
 
   for (const path of paths) {
+    const timestamp = formatDate(path[0].timestamp, 'd/M/yy HH:mm');
     const borrowedDec = path[0].fromTokenDecimalAmount.toFixed();
-    const boughtDec = path[0].toTokenDecimalAmount.toFixed();
+    const boughtDec = path[0].toTokenDecimalAmount.toFixed(0);
     const revenues = path[1].toTokenDecimalAmount.toFixed(0);
     const bestSellingExchangeName = path[0].exchange.name;
     const bestBuyingExchangeName = path[1].exchange.name;
@@ -33,7 +34,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
           fields: [
             {
               type: 'mrkdwn',
-              text: `*Timestamp:*\n${path[0].timestamp}`,
+              text: `*Timestamp:*\n${timestamp}`,
             },
             {
               type: 'mrkdwn',
@@ -77,12 +78,22 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
 
     // Log all paths in Google spreadsheet in production
     if (config.environment === 'production') {
-      console.log(worksheet);
+      await worksheet.addRow([
+        timestamp,
+        +borrowedDec,
+        bestSellingExchangeName,
+        +boughtDec,
+        bestBuyingExchangeName,
+        +revenues,
+        +gasCost.toFixed(),
+        +profitDec.toFixed(0),
+        `${profitPercent}%`,
+      ]);
     }
     // Log all paths in the console in development
     else if (config.environment === 'development') {
       tableRows.push({
-        Timestamp: formatDate(path[0].timestamp, 'd/M/yy HH:mm'),
+        Timestamp: timestamp,
         [`${path[0].fromToken.symbol} decimals borrowed`]: borrowedDec,
         'Best selling exchange': bestSellingExchangeName,
         [`${path[0].toToken.symbol} decimals bought`]: boughtDec,
