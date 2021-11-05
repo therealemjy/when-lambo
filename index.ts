@@ -7,6 +7,7 @@ import { Token } from '@src/types';
 
 import './@moduleAliases';
 import config from './src/config';
+import BancorExchange from './src/exchanges/bancor';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
@@ -30,6 +31,7 @@ const provider = new ethers.providers.Web3Provider(
 const uniswapV2ExchangeService = new UniswapV2Exchange(provider);
 const sushiswapExchangeService = new SushiswapExchange(provider);
 const kyberExchangeService = new KyberExchange(provider);
+const bancorExchangeService = new BancorExchange(provider);
 
 const tradedToken: Token = {
   symbol: config.tradedToken.symbol,
@@ -42,6 +44,9 @@ const SPREAD_SHEET_TITLE = `WETH / ${tradedToken.symbol}`;
 let isMonitoring = false;
 
 const init = async () => {
+  // Init exchanges that need to call asynchronous functions to get initialized
+  await bancorExchangeService.init();
+
   // Initialize Google Spreadsheet intance
   const spreadsheet = new GoogleSpreadsheet(config.googleSpreadSheet.worksheetId);
 
