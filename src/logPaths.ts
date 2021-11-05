@@ -11,7 +11,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
   const tableRows: any[] = [];
 
   for (const path of paths) {
-    const timestamp = formatDate(path[0].timestamp, 'd/M/yy HH:mm');
+    const timestamp = formatDate(path[0].timestamp, 'd/M/yy HH:mm:ss');
     const borrowedDec = path[0].fromTokenDecimalAmount.toFixed();
     const boughtDec = path[0].toTokenDecimalAmount.toFixed(0);
     const revenues = path[1].toTokenDecimalAmount.toFixed(0);

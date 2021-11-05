@@ -19,7 +19,7 @@ class Curve implements Exchange {
     this.provider = provider;
 
     this.name = 'Curve';
-    this.estimatedGasForSwap = new BigNumber(114651);
+    this.estimatedGasForSwap = new BigNumber(115000);
 
     this.addressProvider = new ethers.Contract(
       addressProviderContract.address,

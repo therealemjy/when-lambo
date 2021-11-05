@@ -16,7 +16,7 @@ class CryptoCom implements Exchange {
     this.provider = provider;
 
     this.name = 'Crypto.com';
-    this.estimatedGasForSwap = new BigNumber(105657);
+    this.estimatedGasForSwap = new BigNumber(200000);
 
     this.routerContract = new ethers.Contract(
       cryptoComRouterContract.address,

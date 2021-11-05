@@ -16,7 +16,7 @@ class UniswapV2 implements Exchange {
     this.provider = provider;
 
     this.name = 'Uniswap V2';
-    this.estimatedGasForSwap = new BigNumber(105657);
+    this.estimatedGasForSwap = new BigNumber(165000);
 
     this.routerContract = new ethers.Contract(
       uniswapV2RouterContract.address,

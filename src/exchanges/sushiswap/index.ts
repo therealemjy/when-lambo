@@ -16,7 +16,7 @@ class Sushiswap implements Exchange {
     this.provider = provider;
 
     this.name = 'Sushiswap';
-    this.estimatedGasForSwap = new BigNumber(109253);
+    this.estimatedGasForSwap = new BigNumber(115000);
 
     this.routerContract = new ethers.Contract(
       sushiswapRouterContract.address,
