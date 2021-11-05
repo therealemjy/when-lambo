@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "target": "es6",
+    "skipLibCheck": true,
+    "rootDirs": ["./"],
+    "baseUrl": "./",
+    "sourceMap": true,
+    "outDir": "dist",
+    "paths": {
+      "@src/*": ["./src/*"]
+    },
+    "lib": ["es2020"]
+  },
+  "exclude": ["node_modules", "dist", "build"]
+}
