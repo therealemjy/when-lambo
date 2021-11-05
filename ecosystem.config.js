@@ -31,7 +31,7 @@ module.exports = {
       ref: 'origin/master',
       repo: 'git@github.com:peel-chat/bot-test.git',
       path: '/home/ubuntu/when-lambo',
-      'post-deploy': 'npm install && npm run tsc && pm2 delete all && pm2 start ecosystem.config.js --env production',
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env production',
     },
   },
 };
