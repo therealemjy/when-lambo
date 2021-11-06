@@ -9,6 +9,7 @@ import sendSlackMessage from '@src/utils/sendSlackMessage';
 const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) => {
   const slackBlocks: any[] = [];
   const tableRows: any[] = [];
+  const worksheetRows: any[] = [];
 
   for (const path of paths) {
     const timestamp = formatDate(path[0].timestamp, 'd/M/yy HH:mm:ss');
@@ -78,7 +79,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
 
     // Log all paths in Google spreadsheet in production
     if (config.environment === 'production') {
-      await worksheet.addRow([
+      worksheetRows.push([
         timestamp,
         +borrowedDec,
         bestSellingExchangeName,
@@ -104,6 +105,10 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
         'Profit (%)': profitPercent + '%',
       });
     }
+  }
+
+  if (config.environment === 'production' && worksheetRows.length > 0) {
+    await worksheet.addRows(worksheetRows);
   }
 
   if (config.environment === 'production' && slackBlocks.length > 0) {
