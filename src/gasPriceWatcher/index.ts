@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 
 class GasPriceWatcher {
   constructor() {
-    console.log('Gas price watcher has started.');
+    console.log('Gas price watcher started.');
     this.getPrices();
   }
 

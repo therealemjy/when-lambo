@@ -16,33 +16,18 @@ import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
 import { WETH } from './src/tokens';
 
-const provider = new ethers.providers.Web3Provider(
-  new AWSWebsocketProvider(config.aws.wsRpcUrl, {
-    clientConfig: {
-      credentials: {
-        accessKeyId: config.aws.accessKeyId,
-        secretAccessKey: config.aws.secretAccessKey,
-      },
-    },
-  })
-);
-
-// Instantiate exchange services
-const uniswapV2ExchangeService = new UniswapV2Exchange(provider);
-const sushiswapExchangeService = new SushiswapExchange(provider);
-const kyberExchangeService = new KyberExchange(provider);
-const cryptoComExchangeService = new CryptoComExchange(provider);
-
 const tradedToken: Token = {
   symbol: config.tradedToken.symbol,
   address: config.tradedToken.address,
   decimals: config.tradedToken.decimals,
 };
 
+const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
+
 let isMonitoring = false;
 
-const init = async () => {
-  // Initialize Google Spreadsheet intance
+const getWorksheet = async () => {
+  // Initialize Google Spreadsheet instance
   const spreadsheet = new GoogleSpreadsheet(config.googleSpreadSheet.worksheetId);
 
   await spreadsheet.useServiceAccountAuth({
@@ -51,47 +36,82 @@ const init = async () => {
   });
   await spreadsheet.loadInfo();
 
-  const worksheet = spreadsheet.sheetsByIndex[0];
+  return spreadsheet.sheetsByIndex[0];
+};
+
+const init = async () => {
+  const worksheet = await getWorksheet();
 
   // Pull gas prices every 5 seconds
   gasPriceWatcher.updateEvery(5000);
 
-  console.log('Price monitoring has started.');
+  const restart = () => {
+    const provider = new ethers.providers.Web3Provider(
+      new AWSWebsocketProvider(config.aws.wsRpcUrl, {
+        clientConfig: {
+          credentials: {
+            accessKeyId: config.aws.accessKeyId,
+            secretAccessKey: config.aws.secretAccessKey,
+          },
+        },
+      })
+    );
 
-  provider.addListener('block', async (blockNumber) => {
-    if (config.environment === 'development') {
-      console.log(`New block received. Block # ${blockNumber}`);
-    }
+    // Instantiate exchange services
+    const uniswapV2ExchangeService = new UniswapV2Exchange(provider);
+    const sushiswapExchangeService = new SushiswapExchange(provider);
+    const kyberExchangeService = new KyberExchange(provider);
+    const cryptoComExchangeService = new CryptoComExchange(provider);
 
-    if (isMonitoring && config.environment === 'development') {
-      console.log('Block skipped! Price monitoring ongoing.');
-    } else if (config.environment === 'development') {
-      console.time('monitorPrices');
-    }
+    const onReceiveBlock = async (blockNumber: string) => {
+      if (config.environment === 'development') {
+        console.log(`New block received. Block # ${blockNumber}`);
+      }
 
-    if (isMonitoring) {
-      return;
-    }
+      if (isMonitoring && config.environment === 'development') {
+        console.log('Block skipped! Price monitoring ongoing.');
+      } else if (config.environment === 'development') {
+        console.time('monitorPrices');
+      }
 
-    isMonitoring = true;
+      if (isMonitoring) {
+        return;
+      }
 
-    const paths = await monitorPrices({
-      refTokenDecimalAmounts: config.tradedToken.weiAmounts,
-      refToken: WETH,
-      tradedToken,
-      exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService, cryptoComExchangeService],
-      slippageAllowancePercent: config.slippageAllowancePercent,
-      gasPriceWei: global.currentGasPrices.rapid,
-    });
+      isMonitoring = true;
 
-    isMonitoring = false;
+      const paths = await monitorPrices({
+        refTokenDecimalAmounts: config.tradedToken.weiAmounts,
+        refToken: WETH,
+        tradedToken,
+        exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService, cryptoComExchangeService],
+        slippageAllowancePercent: config.slippageAllowancePercent,
+        gasPriceWei: global.currentGasPrices.rapid,
+      });
 
-    if (config.environment === 'development') {
-      console.timeEnd('monitorPrices');
-    }
+      isMonitoring = false;
 
-    logPaths(paths, worksheet);
-  });
+      if (config.environment === 'development') {
+        console.timeEnd('monitorPrices');
+      }
+
+      logPaths(paths, worksheet);
+    };
+
+    provider.removeListener('block', onReceiveBlock);
+    provider.addListener('block', onReceiveBlock);
+
+    console.log('Price monitoring bot started.');
+
+    // Regularly restart the bot so the websocket connection doesn't idle
+    setTimeout(() => {
+      console.log('Restarting bot...');
+      restart();
+    }, THIRTY_MINUTES_IN_MILLISECONDS);
+  };
+
+  // Start bot
+  restart();
 };
 
 init();
