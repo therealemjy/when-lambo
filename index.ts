@@ -55,7 +55,7 @@ const init = async () => {
 
   const worksheet = spreadsheet.sheetsByTitle[SPREAD_SHEET_TITLE];
 
-  if (!worksheet) {
+  if (!worksheet && config.environment === 'production') {
     throw new Error(
       `Worksheet "${SPREAD_SHEET_TITLE}" does not exist on spreadsheet "${spreadsheet.title}" (ID: ${config.googleSpreadSheet.worksheetId}). Create it then start the bot again.`
     );
