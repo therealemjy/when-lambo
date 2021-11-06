@@ -15,7 +15,7 @@ const getConvertedDealGasCost = (deal: Deal) => {
 
   // Otherwise we convert the gas cost in the currency of the traded token
   const fromTokenDecimalPriceInToTokenDecimals = deal.toTokenDecimalAmount
-    .dividedBy(deal.fromTokenDecimalAmount)
+    .dividedBy(deal.fromTokenDecimalAmount) // In this case, we know fromTokenDecimalAmount is expressed in wei
     .toFixed(0);
 
   return deal.estimatedGasCost.multipliedBy(fromTokenDecimalPriceInToTokenDecimals);
@@ -45,13 +45,21 @@ const findBestDeal = async ({
       toToken: tradedToken,
     });
 
+    // Apply maximum slippage allowance, which means any deal found is
+    // calculated with the most pessimistic outcome (given our slippage
+    // allowance). If we still yield a profit despite this, then we consider the
+    // opportunity safe
+    const pessimisticToTokenDecimalAmount = new BigNumber(
+      decimalAmount.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
+    );
+
     return {
       timestamp: new Date(),
       exchange,
       fromToken: refToken,
       fromTokenDecimalAmount: refTokenDecimalAmount,
       toToken: tradedToken,
-      toTokenDecimalAmount: decimalAmount,
+      toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
       slippageAllowancePercent,
       estimatedGasCost: gasPriceWei.multipliedBy(exchange.estimatedGasForSwap),
     };
@@ -82,19 +90,7 @@ const findBestDeal = async ({
     return dealRevenuesMinusGas.isGreaterThan(currentBestDealRevenuesMinusGas) ? deal : currentBestDeal;
   }, deals[0]);
 
-  // Apply maximum slippage allowance, which means any deal found is calculated
-  // with the most pessimistic outcome (given our slippage allowance). If we
-  // still yield a profit despite this, then we consider opportunity is safe
-  const pessimisticToTokenDecimalAmount = new BigNumber(
-    bestDeal.toTokenDecimalAmount.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
-  );
-
-  const pessimisticBestDeal = {
-    ...bestDeal,
-    toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
-  };
-
-  return pessimisticBestDeal;
+  return bestDeal;
 };
 
 export default findBestDeal;
