@@ -45,7 +45,7 @@ const init = async () => {
   // Pull gas prices every 5 seconds
   gasPriceWatcher.updateEvery(5000);
 
-  const restart = () => {
+  const start = () => {
     const provider = new ethers.providers.Web3Provider(
       new AWSWebsocketProvider(config.aws.wsRpcUrl, {
         clientConfig: {
@@ -98,7 +98,6 @@ const init = async () => {
       logPaths(paths, worksheet);
     };
 
-    provider.removeListener('block', onReceiveBlock);
     provider.addListener('block', onReceiveBlock);
 
     console.log('Price monitoring bot started.');
@@ -106,7 +105,11 @@ const init = async () => {
     // Regularly restart the bot so the websocket connection doesn't idle
     setTimeout(() => {
       console.log('Restarting bot...');
-      restart();
+
+      // Shut down bot
+      provider.removeAllListeners();
+
+      start();
     }, THIRTY_MINUTES_IN_MILLISECONDS);
   };
 
