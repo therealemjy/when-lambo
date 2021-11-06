@@ -33,6 +33,14 @@ module.exports = {
         TRADED_TOKEN_WEI_AMOUNTS:
           '1000000000000000000,2000000000000000000,3000000000000000000,4000000000000000000,5000000000000000000',
       },
+      env_shib: {
+        ...baseEnvs,
+        TRADED_TOKEN_ADDRESS: '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce',
+        TRADED_TOKEN_SYMBOL: 'SHIB',
+        TRADED_TOKEN_DECIMALS: '18',
+        TRADED_TOKEN_WEI_AMOUNTS:
+          '1000000000000000000,2000000000000000000,3000000000000000000,4000000000000000000,5000000000000000000',
+      },
     },
   ],
   deploy: {
@@ -40,6 +48,11 @@ module.exports = {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env dai',
       host: ['ec2-3-91-241-119.compute-1.amazonaws.com'],
+    },
+    shib: {
+      ...baseOptions,
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env shib',
+      host: ['ec2-184-73-39-7.compute-1.amazonaws.com'],
     },
   },
 };
