@@ -39,8 +39,6 @@ const tradedToken: Token = {
   decimals: config.tradedToken.decimals,
 };
 
-const SPREAD_SHEET_TITLE = `WETH / ${tradedToken.symbol}`;
-
 let isMonitoring = false;
 
 const init = async () => {
@@ -53,13 +51,7 @@ const init = async () => {
   });
   await spreadsheet.loadInfo();
 
-  const worksheet = spreadsheet.sheetsByTitle[SPREAD_SHEET_TITLE];
-
-  if (!worksheet && config.environment === 'production') {
-    throw new Error(
-      `Worksheet "${SPREAD_SHEET_TITLE}" does not exist on spreadsheet "${spreadsheet.title}" (ID: ${config.googleSpreadSheet.worksheetId}). Create it then start the bot again.`
-    );
-  }
+  const worksheet = spreadsheet.sheetsByIndex[0];
 
   // Pull gas prices every 5 seconds
   gasPriceWatcher.updateEvery(5000);
