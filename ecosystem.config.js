@@ -91,5 +91,25 @@ module.exports = {
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env shib',
       host: ['ec2-184-73-39-7.compute-1.amazonaws.com'],
     },
+    link: {
+      ...baseOptions,
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env link',
+      host: ['ec2-3-89-131-117.compute-1.amazonaws.com'],
+    },
+    mana: {
+      ...baseOptions,
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env mana',
+      host: ['ec2-35-171-162-140.compute-1.amazonaws.com'],
+    },
+    aave: {
+      ...baseOptions,
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env aave',
+      host: ['ec2-3-91-151-108.compute-1.amazonaws.com'],
+    },
+    sand: {
+      ...baseOptions,
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env sand',
+      host: ['ec2-184-72-215-181.compute-1.amazonaws.com'],
+    },
   },
 };
