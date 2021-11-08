@@ -8,7 +8,6 @@ import exchangeProxyContract from './contracts/ExchangeProxy.json';
 class Balancer implements Exchange {
   name: string;
   estimatedGasForSwap: BigNumber;
-
   provider: ethers.providers.Web3Provider;
   exchangeProxy: ethers.Contract;
 
