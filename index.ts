@@ -114,7 +114,7 @@ const init = async () => {
   };
 
   // Start bot
-  restart();
+  start();
 };
 
 init();
