@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 
 import { Exchange } from '@src/exchanges/types';
 
-import exchangeProxyContract from './contracts/ExchangeProxy.json';
+import exchangeProxyContract from './contracts/exchangeProxy.json';
 
 class Balancer implements Exchange {
   name: string;
