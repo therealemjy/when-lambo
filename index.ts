@@ -7,6 +7,7 @@ import { Token } from '@src/types';
 
 import './@moduleAliases';
 import config from './src/config';
+import BalancerExchange from './src/exchanges/balancer';
 import CryptoComExchange from './src/exchanges/cryptoCom';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
@@ -62,6 +63,7 @@ const init = async () => {
     const sushiswapExchangeService = new SushiswapExchange(provider);
     const kyberExchangeService = new KyberExchange(provider);
     const cryptoComExchangeService = new CryptoComExchange(provider);
+    const balancerExchangeService = new BalancerExchange(provider);
 
     const onReceiveBlock = async (blockNumber: string) => {
       if (config.environment === 'development') {
@@ -84,7 +86,13 @@ const init = async () => {
         refTokenDecimalAmounts: config.tradedToken.weiAmounts,
         refToken: WETH,
         tradedToken,
-        exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService, cryptoComExchangeService],
+        exchanges: [
+          uniswapV2ExchangeService,
+          sushiswapExchangeService,
+          kyberExchangeService,
+          cryptoComExchangeService,
+          balancerExchangeService,
+        ],
         slippageAllowancePercent: config.slippageAllowancePercent,
         gasPriceWei: global.currentGasPrices.rapid,
       });
@@ -114,7 +122,7 @@ const init = async () => {
   };
 
   // Start bot
-  restart();
+  start();
 };
 
 init();
