@@ -26,10 +26,9 @@ class Balancer implements Exchange {
   }
 
   getDecimalAmountOut: Exchange['getDecimalAmountOut'] = async ({ fromTokenDecimalAmount, fromToken, toToken }) => {
-    const res = await this.exchangeProxy.viewSplitExactIn(fromToken.address, toToken.address,  fromTokenDecimalAmount.toFixed(), 4);
+    const [_swaps, totalAmounts] = await this.exchangeProxy.viewSplitExactIn(fromToken.address, toToken.address,  fromTokenDecimalAmount.toFixed(), 4);
 
-    console.log("Balancer res", res)
-    return new BigNumber(1);
+    return new BigNumber(totalAmounts.toString())
   }
 }
 
