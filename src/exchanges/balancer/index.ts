@@ -1,12 +1,12 @@
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 
-import { Exchange } from '@src/exchanges/types';
+import { Exchange, ExchangeName } from '@src/types';
 
 import exchangeProxyContract from './contracts/exchangeProxy.json';
 
 class Balancer implements Exchange {
-  name: string;
+  name: ExchangeName;
   estimatedGasForSwap: BigNumber;
   provider: ethers.providers.Web3Provider;
   exchangeProxy: ethers.Contract;
@@ -14,7 +14,7 @@ class Balancer implements Exchange {
   constructor(provider: ethers.providers.Web3Provider) {
     this.provider = provider;
 
-    this.name = 'Balancer';
+    this.name = ExchangeName.Balancer;
     this.estimatedGasForSwap = new BigNumber(166270);
 
     this.exchangeProxy = new ethers.Contract(
@@ -27,7 +27,10 @@ class Balancer implements Exchange {
   getDecimalAmountOut: Exchange['getDecimalAmountOut'] = async ({ fromTokenDecimalAmount, fromToken, toToken }) => {
     const [_swaps, totalAmounts] = await this.exchangeProxy.viewSplitExactIn(fromToken.address, toToken.address,  fromTokenDecimalAmount.toFixed(), 4);
 
-    return new BigNumber(totalAmounts.toString())
+    return {
+      decimalAmountOut: new BigNumber(totalAmounts.toString()),
+      usedExchangeNames: [ExchangeName.Balancer],
+    }
   }
 }
 

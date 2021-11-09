@@ -1,12 +1,12 @@
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 
-import { Exchange } from '@src/exchanges/types';
+import { Exchange, ExchangeName } from '@src/types';
 
 import kyberNetworkProxy from './contracts/kyberNetworkProxy.json';
 
 class Kyber implements Exchange {
-  name: string;
+  name: ExchangeName;
   estimatedGasForSwap: BigNumber;
 
   provider: ethers.providers.Web3Provider;
@@ -15,7 +15,7 @@ class Kyber implements Exchange {
   constructor(provider: ethers.providers.Web3Provider) {
     this.provider = provider;
 
-    this.name = 'Kyber';
+    this.name = ExchangeName.Kyber;
     this.estimatedGasForSwap = new BigNumber(400000);
 
     this.networkProxy = new ethers.Contract(
@@ -47,7 +47,10 @@ class Kyber implements Exchange {
     // decimals provided
     const totalToTokenDecimals = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
 
-    return totalToTokenDecimals;
+    return {
+      decimalAmountOut: totalToTokenDecimals,
+      usedExchangeNames: [ExchangeName.Kyber]
+    }
   }
 }
 

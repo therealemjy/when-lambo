@@ -1,13 +1,17 @@
 import BigNumber from 'bignumber.js';
 
-import { Token } from '@src/types';
+import { Token, ExchangeName } from '@src/types';
 
 export interface Exchange {
-  name: string;
+  name: ExchangeName;
   estimatedGasForSwap: BigNumber; // in Wei
   getDecimalAmountOut: (args: {
     fromTokenDecimalAmount: BigNumber;
     fromToken: Token;
     toToken: Token;
-  }) => Promise<BigNumber>;
+  }) => Promise<IGetDecimalAmountOutput>;
+}
+export interface IGetDecimalAmountOutput {
+  decimalAmountOut: BigNumber;
+  usedExchangeNames: ExchangeName[];
 }

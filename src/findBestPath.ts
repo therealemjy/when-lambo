@@ -8,6 +8,7 @@ const findBestPath = async ({
   refTokenDecimalAmount,
   refToken,
   tradedToken,
+  aggregators,
   exchanges,
   slippageAllowancePercent,
   gasPriceWei,
@@ -15,6 +16,7 @@ const findBestPath = async ({
   refTokenDecimalAmount: BigNumber;
   refToken: Token;
   tradedToken: Token;
+  aggregators: Exchange[];
   exchanges: Exchange[];
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
@@ -25,7 +27,7 @@ const findBestPath = async ({
     refTokenDecimalAmount,
     refToken,
     tradedToken,
-    exchanges,
+    aggregators, // New strategy: buy on aggregators, sell to exchanges' pools
     slippageAllowancePercent,
     gasPriceWei,
   });
@@ -41,7 +43,7 @@ const findBestPath = async ({
     refToken: bestSellingDeal.toToken,
     tradedToken: bestSellingDeal.fromToken,
     // Remove the exchange we got the best selling deal from
-    exchanges: exchanges.filter((exchange) => exchange.name !== bestSellingDeal.exchange.name),
+    exchanges: exchanges.filter((exchange) => !bestSellingDeal.usedExchangeNames.includes(exchange.name)),
     slippageAllowancePercent,
     gasPriceWei,
   });

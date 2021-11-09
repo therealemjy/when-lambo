@@ -1,13 +1,13 @@
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 
-import { Exchange } from '@src/exchanges/types';
+import { Exchange, ExchangeName } from '@src/types';
 
 import addressProviderContract from './contracts/addressProviderContract.json';
 import swapContract from './contracts/swapContract.json';
 
 class Curve implements Exchange {
-  name: string;
+  name: ExchangeName;
   estimatedGasForSwap: BigNumber;
 
   provider: ethers.providers.Web3Provider;
@@ -18,7 +18,7 @@ class Curve implements Exchange {
   constructor(provider: ethers.providers.Web3Provider) {
     this.provider = provider;
 
-    this.name = 'Curve';
+    this.name = ExchangeName.Curve;
     this.estimatedGasForSwap = new BigNumber(115000);
 
     this.addressProvider = new ethers.Contract(
@@ -60,7 +60,10 @@ class Curve implements Exchange {
     // decimals provided
     const totalToTokenDecimals = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
 
-    return totalToTokenDecimals
+    return {
+      decimalAmountOut:totalToTokenDecimals,
+      usedExchangeNames: [ExchangeName.Curve]
+    }
   }
 }
 

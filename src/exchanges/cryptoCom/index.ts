@@ -1,12 +1,12 @@
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 
-import { Exchange } from '@src/exchanges/types';
+import { Exchange, ExchangeName } from '@src/types';
 
 import cryptoComRouterContract from './contracts/cryptoComRouter.json';
 
 class CryptoCom implements Exchange {
-  name: string;
+  name: ExchangeName;
   estimatedGasForSwap: BigNumber;
 
   provider: ethers.providers.Web3Provider;
@@ -15,7 +15,7 @@ class CryptoCom implements Exchange {
   constructor(provider: ethers.providers.Web3Provider) {
     this.provider = provider;
 
-    this.name = 'Crypto.com';
+    this.name = ExchangeName.CryptoCom;
     this.estimatedGasForSwap = new BigNumber(165000);
 
     this.routerContract = new ethers.Contract(
@@ -27,7 +27,11 @@ class CryptoCom implements Exchange {
 
   getDecimalAmountOut: Exchange['getDecimalAmountOut'] = async ({ fromTokenDecimalAmount, fromToken, toToken }) => {
     const res = await this.routerContract.getAmountsOut(fromTokenDecimalAmount.toFixed(), [fromToken.address, toToken.address]);
-    return new BigNumber(res[1].toString());
+
+    return {
+      decimalAmountOut: new BigNumber(res[1].toString()),
+      usedExchangeNames: [ExchangeName.CryptoCom]
+    }
   }
 }
 

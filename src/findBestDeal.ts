@@ -26,20 +26,22 @@ const findBestDeal = async ({
   refToken,
   tradedToken,
   exchanges,
+  aggregators,
   slippageAllowancePercent,
   gasPriceWei,
 }: {
   refTokenDecimalAmount: BigNumber;
   refToken: Token;
   tradedToken: Token;
-  exchanges: Exchange[];
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
+  exchanges?: Exchange[];
+  aggregators?: Exchange[];
 }): Promise<Deal | undefined> => {
   // Check how many tradedToken (e.g.: DAI) decimals we get from trading the
   // provided refToken (e.g.: WETH) decimals amount, on all monitored exchanges
-  const dealPromises = exchanges.map<Promise<Deal>>(async (exchange) => {
-    const decimalAmount = await exchange.getDecimalAmountOut({
+  const dealPromises = (exchanges || aggregators || []).map<Promise<Deal>>(async (exchange) => {
+    const res = await exchange.getDecimalAmountOut({
       fromTokenDecimalAmount: refTokenDecimalAmount,
       fromToken: refToken,
       toToken: tradedToken,
@@ -50,7 +52,7 @@ const findBestDeal = async ({
     // allowance). If we still yield a profit despite this, then we consider the
     // opportunity safe
     const pessimisticToTokenDecimalAmount = new BigNumber(
-      decimalAmount.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
+      res.decimalAmountOut.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
     );
 
     return {
@@ -62,6 +64,7 @@ const findBestDeal = async ({
       toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
       slippageAllowancePercent,
       estimatedGasCost: gasPriceWei.multipliedBy(exchange.estimatedGasForSwap),
+      usedExchangeNames: res.usedExchangeNames,
     };
   });
 

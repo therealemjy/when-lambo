@@ -6,6 +6,16 @@ import Token from '@src/tokens/Token';
 export type { Token };
 export type { Exchange };
 
+export enum ExchangeName {
+  UniswapV2 = 'Uniswap V2',
+  Kyber = 'Kyber',
+  Sushiswap = 'Sushiswap',
+  Balancer = 'Balancer',
+  Curve = 'Curve',
+  CryptoCom = 'Crypto.com',
+  OneInch = '1inch',
+}
+
 export interface Deal {
   timestamp: Date;
   exchange: Exchange;
@@ -15,6 +25,7 @@ export interface Deal {
   toTokenDecimalAmount: BigNumber;
   slippageAllowancePercent: number;
   estimatedGasCost: BigNumber;
+  usedExchangeNames: ExchangeName[];
 }
 
 export type Path = [Deal, Deal];

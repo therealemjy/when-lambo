@@ -7,6 +7,7 @@ import { Token } from '@src/types';
 
 import './@moduleAliases';
 import config from './src/config';
+import OneInchExchange from './src/exchanges/1inch';
 import BalancerExchange from './src/exchanges/balancer';
 import CryptoComExchange from './src/exchanges/cryptoCom';
 import KyberExchange from './src/exchanges/kyber';
@@ -65,6 +66,8 @@ const init = async () => {
     const cryptoComExchangeService = new CryptoComExchange(provider);
     const balancerExchangeService = new BalancerExchange(provider);
 
+    const oneInchAggregatorService = new OneInchExchange();
+
     const onReceiveBlock = async (blockNumber: string) => {
       if (config.environment === 'development') {
         console.log(`New block received. Block # ${blockNumber}`);
@@ -86,6 +89,7 @@ const init = async () => {
         refTokenDecimalAmounts: config.tradedToken.weiAmounts,
         refToken: WETH,
         tradedToken,
+        aggregators: [oneInchAggregatorService],
         exchanges: [
           uniswapV2ExchangeService,
           sushiswapExchangeService,
