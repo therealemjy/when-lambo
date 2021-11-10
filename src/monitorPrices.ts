@@ -9,7 +9,6 @@ const monitorPrices = async ({
   refTokenDecimalAmounts,
   refToken,
   tradedToken,
-  aggregators,
   exchanges,
   slippageAllowancePercent,
   gasPriceWei,
@@ -17,10 +16,9 @@ const monitorPrices = async ({
   refTokenDecimalAmounts: BigNumber[];
   refToken: Token;
   tradedToken: Token;
-  aggregators: Exchange[];
-  exchanges: Exchange[];
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
+  exchanges: Exchange[];
 }) => {
   const paths = await Promise.all(
     refTokenDecimalAmounts.map((refTokenDecimalAmount) =>
@@ -28,7 +26,6 @@ const monitorPrices = async ({
         refTokenDecimalAmount,
         refToken,
         tradedToken,
-        aggregators,
         exchanges,
         slippageAllowancePercent,
         gasPriceWei,

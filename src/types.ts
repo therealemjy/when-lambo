@@ -14,6 +14,7 @@ export enum ExchangeName {
   CurveV2 = 'Curve V2',
   CryptoCom = 'Crypto.com',
   OneInch = '1inch',
+  ZeroX = 'ZeroX',
 }
 
 export interface Deal {

@@ -26,7 +26,6 @@ const findBestDeal = async ({
   refToken,
   tradedToken,
   exchanges,
-  aggregators,
   slippageAllowancePercent,
   gasPriceWei,
 }: {
@@ -35,12 +34,11 @@ const findBestDeal = async ({
   tradedToken: Token;
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
-  exchanges?: Exchange[];
-  aggregators?: Exchange[];
+  exchanges: Exchange[];
 }): Promise<Deal | undefined> => {
   // Check how many tradedToken (e.g.: DAI) decimals we get from trading the
-  // provided refToken (e.g.: WETH) decimals amount, on all monitored exchanges
-  const dealPromises = (exchanges || aggregators || []).map<Promise<Deal>>(async (exchange) => {
+  // provided refToken (e.g.: WETH) decimals amount, on all monitored exchanges.
+  const dealPromises = exchanges.map<Promise<Deal>>(async (exchange) => {
     const res = await exchange.getDecimalAmountOut({
       fromTokenDecimalAmount: refTokenDecimalAmount,
       fromToken: refToken,
