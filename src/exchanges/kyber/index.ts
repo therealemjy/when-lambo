@@ -7,7 +7,6 @@ import kyberNetworkProxy from './contracts/kyberNetworkProxy.json';
 
 class Kyber implements Exchange {
   name: ExchangeName;
-  estimatedGasForSwap: BigNumber;
 
   provider: ethers.providers.Web3Provider;
   networkProxy: ethers.Contract
@@ -16,7 +15,6 @@ class Kyber implements Exchange {
     this.provider = provider;
 
     this.name = ExchangeName.Kyber;
-    this.estimatedGasForSwap = new BigNumber(400000);
 
     this.networkProxy = new ethers.Contract(
       kyberNetworkProxy.address,
@@ -49,7 +47,8 @@ class Kyber implements Exchange {
 
     return {
       decimalAmountOut: totalToTokenDecimals,
-      usedExchangeNames: [ExchangeName.Kyber]
+      usedExchangeNames: [ExchangeName.Kyber],
+      estimatedGas: new BigNumber(400000)
     }
   }
 }

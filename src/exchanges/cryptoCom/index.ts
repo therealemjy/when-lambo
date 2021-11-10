@@ -7,7 +7,6 @@ import cryptoComRouterContract from './contracts/cryptoComRouter.json';
 
 class CryptoCom implements Exchange {
   name: ExchangeName;
-  estimatedGasForSwap: BigNumber;
 
   provider: ethers.providers.Web3Provider;
   routerContract: ethers.Contract;
@@ -16,7 +15,6 @@ class CryptoCom implements Exchange {
     this.provider = provider;
 
     this.name = ExchangeName.CryptoCom;
-    this.estimatedGasForSwap = new BigNumber(165000);
 
     this.routerContract = new ethers.Contract(
       cryptoComRouterContract.address,
@@ -30,7 +28,8 @@ class CryptoCom implements Exchange {
 
     return {
       decimalAmountOut: new BigNumber(res[1].toString()),
-      usedExchangeNames: [ExchangeName.CryptoCom]
+      usedExchangeNames: [ExchangeName.CryptoCom],
+      estimatedGas: new BigNumber(165000)
     }
   }
 }

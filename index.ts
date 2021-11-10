@@ -8,7 +8,7 @@ import { Token } from '@src/types';
 import './@moduleAliases';
 import config from './src/config';
 import OneInchExchange from './src/exchanges/1inch';
-import BalancerExchange from './src/exchanges/balancer';
+import BalancerV2Exchange from './src/exchanges/balancerV2';
 import CryptoComExchange from './src/exchanges/cryptoCom';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
@@ -64,7 +64,7 @@ const init = async () => {
     const sushiswapExchangeService = new SushiswapExchange(provider);
     const kyberExchangeService = new KyberExchange(provider);
     const cryptoComExchangeService = new CryptoComExchange(provider);
-    const balancerExchangeService = new BalancerExchange(provider);
+    const balancerV2ExchangeService = new BalancerV2Exchange(provider);
 
     const oneInchAggregatorService = new OneInchExchange();
 
@@ -95,7 +95,7 @@ const init = async () => {
           sushiswapExchangeService,
           kyberExchangeService,
           cryptoComExchangeService,
-          balancerExchangeService,
+          balancerV2ExchangeService,
         ],
         slippageAllowancePercent: config.slippageAllowancePercent,
         gasPriceWei: global.currentGasPrices.rapid,

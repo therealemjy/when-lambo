@@ -10,8 +10,8 @@ export enum ExchangeName {
   UniswapV2 = 'Uniswap V2',
   Kyber = 'Kyber',
   Sushiswap = 'Sushiswap',
-  Balancer = 'Balancer',
-  Curve = 'Curve',
+  BalancerV2 = 'Balancer V2',
+  CurveV2 = 'Curve V2',
   CryptoCom = 'Crypto.com',
   OneInch = '1inch',
 }

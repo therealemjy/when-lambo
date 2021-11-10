@@ -6,9 +6,8 @@ import { Exchange, ExchangeName } from '@src/types';
 import addressProviderContract from './contracts/addressProviderContract.json';
 import swapContract from './contracts/swapContract.json';
 
-class Curve implements Exchange {
+class CurveV2 implements Exchange {
   name: ExchangeName;
-  estimatedGasForSwap: BigNumber;
 
   provider: ethers.providers.Web3Provider;
   networkProxy: ethers.Contract;
@@ -18,8 +17,7 @@ class Curve implements Exchange {
   constructor(provider: ethers.providers.Web3Provider) {
     this.provider = provider;
 
-    this.name = ExchangeName.Curve;
-    this.estimatedGasForSwap = new BigNumber(115000);
+    this.name = ExchangeName.CurveV2;
 
     this.addressProvider = new ethers.Contract(
       addressProviderContract.address,
@@ -62,9 +60,10 @@ class Curve implements Exchange {
 
     return {
       decimalAmountOut:totalToTokenDecimals,
-      usedExchangeNames: [ExchangeName.Curve]
+      usedExchangeNames: [ExchangeName.CurveV2],
+      estimatedGas: new BigNumber(115000)
     }
   }
 }
 
-export default Curve;
+export default CurveV2;

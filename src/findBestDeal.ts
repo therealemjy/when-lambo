@@ -63,7 +63,7 @@ const findBestDeal = async ({
       toToken: tradedToken,
       toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
       slippageAllowancePercent,
-      estimatedGasCost: gasPriceWei.multipliedBy(exchange.estimatedGasForSwap),
+      estimatedGasCost: gasPriceWei.multipliedBy(res.estimatedGas),
       usedExchangeNames: res.usedExchangeNames,
     };
   });

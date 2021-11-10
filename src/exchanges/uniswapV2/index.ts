@@ -7,7 +7,6 @@ import uniswapV2RouterContract from './contracts/uniswapV2Router.json';
 
 class UniswapV2 implements Exchange {
   name: ExchangeName;
-  estimatedGasForSwap: BigNumber;
 
   provider: ethers.providers.Web3Provider;
   routerContract: ethers.Contract;
@@ -16,7 +15,6 @@ class UniswapV2 implements Exchange {
     this.provider = provider;
 
     this.name = ExchangeName.UniswapV2;
-    this.estimatedGasForSwap = new BigNumber(115000);
 
     this.routerContract = new ethers.Contract(
       uniswapV2RouterContract.address,
@@ -30,7 +28,8 @@ class UniswapV2 implements Exchange {
 
     return {
       decimalAmountOut: new BigNumber(res[1].toString()),
-      usedExchangeNames: [ExchangeName.UniswapV2]
+      usedExchangeNames: [ExchangeName.UniswapV2],
+      estimatedGas: new BigNumber(115000)
     }
   }
 }

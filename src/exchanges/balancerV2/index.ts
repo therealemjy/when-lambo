@@ -3,23 +3,21 @@ import BigNumber from 'bignumber.js';
 
 import { Exchange, ExchangeName } from '@src/types';
 
-import exchangeProxyContract from './contracts/exchangeProxy.json';
+import balancerV2ExchangeProxyContract from './contracts/balancerV2ExchangeProxy.json';
 
-class Balancer implements Exchange {
+class BalancerV2 implements Exchange {
   name: ExchangeName;
-  estimatedGasForSwap: BigNumber;
   provider: ethers.providers.Web3Provider;
   exchangeProxy: ethers.Contract;
 
   constructor(provider: ethers.providers.Web3Provider) {
     this.provider = provider;
 
-    this.name = ExchangeName.Balancer;
-    this.estimatedGasForSwap = new BigNumber(166270);
+    this.name = ExchangeName.BalancerV2;
 
     this.exchangeProxy = new ethers.Contract(
-      exchangeProxyContract.address,
-      exchangeProxyContract.abi,
+      balancerV2ExchangeProxyContract.address,
+      balancerV2ExchangeProxyContract.abi,
       provider
     );
   }
@@ -29,9 +27,10 @@ class Balancer implements Exchange {
 
     return {
       decimalAmountOut: new BigNumber(totalAmounts.toString()),
-      usedExchangeNames: [ExchangeName.Balancer],
+      usedExchangeNames: [ExchangeName.BalancerV2],
+      estimatedGas: new BigNumber(166270)
     }
   }
 }
 
-export default Balancer;
+export default BalancerV2;
