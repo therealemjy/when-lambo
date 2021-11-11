@@ -15,6 +15,7 @@ export interface EnvConfig {
     address: string;
     symbol: string;
     decimals: number;
+    // TODO: move outside of tradedToken (confusing)
     weiAmounts: BigNumber[];
   };
   googleSpreadSheet: {

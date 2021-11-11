@@ -13,6 +13,7 @@ import CryptoComExchange from './src/exchanges/cryptoCom';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
+import UniswapV2RouteContract from './src/exchanges/uniswapV2/contracts/uniswapV2Router.json';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
@@ -63,43 +64,22 @@ const init = async () => {
 
     const contractCallContext: ContractCallContext<{ extraContext: string; foo4: boolean }>[] = [
       {
-        reference: 'testContract',
-        contractAddress: '0x6795b15f3b16Cf8fB3E56499bbC07F6261e9b0C3',
-        abi: [
+        reference: 'uniswapV2',
+        contractAddress: UniswapV2RouteContract.address,
+        abi: UniswapV2RouteContract.abi,
+        calls: [
           {
-            name: 'foo',
-            type: 'function',
-            inputs: [{ name: 'example', type: 'uint256' }],
-            outputs: [{ name: 'amounts', type: 'uint256' }],
+            reference: 'getAmountsOutCall',
+            methodName: 'getAmountsOut',
+            methodParameters: [config.tradedToken.weiAmounts[0].toFixed(), [WETH.address, tradedToken.address]],
           },
         ],
-        calls: [{ reference: 'fooCall', methodName: 'foo', methodParameters: [42] }],
-        context: {
-          extraContext: 'extraContext',
-          foo4: true,
-        },
-      },
-      {
-        reference: 'testContract2',
-        contractAddress: '0x66BF8e2E890eA0392e158e77C6381b34E0771318',
-        abi: [
-          {
-            name: 'fooTwo',
-            type: 'function',
-            inputs: [{ name: 'example', type: 'uint256' }],
-            outputs: [
-              { name: 'amounts', type: 'uint256' },
-              { name: 'path', type: 'address[]' },
-            ],
-          },
-        ],
-        calls: [{ reference: 'fooTwoCall', methodName: 'fooTwo', methodParameters: [42] }],
       },
     ];
 
     const fn = async () => {
       const results: ContractCallResults = await multicall.call(contractCallContext);
-      console.log(results);
+      console.log(results.results.uniswapV2.callsReturnContext[0].returnValues);
     };
 
     fn();
@@ -133,7 +113,11 @@ const init = async () => {
       const paths = await monitorPrices({
         refTokenDecimalAmounts: config.tradedToken.weiAmounts,
         refToken: WETH,
-        tradedToken,
+        tradedToken: {
+          symbol: config.tradedToken.symbol,
+          address: config.tradedToken.address,
+          decimals: config.tradedToken.decimals,
+        },
         exchanges: [
           uniswapV2ExchangeService,
           sushiswapExchangeService,
