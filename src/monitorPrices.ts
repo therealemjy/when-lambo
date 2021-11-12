@@ -49,19 +49,20 @@ const monitorPrices = async ({
 
     console.log(exchange.name);
 
+    const resultFormatter = resultFormatters[exchange.name];
+    const formattedResults = resultFormatter(multicallRes.results[exchange.name]);
+
+    console.log(formattedResults);
+
     // Go through each result of the exchange
     // @ts-ignore
-    const deals = multicallRes.results[exchange.name].callsReturnContext
-      // Filter out unsuccessful calls
-      .filter((callReturnContext) => callReturnContext.success)
-      // Format each result and return a deal
-      .forEach((callReturnContext) => {
-        console.log(callReturnContext);
-        const resultFormatter = resultFormatters[exchange.name];
-        console.log(resultFormatter);
-
-        // const formattedResult = resultFormatter(callReturnContext);
-      });
+    // const deals = multicallRes.results[exchange.name].callsReturnContext
+    //   // Filter out unsuccessful calls
+    //   .filter((callReturnContext) => callReturnContext.success)
+    //   // Format each result and shape them into deals
+    //   .forEach((callReturnContext) => {
+    //     const formattedResult = resultFormatter(callReturnContext);
+    //   });
 
     return updatedResults;
   }, []);

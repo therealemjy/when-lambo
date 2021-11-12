@@ -1,7 +1,7 @@
 import { ContractCallReturnContext } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ExchangeName, ResultFormatter } from '@src/types';
+import { Exchange, ExchangeName, IGetDecimalAmountOutCallContextInput } from '@src/types';
 
 import swapContract from './contracts/swapContract.json';
 
@@ -25,7 +25,9 @@ class CurveV2 implements Exchange {
       const swapContractAddress = await this.addressProvider.get_address(2, { gasLimit:100000 });
     */
   // }
-  getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({ callReference, fromTokenDecimalAmounts, fromToken, toToken }) => {
+  getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = (args) => {
+    const { callReference, fromTokenDecimalAmounts, fromToken, toToken } = args;
+
     const calls = fromTokenDecimalAmounts.map(fromTokenDecimalAmount => {
       const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed();
 
@@ -43,31 +45,34 @@ class CurveV2 implements Exchange {
         abi: swapContract.abi,
         calls,
       },
-      resultFormatter: this._formatDecimalAmountOutCallResults
+      resultFormatter: (callResult: ContractCallReturnContext) => this._formatDecimalAmountOutCallResults(callResult, args)
     }
   }
 
-  _formatDecimalAmountOutCallResults: ResultFormatter = (
+  _formatDecimalAmountOutCallResults = (
     callResult: ContractCallReturnContext,
-    { fromToken }
+    { fromToken }: IGetDecimalAmountOutCallContextInput
   ) => (
-    callResult.callsReturnContext.map(callReturnContext => {
-      // Price of 1 fromToken in toToken decimals
-      const oneFromTokenSellRate = callReturnContext.returnValues[0].toString();
+    callResult.callsReturnContext
+      // Filter out unsuccessful calls
+      .filter(callReturnContext => callReturnContext.success)
+      .map(callReturnContext => {
+        // Price of 1 fromToken in toToken decimals
+        const oneFromTokenSellRate = callReturnContext.returnValues[0].toString();
 
-      // Price of 1 fromToken decimal in toToken decimals
-      const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(1 * 10 ** fromToken.decimals);
+        // Price of 1 fromToken decimal in toToken decimals
+        const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(1 * 10 ** fromToken.decimals);
 
-      // Total amount of toToken decimals we get from selling all the fromToken
-      // decimals provided
-      const fromTokenDecimalAmount = callReturnContext.returnValues[2];
-      const decimalAmountOut = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
+        // Total amount of toToken decimals we get from selling all the fromToken
+        // decimals provided
+        const fromTokenDecimalAmount = callReturnContext.returnValues[2];
+        const decimalAmountOut = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
 
-      return {
-        decimalAmountOut,
-        estimatedGas: new BigNumber(115000)
-      }
-    })
+        return {
+          decimalAmountOut,
+          estimatedGas: new BigNumber(115000)
+        }
+      })
   )
 }
 

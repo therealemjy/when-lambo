@@ -33,10 +33,13 @@ class UniswapV2 implements Exchange {
         calls,
       },
       resultFormatter: (callResult) => (
-        callResult.callsReturnContext.map(callReturnContext => ({
-          decimalAmountOut: new BigNumber(callReturnContext.returnValues[1].toString()),
-          estimatedGas: new BigNumber(115000)
-        }))
+        callResult.callsReturnContext
+          // Filter out unsuccessful calls
+          .filter(callReturnContext => callReturnContext.success)
+          .map(callReturnContext => ({
+            decimalAmountOut: new BigNumber(callReturnContext.returnValues[1].toString()),
+            estimatedGas: new BigNumber(115000)
+          }))
       )
     }
   };

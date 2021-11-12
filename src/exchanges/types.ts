@@ -18,10 +18,7 @@ export interface Exchange {
   };
 }
 
-export type ResultFormatter = (
-  result: ContractCallReturnContext,
-  callArgs: IGetDecimalAmountOutCallContextInput
-) => FormattedDecimalAmountOutCallResult;
+export type ResultFormatter = (result: ContractCallReturnContext) => FormattedDecimalAmountOutCallResult;
 
 export type FormattedDecimalAmountOutCallResult = Array<{
   decimalAmountOut: BigNumber;
