@@ -16,8 +16,8 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
     const borrowedDec = path[0].fromTokenDecimalAmount.toFixed();
     const boughtDec = path[0].toTokenDecimalAmount.toFixed(0);
     const revenues = path[1].toTokenDecimalAmount.toFixed(0);
-    const bestSellingExchangeName = path[0].exchange.name;
-    const bestBuyingExchangeName = path[1].exchange.name;
+    const bestSellingExchangeName = path[0].exchangeName;
+    const bestBuyingExchangeName = path[1].exchangeName;
     const gasCost = path[0].estimatedGasCost.plus(path[1].estimatedGasCost);
 
     const [profitDec, profitPercent] = calculateProfit({

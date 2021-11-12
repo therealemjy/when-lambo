@@ -1,10 +1,8 @@
 import AWSWebsocketProvider from '@aws/web3-ws-provider';
-import { Multicall, ContractCallResults, ContractCallContext } from '@maxime.julian/ethereum-multicall';
+import { Multicall } from '@maxime.julian/ethereum-multicall';
 import 'console.table';
 import { ethers } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
-
-import { Token } from '@src/types';
 
 import './@moduleAliases';
 import config from './src/config';
@@ -17,12 +15,6 @@ import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
 import { WETH } from './src/tokens';
-
-const tradedToken: Token = {
-  symbol: config.tradedToken.symbol,
-  address: config.tradedToken.address,
-  decimals: config.tradedToken.decimals,
-};
 
 const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
 
@@ -68,26 +60,6 @@ const init = async () => {
     const cryptoComExchangeService = new CryptoComExchange();
     const balancerV2ExchangeService = new BalancerV1Exchange();
 
-    const contractCallContext: ContractCallContext[] = [
-      uniswapV2ExchangeService.getDecimalAmountOutCallContext({
-        callReference: 'uniswap',
-        fromTokenDecimalAmounts: config.tradedToken.weiAmounts,
-        fromToken: WETH,
-        toToken: tradedToken,
-      }),
-    ];
-
-    const fn = async () => {
-      const { results }: ContractCallResults = await multicall.call(contractCallContext);
-      const uniswapResult = uniswapV2ExchangeService.formatDecimalAmountOutCallResults(results['uniswap']);
-
-      console.log(uniswapResult);
-    };
-
-    fn();
-
-    return;
-
     const onReceiveBlock = async (blockNumber: string) => {
       if (config.environment === 'development') {
         console.log(`New block received. Block # ${blockNumber}`);
@@ -106,6 +78,7 @@ const init = async () => {
       isMonitoring = true;
 
       const paths = await monitorPrices({
+        multicall,
         refTokenDecimalAmounts: config.tradedToken.weiAmounts,
         refToken: WETH,
         tradedToken: {

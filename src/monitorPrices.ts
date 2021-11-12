@@ -1,11 +1,12 @@
+import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
 import { Exchange } from '@src/types';
 
-import findBestPath from './findBestPath';
-import { Token, Path } from './types';
+import { Token } from './types';
 
 const monitorPrices = async ({
+  multicall,
   refTokenDecimalAmounts,
   refToken,
   tradedToken,
@@ -13,6 +14,7 @@ const monitorPrices = async ({
   slippageAllowancePercent,
   gasPriceWei,
 }: {
+  multicall: Multicall;
   refTokenDecimalAmounts: BigNumber[];
   refToken: Token;
   tradedToken: Token;
@@ -20,21 +22,7 @@ const monitorPrices = async ({
   gasPriceWei: BigNumber;
   exchanges: Exchange[];
 }) => {
-  const paths = await Promise.all(
-    refTokenDecimalAmounts.map((refTokenDecimalAmount) =>
-      findBestPath({
-        refTokenDecimalAmount,
-        refToken,
-        tradedToken,
-        exchanges,
-        slippageAllowancePercent,
-        gasPriceWei,
-      })
-    )
-  );
-
-  const validPaths = paths.filter((path): path is Path => path !== undefined);
-  return validPaths;
+  return [];
 };
 
 export default monitorPrices;
