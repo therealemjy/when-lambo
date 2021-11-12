@@ -58,7 +58,8 @@ const init = async () => {
     const sushiswapExchangeService = new SushiswapExchange();
     const kyberExchangeService = new KyberExchange();
     const cryptoComExchangeService = new CryptoComExchange();
-    const balancerV2ExchangeService = new BalancerV1Exchange();
+    // @ts-ignore
+    const balancerV1ExchangeService = new BalancerV1Exchange();
 
     const onReceiveBlock = async (blockNumber: string) => {
       if (config.environment === 'development') {
@@ -91,7 +92,8 @@ const init = async () => {
           sushiswapExchangeService,
           kyberExchangeService,
           cryptoComExchangeService,
-          balancerV2ExchangeService,
+          // TODO: investigate why Balancer's call throws an "out of gas" error
+          // balancerV1ExchangeService,
         ],
         slippageAllowancePercent: config.slippageAllowancePercent,
         gasPriceWei: global.currentGasPrices.rapid,

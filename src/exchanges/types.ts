@@ -12,12 +12,14 @@ export interface Exchange {
     toToken: Token;
   }) => {
     context: ContractCallContext;
-    resultFormatter: (
-      result: ContractCallReturnContext,
-      additionalArgs?: any // TODO: type properly
-    ) => FormattedDecimalAmountOutCallResult;
+    resultFormatter: ResultFormatter;
   };
 }
+
+export type ResultFormatter = (
+  result: ContractCallReturnContext,
+  additionalArgs?: any // TODO: type properly
+) => FormattedDecimalAmountOutCallResult;
 
 export type FormattedDecimalAmountOutCallResult = Array<{
   decimalAmountOut: BigNumber;

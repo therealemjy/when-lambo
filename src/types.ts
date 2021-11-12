@@ -1,10 +1,10 @@
 import BigNumber from 'bignumber.js';
 
-import { Exchange, FormattedDecimalAmountOutCallResult } from '@src/exchanges/types';
+import { Exchange, FormattedDecimalAmountOutCallResult, ResultFormatter } from '@src/exchanges/types';
 import Token from '@src/tokens/Token';
 
 export type { Token };
-export type { Exchange, FormattedDecimalAmountOutCallResult };
+export type { Exchange, FormattedDecimalAmountOutCallResult, ResultFormatter };
 
 export enum ExchangeName {
   UniswapV2 = 'Uniswap V2',

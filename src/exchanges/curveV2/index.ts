@@ -25,7 +25,6 @@ class CurveV2 implements Exchange {
       const swapContractAddress = await this.addressProvider.get_address(2, { gasLimit:100000 });
     */
   // }
-
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({ callReference, fromTokenDecimalAmounts, fromToken, toToken }) => {
     const calls = fromTokenDecimalAmounts.map(fromTokenDecimalAmount => {
       const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed();
@@ -69,26 +68,6 @@ class CurveV2 implements Exchange {
       }
     })
   )
-
-  // TODO: remove, only here to check the new implementation works
-  //   const res = await this.swap['get_best_rate(address,address,uint256)'](fromToken.address, toToken.address, fromTokenDecimalAmount.toFixed());
-
-  //   // // Price of 1 fromToken in toToken decimals
-  //   const oneFromTokenSellRate = res[0].toString();
-
-  //   // Price of 1 fromToken decimal in toToken decimals
-  //   const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(1 * 10 ** fromToken.decimals);
-
-  //   // Total amount of toToken decimals we get from selling all the fromToken
-  //   // decimals provided
-  //   const totalToTokenDecimals = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
-
-  //   return {
-  //     decimalAmountOut:totalToTokenDecimals,
-  //     usedExchangeNames: [ExchangeName.CurveV2],
-  //     estimatedGas: new BigNumber(115000)
-  //   }
-  // };
 }
 
 export default CurveV2;

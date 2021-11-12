@@ -2,13 +2,13 @@ import BigNumber from 'bignumber.js';
 
 import { Exchange, ExchangeName } from '@src/types';
 
-import balancerV2ExchangeProxyContract from './contracts/balancerV2ExchangeProxy.json';
+import balancerV1ExchangeProxyContract from './contracts/balancerV1ExchangeProxy.json';
 
 // Number of pools we allow Balancer to take the funds from. Note: we're
 // currently setting it to 1 as we're not sure if taking funds from multiple
 // pools increases the gas cost or not.
 // TODO: check if that's true or if we can increase the number of pools
-const N_POOLS = 1;
+const N_POOLS = 4;
 
 class BalancerV1 implements Exchange {
   name: ExchangeName;
@@ -31,8 +31,8 @@ class BalancerV1 implements Exchange {
     return {
       context: {
         reference: callReference,
-        contractAddress: balancerV2ExchangeProxyContract.address,
-        abi: balancerV2ExchangeProxyContract.abi,
+        contractAddress: balancerV1ExchangeProxyContract.address,
+        abi: balancerV1ExchangeProxyContract.abi,
         calls,
       },
       resultFormatter: (callResult) => (
