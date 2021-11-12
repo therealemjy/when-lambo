@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@aws/web3-ws-provider": "^1.0.3",
-    "@maxime.julian/ethereum-multicall": "^2.9.0",
+    "@maxime.julian/ethereum-multicall": "^3.0.0",
     "aws-sdk": "^2.1016.0",
     "axios": "^0.24.0",
     "bignumber.js": "^9.0.1",

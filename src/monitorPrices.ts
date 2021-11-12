@@ -37,7 +37,9 @@ const monitorPrices = async ({
     return [...contexts, context];
   }, []);
 
-  const multicallRes = await multicall.call(multicallContexts);
+  const multicallRes = await multicall.call(multicallContexts, {
+    gasLimit: 999999999999999, // Add stupid value to prevent issues with view functions running out of gas
+  });
 
   console.log(multicallRes.results['Uniswap V2'].originalContractCallContext);
 
