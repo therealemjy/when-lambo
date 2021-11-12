@@ -8,12 +8,11 @@ import { Token } from '@src/types';
 
 import './@moduleAliases';
 import config from './src/config';
-import BalancerV2Exchange from './src/exchanges/balancerV2';
+import BalancerV1Exchange from './src/exchanges/balancerV1';
 import CryptoComExchange from './src/exchanges/cryptoCom';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
-import UniswapV2RouteContract from './src/exchanges/uniswapV2/contracts/uniswapV2Router.json';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import monitorPrices from './src/monitorPrices';
@@ -62,36 +61,32 @@ const init = async () => {
 
     const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
 
-    const contractCallContext: ContractCallContext<{ extraContext: string; foo4: boolean }>[] = [
-      {
-        reference: 'uniswapV2',
-        contractAddress: UniswapV2RouteContract.address,
-        abi: UniswapV2RouteContract.abi,
-        calls: [
-          {
-            reference: 'getAmountsOutCall',
-            methodName: 'getAmountsOut',
-            methodParameters: [config.tradedToken.weiAmounts[0].toFixed(), [WETH.address, tradedToken.address]],
-          },
-        ],
-      },
+    // Instantiate exchange services
+    const uniswapV2ExchangeService = new UniswapV2Exchange();
+    const sushiswapExchangeService = new SushiswapExchange();
+    const kyberExchangeService = new KyberExchange();
+    const cryptoComExchangeService = new CryptoComExchange();
+    const balancerV2ExchangeService = new BalancerV1Exchange();
+
+    const contractCallContext: ContractCallContext[] = [
+      uniswapV2ExchangeService.getDecimalAmountOutCallContext({
+        callReference: 'uniswap',
+        fromTokenDecimalAmounts: config.tradedToken.weiAmounts,
+        fromToken: WETH,
+        toToken: tradedToken,
+      }),
     ];
 
     const fn = async () => {
-      const results: ContractCallResults = await multicall.call(contractCallContext);
-      console.log(results.results.uniswapV2.callsReturnContext[0].returnValues);
+      const { results }: ContractCallResults = await multicall.call(contractCallContext);
+      const uniswapResult = uniswapV2ExchangeService.formatDecimalAmountOutCallResults(results['uniswap']);
+
+      console.log(uniswapResult);
     };
 
     fn();
 
     return;
-
-    // Instantiate exchange services
-    const uniswapV2ExchangeService = new UniswapV2Exchange(provider);
-    const sushiswapExchangeService = new SushiswapExchange(provider);
-    const kyberExchangeService = new KyberExchange(provider);
-    const cryptoComExchangeService = new CryptoComExchange(provider);
-    const balancerV2ExchangeService = new BalancerV2Exchange(provider);
 
     const onReceiveBlock = async (blockNumber: string) => {
       if (config.environment === 'development') {

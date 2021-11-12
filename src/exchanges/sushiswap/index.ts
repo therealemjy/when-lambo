@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 
 import { Exchange, ExchangeName } from '@src/types';
@@ -8,30 +7,36 @@ import sushiswapRouterContract from './contracts/sushiswapRouter.json';
 class Sushiswap implements Exchange {
   name: ExchangeName;
 
-  provider: ethers.providers.Web3Provider;
-  routerContract: ethers.Contract;
-
-  constructor(provider: ethers.providers.Web3Provider) {
-    this.provider = provider;
-
+  constructor() {
     this.name = ExchangeName.Sushiswap;
-
-    this.routerContract = new ethers.Contract(
-      sushiswapRouterContract.address,
-      sushiswapRouterContract.abi,
-      provider
-    );
   }
 
-  getDecimalAmountOut: Exchange['getDecimalAmountOut'] = async ({ fromTokenDecimalAmount, fromToken, toToken }) => {
-    const res = await this.routerContract.getAmountsOut(fromTokenDecimalAmount.toFixed(), [fromToken.address, toToken.address]);
+  getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({ callReference, fromTokenDecimalAmounts, fromToken, toToken }) => {
+    const calls = fromTokenDecimalAmounts.map(fromTokenDecimalAmount => {
+      const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed();
+
+      return {
+        reference: `getAmountsOut-${fixedFromTokenDecimalAmount}`,
+        methodName: 'getAmountsOut',
+        methodParameters: [fixedFromTokenDecimalAmount, [fromToken.address, toToken.address]],
+      }
+    });
 
     return {
-      decimalAmountOut: new BigNumber(res[1].toString()),
-      usedExchangeNames: [ExchangeName.Sushiswap],
-      estimatedGas: new BigNumber(115000)
+      context: {
+        reference: callReference,
+        contractAddress: sushiswapRouterContract.address,
+        abi: sushiswapRouterContract.abi,
+        calls,
+      },
+      resultFormatter: (callResult) => (
+        callResult.callsReturnContext.map(callReturnContext => ({
+          decimalAmountOut: new BigNumber(callReturnContext.returnValues[1].toString()),
+          estimatedGas: new BigNumber(115000)
+        }))
+      )
     }
-  }
+  };
 }
 
 export default Sushiswap;

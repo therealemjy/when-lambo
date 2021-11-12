@@ -8,30 +8,38 @@ import uniswapV2RouterContract from './contracts/uniswapV2Router.json';
 class UniswapV2 implements Exchange {
   name: ExchangeName;
 
-  provider: ethers.providers.Web3Provider;
   routerContract: ethers.Contract;
 
-  constructor(provider: ethers.providers.Web3Provider) {
-    this.provider = provider;
-
+  constructor() {
     this.name = ExchangeName.UniswapV2;
-
-    this.routerContract = new ethers.Contract(
-      uniswapV2RouterContract.address,
-      uniswapV2RouterContract.abi,
-      provider
-    );
   }
 
-  getDecimalAmountOut: Exchange['getDecimalAmountOut'] = async ({ fromTokenDecimalAmount, fromToken, toToken }) => {
-    const res = await this.routerContract.getAmountsOut(fromTokenDecimalAmount.toFixed(), [fromToken.address, toToken.address]);
+  getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({ callReference, fromTokenDecimalAmounts, fromToken, toToken }) => {
+    const calls = fromTokenDecimalAmounts.map(fromTokenDecimalAmount => {
+      const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed();
+
+      return {
+        reference: `getAmountsOut-${fixedFromTokenDecimalAmount}`,
+        methodName: 'getAmountsOut',
+        methodParameters: [fixedFromTokenDecimalAmount, [fromToken.address, toToken.address]],
+      }
+    });
 
     return {
-      decimalAmountOut: new BigNumber(res[1].toString()),
-      usedExchangeNames: [ExchangeName.UniswapV2],
-      estimatedGas: new BigNumber(115000)
+      context: {
+        reference: callReference,
+        contractAddress: uniswapV2RouterContract.address,
+        abi: uniswapV2RouterContract.abi,
+        calls,
+      },
+      resultFormatter: (callResult) => (
+        callResult.callsReturnContext.map(callReturnContext => ({
+          decimalAmountOut: new BigNumber(callReturnContext.returnValues[1].toString()),
+          estimatedGas: new BigNumber(115000)
+        }))
+      )
     }
-  }
+  };
 }
 
 export default UniswapV2;

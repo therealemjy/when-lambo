@@ -39,7 +39,7 @@ const findBestDeal = async ({
   // Check how many tradedToken (e.g.: DAI) decimals we get from trading the
   // provided refToken (e.g.: WETH) decimals amount, on all monitored exchanges.
   const dealPromises = exchanges.map<Promise<Deal>>(async (exchange) => {
-    const res = await exchange.getDecimalAmountOut({
+    const res = await exchange.getDecimalAmountOutCallContext({
       fromTokenDecimalAmount: refTokenDecimalAmount,
       fromToken: refToken,
       toToken: tradedToken,

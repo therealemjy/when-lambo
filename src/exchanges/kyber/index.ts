@@ -1,56 +1,64 @@
-import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
+import { ContractCallReturnContext } from '@maxime.julian/ethereum-multicall';
 
-import { Exchange, ExchangeName } from '@src/types';
+import { Exchange, ExchangeName, FormattedDecimalAmountOutCallResult } from '@src/types';
 
 import kyberNetworkProxy from './contracts/kyberNetworkProxy.json';
 
 class Kyber implements Exchange {
   name: ExchangeName;
 
-  provider: ethers.providers.Web3Provider;
-  networkProxy: ethers.Contract
-
-  constructor(provider: ethers.providers.Web3Provider) {
-    this.provider = provider;
-
+  constructor() {
     this.name = ExchangeName.Kyber;
-
-    this.networkProxy = new ethers.Contract(
-      kyberNetworkProxy.address,
-      kyberNetworkProxy.abi,
-      provider
-    );
   }
 
-  getDecimalAmountOut: Exchange['getDecimalAmountOut'] = async ({ fromTokenDecimalAmount, fromToken, toToken }) => {
-    const res = await this.networkProxy
-      .getExpectedRate(
-        fromToken.address,
-        toToken.address,
-        fromTokenDecimalAmount.toFixed()
-      );
+  getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({ callReference, fromTokenDecimalAmounts, fromToken, toToken }) => {
+    const calls = fromTokenDecimalAmounts.map(fromTokenDecimalAmount => {
+      const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed();
 
-    // Price of 1 fromToken in toToken decimals
-    const oneFromTokenSellRate = res[0].toString();
-
-    if (parseInt(oneFromTokenSellRate) === 0) {
-      throw new Error('Token not found on Kyber exchange');
-    }
-
-    // Price of 1 fromToken decimal in toToken decimals
-    const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(1 * 10 ** fromToken.decimals);
-
-    // Total amount of toToken decimals we get from selling all the fromToken
-    // decimals provided
-    const totalToTokenDecimals = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
+      return {
+        reference: `getExpectedRate-${fixedFromTokenDecimalAmount}`,
+        methodName: 'getExpectedRate',
+        methodParameters: [fromToken.address, toToken.address, fromTokenDecimalAmount.toFixed()],
+      }
+    });
 
     return {
-      decimalAmountOut: totalToTokenDecimals,
-      usedExchangeNames: [ExchangeName.Kyber],
-      estimatedGas: new BigNumber(400000)
+      context: {
+        reference: callReference,
+        contractAddress: kyberNetworkProxy.address,
+        abi: kyberNetworkProxy.abi,
+        calls,
+      },
+      resultFormatter: this._formatDecimalAmountOutCallResults
     }
-  }
+  };
+
+  _formatDecimalAmountOutCallResults = (
+    callResult: ContractCallReturnContext,
+    { fromTokenDecimalAmount, fromTokenDecimals }: { fromTokenDecimalAmount: BigNumber, fromTokenDecimals: number; }
+  ): FormattedDecimalAmountOutCallResult => (
+    callResult.callsReturnContext.map(callReturnContext => {
+        // Price of 1 fromToken in toToken decimals
+      const oneFromTokenSellRate = callReturnContext.returnValues[0].toString();
+
+      if (parseInt(oneFromTokenSellRate) === 0) {
+        throw new Error('Token not found on Kyber exchange');
+      }
+
+      // Price of 1 fromToken decimal in toToken decimals
+      const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(1 * 10 ** fromTokenDecimals);
+
+      // Total amount of toToken decimals we get from selling all the fromToken
+      // decimals provided
+      const decimalAmountOut = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
+
+      return {
+        decimalAmountOut,
+        estimatedGas: new BigNumber(400000)
+      }
+    })
+  );
 }
 
 export default Kyber;
