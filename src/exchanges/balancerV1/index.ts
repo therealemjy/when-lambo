@@ -8,7 +8,7 @@ import balancerV1ExchangeProxyContract from './contracts/balancerV1ExchangeProxy
 // currently setting it to 1 as we're not sure if taking funds from multiple
 // pools increases the gas cost or not.
 // TODO: check if that's true or if we can increase the number of pools
-const N_POOLS = 4;
+const N_POOLS = 1;
 
 class BalancerV1 implements Exchange {
   name: ExchangeName;
@@ -43,15 +43,6 @@ class BalancerV1 implements Exchange {
       )
     }
   }
-
-  // TODO: remove, here to check the new implementation only
-  //   const [_swaps, totalAmounts] = await this.exchangeProxy.viewSplitExactIn(fromToken.address, toToken.address, fromTokenDecimalAmount.toFixed(), 4);
-
-  //   return {
-  //     decimalAmountOut: new BigNumber(totalAmounts.toString()),
-  //     estimatedGas: new BigNumber(165000)
-  //   }
-  // )
 }
 
 export default BalancerV1;

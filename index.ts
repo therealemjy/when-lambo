@@ -6,7 +6,6 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import './@moduleAliases';
 import config from './src/config';
-import BalancerV1Exchange from './src/exchanges/balancerV1';
 import CryptoComExchange from './src/exchanges/cryptoCom';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
@@ -58,8 +57,6 @@ const init = async () => {
     const sushiswapExchangeService = new SushiswapExchange();
     const kyberExchangeService = new KyberExchange();
     const cryptoComExchangeService = new CryptoComExchange();
-    // @ts-ignore
-    const balancerV1ExchangeService = new BalancerV1Exchange();
 
     const onReceiveBlock = async (blockNumber: string) => {
       if (config.environment === 'development') {
@@ -87,14 +84,7 @@ const init = async () => {
           address: config.tradedToken.address,
           decimals: config.tradedToken.decimals,
         },
-        exchanges: [
-          uniswapV2ExchangeService,
-          sushiswapExchangeService,
-          kyberExchangeService,
-          cryptoComExchangeService,
-          // TODO: investigate why Balancer's call throws an "out of gas" error
-          // balancerV1ExchangeService,
-        ],
+        exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService, cryptoComExchangeService],
         slippageAllowancePercent: config.slippageAllowancePercent,
         gasPriceWei: global.currentGasPrices.rapid,
       });
