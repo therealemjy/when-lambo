@@ -3,14 +3,16 @@ import BigNumber from 'bignumber.js';
 
 import { Token, ExchangeName } from '@src/types';
 
+export type IGetDecimalAmountOutCallContextInput = {
+  callReference: string;
+  fromTokenDecimalAmounts: BigNumber[];
+  fromToken: Token;
+  toToken: Token;
+};
+
 export interface Exchange {
   name: ExchangeName;
-  getDecimalAmountOutCallContext: (args: {
-    callReference: string;
-    fromTokenDecimalAmounts: BigNumber[];
-    fromToken: Token;
-    toToken: Token;
-  }) => {
+  getDecimalAmountOutCallContext: (args: IGetDecimalAmountOutCallContextInput) => {
     context: ContractCallContext;
     resultFormatter: ResultFormatter;
   };
@@ -18,7 +20,7 @@ export interface Exchange {
 
 export type ResultFormatter = (
   result: ContractCallReturnContext,
-  additionalArgs?: any // TODO: type properly
+  callArgs: IGetDecimalAmountOutCallContextInput
 ) => FormattedDecimalAmountOutCallResult;
 
 export type FormattedDecimalAmountOutCallResult = Array<{

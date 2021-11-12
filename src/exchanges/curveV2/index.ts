@@ -1,7 +1,7 @@
 import { ContractCallReturnContext } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ExchangeName, FormattedDecimalAmountOutCallResult } from '@src/types';
+import { Exchange, ExchangeName, ResultFormatter } from '@src/types';
 
 import swapContract from './contracts/swapContract.json';
 
@@ -47,19 +47,20 @@ class CurveV2 implements Exchange {
     }
   }
 
-  _formatDecimalAmountOutCallResults = (
+  _formatDecimalAmountOutCallResults: ResultFormatter = (
     callResult: ContractCallReturnContext,
-    { fromTokenDecimalAmount, fromTokenDecimals }: { fromTokenDecimalAmount: BigNumber, fromTokenDecimals: number; }
-  ): FormattedDecimalAmountOutCallResult => (
+    { fromToken }
+  ) => (
     callResult.callsReturnContext.map(callReturnContext => {
       // Price of 1 fromToken in toToken decimals
       const oneFromTokenSellRate = callReturnContext.returnValues[0].toString();
 
       // Price of 1 fromToken decimal in toToken decimals
-      const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(1 * 10 ** fromTokenDecimals);
+      const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(1 * 10 ** fromToken.decimals);
 
       // Total amount of toToken decimals we get from selling all the fromToken
       // decimals provided
+      const fromTokenDecimalAmount = callReturnContext.returnValues[2];
       const decimalAmountOut = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
 
       return {

@@ -2,9 +2,7 @@ import { ContractCallContext } from '@maxime.julian/ethereum-multicall';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ResultFormatter } from '@src/types';
-
-import { Token } from './types';
+import { Exchange, ResultFormatter, Token, Deal } from '@src/types';
 
 const monitorPrices = async ({
   multicall,
@@ -23,7 +21,10 @@ const monitorPrices = async ({
   gasPriceWei: BigNumber;
   exchanges: Exchange[];
 }) => {
-  const resultFormatters: ResultFormatter[] = [];
+  // Get prices from all the exchanges
+  const resultFormatters: {
+    [key: string]: ResultFormatter;
+  } = {};
 
   const multicallContexts = exchanges.reduce<ContractCallContext[]>((contexts, exchange) => {
     const { context, resultFormatter } = exchange.getDecimalAmountOutCallContext({
@@ -33,7 +34,7 @@ const monitorPrices = async ({
       toToken: tradedToken,
     });
 
-    resultFormatters.push(resultFormatter);
+    resultFormatters[exchange.name] = resultFormatter;
     return [...contexts, context];
   }, []);
 
@@ -41,7 +42,29 @@ const monitorPrices = async ({
     gasLimit: 999999999999999, // Add stupid value to prevent issues with view functions running out of gas
   });
 
-  console.log(multicallRes.results['Uniswap V2'].originalContractCallContext);
+  // Format each result into a deal and sort them by the amount of decimals obtained from it
+  // @ts-ignore
+  const sortedDeals = exchanges.reduce<Deal[]>((results, exchange) => {
+    const updatedResults = [...results];
+
+    console.log(exchange.name);
+
+    // Go through each result of the exchange
+    // @ts-ignore
+    const deals = multicallRes.results[exchange.name].callsReturnContext
+      // Filter out unsuccessful calls
+      .filter((callReturnContext) => callReturnContext.success)
+      // Format each result and return a deal
+      .forEach((callReturnContext) => {
+        console.log(callReturnContext);
+        const resultFormatter = resultFormatters[exchange.name];
+        console.log(resultFormatter);
+
+        // const formattedResult = resultFormatter(callReturnContext);
+      });
+
+    return updatedResults;
+  }, []);
 
   return [];
 };
