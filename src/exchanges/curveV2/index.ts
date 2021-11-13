@@ -55,7 +55,10 @@ class CurveV2 implements Exchange {
   ) => (
     callResult.callsReturnContext
       // Filter out unsuccessful calls
-      .filter(callReturnContext => callReturnContext.success)
+      .filter(callReturnContext => {
+        const oneFromTokenSellRate = new BigNumber(callReturnContext.returnValues[0].hex);
+        return callReturnContext.success && oneFromTokenSellRate.isGreaterThan(0)
+      })
       .map(callReturnContext => {
         // Price of 1 fromToken in toToken decimals
         const oneFromTokenSellRate = new BigNumber(callReturnContext.returnValues[0].hex);

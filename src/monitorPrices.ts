@@ -50,22 +50,11 @@ const monitorPrices = async ({
     console.log(exchange.name);
 
     const resultFormatter = resultFormatters[exchange.name];
-
-    // console.log(
-    //   multicallRes.results[exchange.name].callsReturnContext.map(
-    //     (callsReturnContext) => callsReturnContext.returnValues
-    //   )
-    // );
-
-    // console.log(multicallRes.results[exchange.name]);
-
-    // @ts-ignore
     const formattedResults = resultFormatter(multicallRes.results[exchange.name]);
 
     console.log(formattedResults);
 
     // Format each result into a deal
-
     // @ts-ignore
     // const deals = multicallRes.results[exchange.name].callsReturnContext
     //   // Filter out unsuccessful calls
