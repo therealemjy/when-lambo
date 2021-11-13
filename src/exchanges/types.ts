@@ -21,12 +21,12 @@ export interface Exchange {
 export type ResultsFormatter = (
   result: ContractCallReturnContext,
   callParameters: { fromToken: Token; toToken: Token }
-) => FormattedDecimalAmountOutCallResult;
+) => FormattedGetDecimalAmountOutResult[];
 
-export type FormattedDecimalAmountOutCallResult = Array<{
+export interface FormattedGetDecimalAmountOutResult {
   fromToken: Token;
   fromTokenDecimalAmount: BigNumber;
   toToken: Token;
   toTokenDecimalAmount: BigNumber;
   estimatedGas: BigNumber;
-}>;
+}

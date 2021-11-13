@@ -94,7 +94,7 @@ const findBestDeals = async ({
       // Apply maximum slippage allowance, which means any deal found is
       // calculated with the most pessimistic outcome (given our slippage
       // allowance). If we still yield a profit despite this, then we consider
-      // the opportunity safe
+      // the opportunity safe.
       const pessimisticToTokenDecimalAmount = new BigNumber(
         formattedResult.toTokenDecimalAmount.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
       );
@@ -102,9 +102,9 @@ const findBestDeals = async ({
       const deal = {
         timestamp: new Date(),
         exchangeName: exchange.name,
-        fromToken: formattedResult.fromToken,
+        fromToken,
         fromTokenDecimalAmount: formattedResult.fromTokenDecimalAmount,
-        toToken: formattedResult.toToken,
+        toToken,
         toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
         slippageAllowancePercent,
         estimatedGasCost: gasPriceWei.multipliedBy(formattedResult.estimatedGas),
