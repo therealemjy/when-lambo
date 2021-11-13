@@ -35,7 +35,7 @@ class BalancerV1 implements Exchange {
         abi: balancerV1ExchangeProxyContract.abi,
         calls,
       },
-      resultFormatter: (callResult) => (
+      resultsFormatter: (callResult) => (
         callResult.callsReturnContext
           // Filter out unsuccessful calls
           .filter(callReturnContext => callReturnContext.success)

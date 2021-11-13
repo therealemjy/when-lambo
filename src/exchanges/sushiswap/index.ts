@@ -29,7 +29,7 @@ class Sushiswap implements Exchange {
         abi: sushiswapRouterContract.abi,
         calls,
       },
-      resultFormatter: (callResult) => (
+      resultsFormatter: (callResult) => (
         callResult.callsReturnContext
           // Filter out unsuccessful calls
           .filter(callReturnContext => callReturnContext.success && callReturnContext.returnValues.length > 0)

@@ -14,11 +14,11 @@ export interface Exchange {
   name: ExchangeName;
   getDecimalAmountOutCallContext: (args: IGetDecimalAmountOutCallContextInput) => {
     context: ContractCallContext;
-    resultFormatter: ResultFormatter;
+    resultsFormatter: ResultsFormatter;
   };
 }
 
-export type ResultFormatter = (
+export type ResultsFormatter = (
   result: ContractCallReturnContext,
   callParameters: { fromToken: Token; toToken: Token }
 ) => FormattedDecimalAmountOutCallResult;

@@ -32,7 +32,7 @@ class Kyber implements Exchange {
         abi: kyberNetworkProxy.abi,
         calls,
       },
-      resultFormatter: this._formatDecimalAmountOutCallResults
+      resultsFormatter: this._formatDecimalAmountOutCallResults
     }
   };
 

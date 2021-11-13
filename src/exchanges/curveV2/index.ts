@@ -45,7 +45,7 @@ class CurveV2 implements Exchange {
         abi: swapContract.abi,
         calls,
       },
-      resultFormatter: this._formatDecimalAmountOutCallResults
+      resultsFormatter: this._formatDecimalAmountOutCallResults
     }
   }
 

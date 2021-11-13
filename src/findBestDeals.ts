@@ -2,7 +2,7 @@ import { ContractCallContext } from '@maxime.julian/ethereum-multicall';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ResultFormatter, Token, Deal, UsedExchangeNames } from '@src/types';
+import { Exchange, ResultsFormatter, Token, Deal, UsedExchangeNames } from '@src/types';
 
 import { WETH } from './tokens';
 
@@ -43,8 +43,8 @@ const findBestDeals = async ({
   exchanges: Exchange[];
   usedExchangeNames?: UsedExchangeNames;
 }) => {
-  const resultFormatters: {
-    [key: string]: ResultFormatter;
+  const resultsFormatters: {
+    [key: string]: ResultsFormatter;
   } = {};
 
   // Get prices from all the exchanges
@@ -59,14 +59,14 @@ const findBestDeals = async ({
           (fromTokenDecimalAmount) => usedExchangeNames[fromTokenDecimalAmount.toFixed()] !== exchange.name
         );
 
-    const { context, resultFormatter } = exchange.getDecimalAmountOutCallContext({
+    const { context, resultsFormatter } = exchange.getDecimalAmountOutCallContext({
       callReference: exchange.name,
       fromTokenDecimalAmounts: filteredfromTokenDecimalAmounts,
       fromToken,
       toToken,
     });
 
-    resultFormatters[exchange.name] = resultFormatter;
+    resultsFormatters[exchange.name] = resultsFormatter;
     return [...contexts, context];
   }, []);
 
@@ -86,8 +86,8 @@ const findBestDeals = async ({
     }
 
     // Format results
-    const resultFormatter = resultFormatters[exchange.name];
-    const formattedResults = resultFormatter(multicallRes.results[exchange.name], { fromToken, toToken });
+    const resultsFormatter = resultsFormatters[exchange.name];
+    const formattedResults = resultsFormatter(multicallRes.results[exchange.name], { fromToken, toToken });
 
     // Go through each result to find the best deal for each fromTokenDecimalAmount
     formattedResults.forEach((formattedResult) => {

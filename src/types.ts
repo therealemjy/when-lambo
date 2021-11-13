@@ -3,13 +3,13 @@ import BigNumber from 'bignumber.js';
 import {
   Exchange,
   FormattedDecimalAmountOutCallResult,
-  ResultFormatter,
+  ResultsFormatter,
   IGetDecimalAmountOutCallContextInput,
 } from '@src/exchanges/types';
 import Token from '@src/tokens/Token';
 
 export type { Token };
-export type { Exchange, FormattedDecimalAmountOutCallResult, ResultFormatter, IGetDecimalAmountOutCallContextInput };
+export type { Exchange, FormattedDecimalAmountOutCallResult, ResultsFormatter, IGetDecimalAmountOutCallContextInput };
 
 export enum ExchangeName {
   UniswapV2 = 'Uniswap V2',
