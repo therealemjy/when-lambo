@@ -14,16 +14,19 @@ export interface Exchange {
   name: ExchangeName;
   getDecimalAmountOutCallContext: (args: IGetDecimalAmountOutCallContextInput) => {
     context: ContractCallContext;
-    resultFormatter: ResultFormatter;
+    resultsFormatter: ResultsFormatter;
   };
 }
 
-export type ResultFormatter = (result: ContractCallReturnContext) => FormattedDecimalAmountOutCallResult;
+export type ResultsFormatter = (
+  result: ContractCallReturnContext,
+  callParameters: { fromToken: Token; toToken: Token }
+) => FormattedGetDecimalAmountOutResult[];
 
-export type FormattedDecimalAmountOutCallResult = Array<{
+export interface FormattedGetDecimalAmountOutResult {
   fromToken: Token;
   fromTokenDecimalAmount: BigNumber;
   toToken: Token;
   toTokenDecimalAmount: BigNumber;
   estimatedGas: BigNumber;
-}>;
+}

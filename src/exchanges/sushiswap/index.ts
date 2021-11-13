@@ -29,10 +29,10 @@ class Sushiswap implements Exchange {
         abi: sushiswapRouterContract.abi,
         calls,
       },
-      resultFormatter: (callResult) => (
+      resultsFormatter: (callResult) => (
         callResult.callsReturnContext
           // Filter out unsuccessful calls
-          .filter(callReturnContext => callReturnContext.success && callReturnContext.returnValues.length > 0)
+          .filter(callReturnContext => callReturnContext.success && callReturnContext.returnValues.length >= 2)
           .map(callReturnContext => ({
             fromToken,
             fromTokenDecimalAmount: new BigNumber(callReturnContext.methodParameters[0]),

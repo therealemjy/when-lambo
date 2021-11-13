@@ -2,7 +2,7 @@ import { ContractCallContext } from '@maxime.julian/ethereum-multicall';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ResultFormatter, Token, Deal, UsedExchangeNames } from '@src/types';
+import { Exchange, ResultsFormatter, Token, Deal, UsedExchangeNames } from '@src/types';
 
 import { WETH } from './tokens';
 
@@ -26,45 +26,47 @@ const getConvertedDealGasCost = (deal: Deal) => {
 
 const findBestDeals = async ({
   multicall,
-  refTokenDecimalAmounts,
-  refToken,
-  tradedToken,
+  fromTokenDecimalAmounts,
+  fromToken,
+  toToken,
   exchanges,
   slippageAllowancePercent,
   gasPriceWei,
-  usedExchangeNames, // Reference of all the exchanges used to obtain each refTokenDecimalAmount
+  usedExchangeNames, // Reference of all the exchanges used to obtain each fromTokenDecimalAmount
 }: {
   multicall: Multicall;
-  refTokenDecimalAmounts: BigNumber[];
-  refToken: Token;
-  tradedToken: Token;
+  fromTokenDecimalAmounts: BigNumber[];
+  fromToken: Token;
+  toToken: Token;
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
   exchanges: Exchange[];
   usedExchangeNames?: UsedExchangeNames;
 }) => {
-  // Get prices from all the exchanges
-  const resultFormatters: {
-    [key: string]: ResultFormatter;
+  const resultsFormatters: {
+    [key: string]: ResultsFormatter;
   } = {};
 
+  // Get prices from all the exchanges
   const multicallContexts = exchanges.reduce<ContractCallContext[]>((contexts, exchange) => {
-    const filteredRefTokenDecimalAmounts = !usedExchangeNames
-      ? refTokenDecimalAmounts
+    const filteredfromTokenDecimalAmounts = !usedExchangeNames
+      ? fromTokenDecimalAmounts
       : // If usedExchangeNames was provided, remove all the fromTokenDecimalAmounts
-        // previously found on the exchange
-        refTokenDecimalAmounts.filter(
-          (refTokenDecimalAmount) => usedExchangeNames[refTokenDecimalAmount.toFixed()] !== exchange.name
+        // previously found on the exchange. We do this to prevent front-running
+        // ourselves by buying from an exchange and selling to the same exchange
+        // in the same path.
+        fromTokenDecimalAmounts.filter(
+          (fromTokenDecimalAmount) => usedExchangeNames[fromTokenDecimalAmount.toFixed()] !== exchange.name
         );
 
-    const { context, resultFormatter } = exchange.getDecimalAmountOutCallContext({
+    const { context, resultsFormatter } = exchange.getDecimalAmountOutCallContext({
       callReference: exchange.name,
-      fromTokenDecimalAmounts: filteredRefTokenDecimalAmounts,
-      fromToken: refToken,
-      toToken: tradedToken,
+      fromTokenDecimalAmounts: filteredfromTokenDecimalAmounts,
+      fromToken,
+      toToken,
     });
 
-    resultFormatters[exchange.name] = resultFormatter;
+    resultsFormatters[exchange.name] = resultsFormatter;
     return [...contexts, context];
   }, []);
 
@@ -72,7 +74,7 @@ const findBestDeals = async ({
     gasLimit: 999999999999999, // Add stupid value to prevent issues with view functions running out of gas
   });
 
-  // Find the best deal for each refTokenDecimalAmount
+  // Find the best deal for each fromTokenDecimalAmount
   const bestDeals: {
     [key: string]: Deal;
   } = {};
@@ -84,15 +86,15 @@ const findBestDeals = async ({
     }
 
     // Format results
-    const resultFormatter = resultFormatters[exchange.name];
-    const formattedResults = resultFormatter(multicallRes.results[exchange.name]);
+    const resultsFormatter = resultsFormatters[exchange.name];
+    const formattedResults = resultsFormatter(multicallRes.results[exchange.name], { fromToken, toToken });
 
-    // Go through each result to find the best deal for each refTokenDecimalAmount
+    // Go through each result to find the best deal for each fromTokenDecimalAmount
     formattedResults.forEach((formattedResult) => {
       // Apply maximum slippage allowance, which means any deal found is
       // calculated with the most pessimistic outcome (given our slippage
       // allowance). If we still yield a profit despite this, then we consider
-      // the opportunity safe
+      // the opportunity safe.
       const pessimisticToTokenDecimalAmount = new BigNumber(
         formattedResult.toTokenDecimalAmount.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
       );
@@ -100,9 +102,9 @@ const findBestDeals = async ({
       const deal = {
         timestamp: new Date(),
         exchangeName: exchange.name,
-        fromToken: formattedResult.fromToken,
+        fromToken,
         fromTokenDecimalAmount: formattedResult.fromTokenDecimalAmount,
-        toToken: formattedResult.toToken,
+        toToken,
         toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
         slippageAllowancePercent,
         estimatedGasCost: gasPriceWei.multipliedBy(formattedResult.estimatedGas),
@@ -111,7 +113,7 @@ const findBestDeals = async ({
       const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()];
 
       // If no best deal has been determined for the current
-      // refTokenDecimalAmount, we assign this deal as the best
+      // fromTokenDecimalAmount yet, we assign this deal as the current best
       if (!currentBestDeal) {
         bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()] = deal;
         return;
@@ -127,15 +129,15 @@ const findBestDeals = async ({
       );
 
       // If the deal is better than the current best deal, we assign is as the
-      // best deal
+      // new best deal
       if (dealRevenuesMinusGas.isGreaterThan(currentBestDealRevenuesMinusGas)) {
         bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()] = deal;
       }
     });
   });
 
-  // Return best deals in the form of an array, sorted in the same order as the
-  // refTokenDecimalAmounts
+  // Return best deals in the form of an array, sorted in the same order as
+  // fromTokenDecimalAmounts
   return Object.keys(bestDeals).map((key) => bestDeals[key]);
 };
 

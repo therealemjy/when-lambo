@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { ContractCallReturnContext } from '@maxime.julian/ethereum-multicall';
 
-import { Exchange, ExchangeName, IGetDecimalAmountOutCallContextInput } from '@src/types';
+import { Exchange, ExchangeName, Token } from '@src/types';
 
 import kyberNetworkProxy from './contracts/kyberNetworkProxy.json';
 
@@ -32,13 +32,13 @@ class Kyber implements Exchange {
         abi: kyberNetworkProxy.abi,
         calls,
       },
-      resultFormatter: (callResult: ContractCallReturnContext) => this._formatDecimalAmountOutCallResults(callResult, { callReference, fromTokenDecimalAmounts, fromToken, toToken })
+      resultsFormatter: this._formatDecimalAmountOutCallResults
     }
   };
 
   _formatDecimalAmountOutCallResults = (
     callResult: ContractCallReturnContext,
-    { fromToken, toToken }: IGetDecimalAmountOutCallContextInput
+    { fromToken, toToken }: { fromToken: Token, toToken: Token }
   ) => (
     callResult.callsReturnContext
       // Filter out unsuccessful calls
@@ -47,7 +47,7 @@ class Kyber implements Exchange {
         return callReturnContext.success && oneFromTokenSellRate.isGreaterThan(0)
       })
       .map(callReturnContext => {
-          // Price of 1 fromToken in toToken decimals
+        // Price of 1 fromToken in toToken decimals
         const oneFromTokenSellRate = new BigNumber(callReturnContext.returnValues[0].hex);
 
         // Price of 1 fromToken decimal in toToken decimals

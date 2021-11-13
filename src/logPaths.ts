@@ -121,7 +121,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
       console.table(tableRows);
     }
   } catch (err: any) {
-    const formattedError = formatErrorToSlackBlock(err, config.tradedToken.symbol);
+    const formattedError = formatErrorToSlackBlock(err, config.toToken.symbol);
     sendSlackMessage(formattedError);
   }
 };

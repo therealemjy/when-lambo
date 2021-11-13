@@ -79,12 +79,12 @@ const init = async () => {
 
         const paths = await findBestPaths({
           multicall,
-          refTokenDecimalAmounts: config.tradedToken.weiAmounts,
-          refToken: WETH,
-          tradedToken: {
-            symbol: config.tradedToken.symbol,
-            address: config.tradedToken.address,
-            decimals: config.tradedToken.decimals,
+          fromTokenDecimalAmounts: config.toToken.weiAmounts,
+          fromToken: WETH,
+          toToken: {
+            symbol: config.toToken.symbol,
+            address: config.toToken.address,
+            decimals: config.toToken.decimals,
           },
           exchanges: [
             uniswapV2ExchangeService,
@@ -99,7 +99,7 @@ const init = async () => {
         logPaths(paths, worksheet);
       } catch (err: any) {
         // Format the error to human readable format and send it to slack
-        const formattedError = formatErrorToSlackBlock(err, config.tradedToken.symbol);
+        const formattedError = formatErrorToSlackBlock(err, config.toToken.symbol);
         sendSlackMessage(formattedError);
       } finally {
         // Make sure to reset monitoring status the the script doesn't stop
