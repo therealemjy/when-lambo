@@ -6,10 +6,12 @@ import { Path } from '@src/types';
 import calculateProfit from '@src/utils/calculateProfit';
 import sendSlackMessage from '@src/utils/sendSlackMessage';
 
+type WorksheetRow = [string, number, string, number, string, number, number, number, string];
+
 const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) => {
   const slackBlocks: any[] = [];
   const tableRows: any[] = [];
-  const worksheetRows: any[] = [];
+  const worksheetRows: WorksheetRow[] = [];
 
   for (const path of paths) {
     const timestamp = formatDate(path[0].timestamp, 'd/M/yy HH:mm:ss');
@@ -75,10 +77,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
           type: 'divider',
         },
       ]);
-    }
 
-    // Log all paths in Google spreadsheet in production
-    if (config.environment === 'production') {
       worksheetRows.push([
         timestamp,
         +borrowedDec,
@@ -108,15 +107,19 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
   }
 
   if (config.environment === 'production' && worksheetRows.length > 0) {
+    // Send rows to Google Spreadsheet
     await worksheet.addRows(worksheetRows);
   }
 
   if (config.environment === 'production' && slackBlocks.length > 0) {
-    // Send alerts to slack
+    // Send alert to Slack
     await sendSlackMessage({
       blocks: slackBlocks.flat(),
     });
-  } else if (config.environment === 'development') {
+  }
+
+  if (config.environment === 'development') {
+    // Log paths in console
     console.table(tableRows);
   }
 };
