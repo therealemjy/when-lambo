@@ -1,12 +1,11 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, Token, UsedExchangeNames } from '@src/types';
+import { Exchange, Token, UsedExchangeNames, Path } from '@src/types';
 
 import findBestDeals from './findBestDeals';
-import convertBigNumbersToStrings from './utils/convertBigNumbersToStrings';
 
-const monitorPrices = async ({
+const findBestPaths = async ({
   multicall,
   refToken,
   refTokenDecimalAmounts,
@@ -65,7 +64,22 @@ const monitorPrices = async ({
     return [];
   }
 
-  return [];
+  // Compose best paths
+  const bestPaths = bestBuyingDeals.reduce<Path[]>((paths, bestBuyingDeal) => {
+    // Find corresponding best selling deal
+    const correspondingBestSellingDeal = bestSellingDeals.find((bestSellingDeal) =>
+      bestSellingDeal.fromTokenDecimalAmount.isEqualTo(bestBuyingDeal.toTokenDecimalAmount)
+    );
+
+    if (!correspondingBestSellingDeal) {
+      return paths;
+    }
+
+    const path: Path = [bestBuyingDeal, correspondingBestSellingDeal];
+    return [...paths, path];
+  }, []);
+
+  return bestPaths;
 };
 
-export default monitorPrices;
+export default findBestPaths;

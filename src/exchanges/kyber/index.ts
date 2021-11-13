@@ -55,8 +55,7 @@ class Kyber implements Exchange {
 
         // Total amount of toToken decimals we get from selling all the fromToken
         // decimals provided
-        // TODO: check this works
-        const fromTokenDecimalAmount = new BigNumber(callReturnContext.returnValues[2].hex);
+        const fromTokenDecimalAmount = new BigNumber(callReturnContext.methodParameters[2]);
         const toTokenDecimalAmount = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
 
         return {

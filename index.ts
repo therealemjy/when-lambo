@@ -10,9 +10,9 @@ import CryptoComExchange from './src/exchanges/cryptoCom';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
+import findBestPaths from './src/findBestPaths';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
-import monitorPrices from './src/monitorPrices';
 import { WETH } from './src/tokens';
 
 const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
@@ -75,7 +75,7 @@ const init = async () => {
 
       isMonitoring = true;
 
-      const paths = await monitorPrices({
+      const paths = await findBestPaths({
         multicall,
         refTokenDecimalAmounts: config.tradedToken.weiAmounts,
         refToken: WETH,
