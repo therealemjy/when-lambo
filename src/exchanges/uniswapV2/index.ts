@@ -37,7 +37,7 @@ class UniswapV2 implements Exchange {
           // Filter out unsuccessful calls
           .filter(callReturnContext => callReturnContext.success)
           .map(callReturnContext => ({
-            decimalAmountOut: new BigNumber(callReturnContext.returnValues[1].toString()),
+            decimalAmountOut: new BigNumber(callReturnContext.returnValues[1].hex),
             estimatedGas: new BigNumber(115000)
           }))
       )

@@ -42,21 +42,21 @@ class Kyber implements Exchange {
   ) => (
     callResult.callsReturnContext
       // Filter out unsuccessful calls
-      .filter(callReturnContext => callReturnContext.success)
+      .filter(callReturnContext => {
+        const oneFromTokenSellRate = new BigNumber(callReturnContext.returnValues[0].hex);
+        return callReturnContext.success && oneFromTokenSellRate.isGreaterThan(0)
+      })
       .map(callReturnContext => {
           // Price of 1 fromToken in toToken decimals
-        const oneFromTokenSellRate = callReturnContext.returnValues[0].toString();
-
-        if (parseInt(oneFromTokenSellRate) === 0) {
-          throw new Error('Token not found on Kyber exchange');
-        }
+        const oneFromTokenSellRate = new BigNumber(callReturnContext.returnValues[0].hex);
 
         // Price of 1 fromToken decimal in toToken decimals
-        const oneFromTokenDecimalSellRate = new BigNumber(oneFromTokenSellRate).dividedBy(1 * 10 ** fromToken.decimals);
+        const oneFromTokenDecimalSellRate = oneFromTokenSellRate.dividedBy(1 * 10 ** fromToken.decimals);
 
         // Total amount of toToken decimals we get from selling all the fromToken
         // decimals provided
-        const fromTokenDecimalAmount = callReturnContext.returnValues[2];
+        // TODO: check this works
+        const fromTokenDecimalAmount = new BigNumber(callReturnContext.returnValues[2].hex);
         const decimalAmountOut = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
 
         return {
