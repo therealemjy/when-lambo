@@ -109,9 +109,12 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
   try {
     if (config.environment === 'production' && slackBlocks.length > 0) {
       // Send alert to slack
-      await sendSlackMessage({
-        blocks: slackBlocks.flat(),
-      });
+      await sendSlackMessage(
+        {
+          blocks: slackBlocks.flat(),
+        },
+        'deals'
+      );
     }
 
     if (config.environment === 'production' && worksheetRows.length > 0) {
@@ -125,7 +128,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
     }
   } catch (err: any) {
     const formattedError = formatErrorToSlackBlock(err, config.toToken.symbol);
-    sendSlackMessage(formattedError);
+    sendSlackMessage(formattedError, 'errors');
   }
 };
 

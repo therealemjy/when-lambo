@@ -3,7 +3,8 @@ const baseEnvs = {
   AWS_WS_RPC_URL: 'wss://nd-omssuug64ravhkl6euczd7ixwq.wss.ethereum.managedblockchain.us-east-1.amazonaws.com',
   AWS_ACCESS_KEY_ID: 'AKIA2R3ZISIADD4WZMV7',
   AWS_SECRET_ACCESS_KEY: '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',
-  SLACK_HOOK_URL: '/services/T02KL0NM4JW/B02KL2YR274/uuVWs7PFmmu7HeJFznO0lnbr',
+  SLACK_HOOK_URL_DEALS: '/services/T02KL0NM4JW/B02KL2YR274/uuVWs7PFmmu7HeJFznO0lnbr',
+  SLACK_HOOK_URL_ERRORS: '/services/T02KL0NM4JW/B02MY8HCBH6/emYh5ABeek7BtSgaLAEUlfxo',
   SLIPPAGE_ALLOWANCE_PERCENT: '0.5',
   GOOGLE_SPREADSHEET_CLIENT_EMAIL: 'log-bot@when-lambo-331122.iam.gserviceaccount.com',
   GOOGLE_SPREADSHEET_PRIVATE_KEY_BASE_64:

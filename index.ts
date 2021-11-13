@@ -100,7 +100,7 @@ const init = async () => {
       } catch (err: any) {
         // Format the error to human readable format and send it to slack
         const formattedError = formatErrorToSlackBlock(err, config.toToken.symbol);
-        sendSlackMessage(formattedError);
+        sendSlackMessage(formattedError, 'errors');
       } finally {
         // Make sure to reset monitoring status so the script doesn't stop
         if (config.environment === 'development') {
