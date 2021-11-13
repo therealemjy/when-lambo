@@ -34,3 +34,7 @@ export interface Deal {
 }
 
 export type Path = [Deal, Deal];
+
+export type UsedExchangeNames = {
+  [fixedDecimalAmount: string]: ExchangeName;
+};
