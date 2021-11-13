@@ -1,16 +1,23 @@
 import * as https from 'https';
 import { serializeError } from 'serialize-error';
 
+import config from '@src/config';
+
+const slackChannels = {
+  errors: config.slackChannelsWebhooks.errors,
+  deals: config.slackChannelsWebhooks.deals,
+};
+
 // Doing it this way to avoid using 3rd party services
 // Verbose but works fine
-function sendSlackMessage(message: any) {
+function sendSlackMessage(message: any, type: keyof typeof slackChannels) {
   return new Promise((resolve) => {
     const body = JSON.stringify(message);
 
     const options = {
       hostname: 'hooks.slack.com',
       port: 443,
-      path: process.env.SLACK_HOOK_URL,
+      path: slackChannels[type],
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

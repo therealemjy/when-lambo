@@ -114,15 +114,18 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
 
     if (config.environment === 'production' && slackBlocks.length > 0) {
       // Send alerts to slack
-      await sendSlackMessage({
-        blocks: slackBlocks.flat(),
-      });
+      await sendSlackMessage(
+        {
+          blocks: slackBlocks.flat(),
+        },
+        'deals'
+      );
     } else if (config.environment === 'development') {
       console.table(tableRows);
     }
   } catch (err: any) {
     const formattedError = formatErrorToSlackBlock(err, config.toToken.symbol);
-    sendSlackMessage(formattedError);
+    sendSlackMessage(formattedError, 'errors');
   }
 };
 
