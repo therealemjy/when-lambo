@@ -40,7 +40,10 @@ class BalancerV1 implements Exchange {
           // Filter out unsuccessful calls
           .filter(callReturnContext => callReturnContext.success)
           .map(callReturnContext => ({
-              decimalAmountOut: new BigNumber(callReturnContext.returnValues[1].toString()),
+              fromToken,
+              fromTokenDecimalAmount: new BigNumber(callReturnContext.methodParameters[2]),
+              toToken,
+              toTokenDecimalAmount: new BigNumber(callReturnContext.returnValues[1].toString()),
               estimatedGas: new BigNumber(165000)
             }))
       )

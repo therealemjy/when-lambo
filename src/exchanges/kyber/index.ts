@@ -38,7 +38,7 @@ class Kyber implements Exchange {
 
   _formatDecimalAmountOutCallResults = (
     callResult: ContractCallReturnContext,
-    { fromToken }: IGetDecimalAmountOutCallContextInput
+    { fromToken, toToken }: IGetDecimalAmountOutCallContextInput
   ) => (
     callResult.callsReturnContext
       // Filter out unsuccessful calls
@@ -57,10 +57,13 @@ class Kyber implements Exchange {
         // decimals provided
         // TODO: check this works
         const fromTokenDecimalAmount = new BigNumber(callReturnContext.returnValues[2].hex);
-        const decimalAmountOut = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
+        const toTokenDecimalAmount = oneFromTokenDecimalSellRate.multipliedBy(fromTokenDecimalAmount);
 
         return {
-          decimalAmountOut,
+          fromToken,
+          fromTokenDecimalAmount,
+          toToken,
+          toTokenDecimalAmount,
           estimatedGas: new BigNumber(400000)
         }
       })

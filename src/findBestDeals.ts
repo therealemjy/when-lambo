@@ -83,34 +83,32 @@ const findBestDeals = async ({
     const formattedResults = resultFormatter(multicallRes.results[exchange.name]);
 
     // Go through each result to find the best deal for each refTokenDecimalAmount
-    formattedResults.forEach((formattedResult, resultIndex) => {
+    formattedResults.forEach((formattedResult) => {
       // Apply maximum slippage allowance, which means any deal found is
       // calculated with the most pessimistic outcome (given our slippage
       // allowance). If we still yield a profit despite this, then we consider
       // the opportunity safe
       const pessimisticToTokenDecimalAmount = new BigNumber(
-        formattedResult.decimalAmountOut.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
+        formattedResult.toTokenDecimalAmount.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
       );
-
-      const fromTokenDecimalAmount = refTokenDecimalAmounts[resultIndex];
 
       const deal = {
         timestamp: new Date(),
         exchangeName: exchange.name,
-        fromToken: refToken,
-        fromTokenDecimalAmount,
-        toToken: tradedToken,
+        fromToken: formattedResult.fromToken,
+        fromTokenDecimalAmount: formattedResult.fromTokenDecimalAmount,
+        toToken: formattedResult.toToken,
         toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
         slippageAllowancePercent,
         estimatedGasCost: gasPriceWei.multipliedBy(formattedResult.estimatedGas),
       };
 
-      const currentBestDeal = bestDeals[fromTokenDecimalAmount.toFixed()];
+      const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()];
 
       // If no best deal has been determined for the current
       // refTokenDecimalAmount, we assign this deal as the best
       if (!currentBestDeal) {
-        bestDeals[fromTokenDecimalAmount.toFixed()] = deal;
+        bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()] = deal;
         return;
       }
 
@@ -126,7 +124,7 @@ const findBestDeals = async ({
       // If the deal is better than the current best deal, we assign is as the
       // best deal
       if (dealRevenuesMinusGas.isGreaterThan(currentBestDealRevenuesMinusGas)) {
-        bestDeals[fromTokenDecimalAmount.toFixed()] = deal;
+        bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()] = deal;
       }
     });
   });

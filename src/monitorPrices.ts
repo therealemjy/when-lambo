@@ -8,16 +8,16 @@ import convertBigNumbersToStrings from './utils/convertBigNumbersToStrings';
 
 const monitorPrices = async ({
   multicall,
-  refTokenDecimalAmounts,
   refToken,
+  refTokenDecimalAmounts,
   tradedToken,
   exchanges,
   slippageAllowancePercent,
   gasPriceWei,
 }: {
   multicall: Multicall;
-  refTokenDecimalAmounts: BigNumber[];
   refToken: Token;
+  refTokenDecimalAmounts: BigNumber[];
   tradedToken: Token;
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
@@ -27,8 +27,8 @@ const monitorPrices = async ({
   // refTokenDecimalAmount
   const bestBuyingDeals = await findBestDeals({
     multicall,
-    refTokenDecimalAmounts,
     refToken,
+    refTokenDecimalAmounts,
     tradedToken,
     exchanges,
     slippageAllowancePercent,
@@ -39,10 +39,7 @@ const monitorPrices = async ({
     return [];
   }
 
-  console.log(bestBuyingDeals.map(convertBigNumbersToStrings));
-
   // List exchanges used for each refTokenDecimalAmount
-  // @ts-ignore
   const usedExchangeNames = bestBuyingDeals.reduce<UsedExchangeNames>(
     (acc, bestBuyingDeal) => ({
       ...acc,
@@ -55,9 +52,9 @@ const monitorPrices = async ({
   // each tradedToken decimals obtained from the selling deals
   const bestSellingDeals = await findBestDeals({
     multicall,
+    refToken: tradedToken,
     refTokenDecimalAmounts: bestBuyingDeals.map((bestBuyingDeal) => bestBuyingDeal.toTokenDecimalAmount),
-    refToken,
-    tradedToken,
+    tradedToken: refToken,
     exchanges,
     slippageAllowancePercent,
     gasPriceWei,
@@ -67,8 +64,6 @@ const monitorPrices = async ({
   if (!bestSellingDeals.length) {
     return [];
   }
-
-  console.log(bestSellingDeals.map(convertBigNumbersToStrings));
 
   return [];
 };

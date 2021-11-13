@@ -5,8 +5,8 @@ import { Token, ExchangeName } from '@src/types';
 
 export type IGetDecimalAmountOutCallContextInput = {
   callReference: string;
-  fromTokenDecimalAmounts: BigNumber[];
   fromToken: Token;
+  fromTokenDecimalAmounts: BigNumber[];
   toToken: Token;
 };
 
@@ -21,6 +21,9 @@ export interface Exchange {
 export type ResultFormatter = (result: ContractCallReturnContext) => FormattedDecimalAmountOutCallResult;
 
 export type FormattedDecimalAmountOutCallResult = Array<{
-  decimalAmountOut: BigNumber;
+  fromToken: Token;
+  fromTokenDecimalAmount: BigNumber;
+  toToken: Token;
+  toTokenDecimalAmount: BigNumber;
   estimatedGas: BigNumber;
 }>;
