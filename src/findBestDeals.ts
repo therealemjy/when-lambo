@@ -78,6 +78,11 @@ const findBestDeals = async ({
   } = {};
 
   exchanges.forEach((exchange) => {
+    // Skip exchange if none of the results were found using it
+    if (!multicallRes.results[exchange.name]) {
+      return;
+    }
+
     // Format results
     const resultFormatter = resultFormatters[exchange.name];
     const formattedResults = resultFormatter(multicallRes.results[exchange.name]);
