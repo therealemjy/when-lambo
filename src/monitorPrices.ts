@@ -43,29 +43,39 @@ const monitorPrices = async ({
   });
 
   // Format each result into a deal and sort them by the amount of decimals obtained from it
-  // @ts-ignore
-  const sortedDeals = exchanges.reduce<Deal[]>((results, exchange) => {
-    const updatedResults = [...results];
+  const sortedDeals = exchanges.reduce<Deal[]>((deals, exchange) => {
+    const updatedDeals = [...deals];
 
     console.log(exchange.name);
 
     const resultFormatter = resultFormatters[exchange.name];
     const formattedResults = resultFormatter(multicallRes.results[exchange.name]);
 
-    console.log(formattedResults);
+    formattedResults.forEach((formattedResult, resultIndex) => {
+      // Apply maximum slippage allowance, which means any deal found is
+      // calculated with the most pessimistic outcome (given our slippage
+      // allowance). If we still yield a profit despite this, then we consider the
+      // opportunity safe
+      const pessimisticToTokenDecimalAmount = new BigNumber(
+        formattedResult.decimalAmountOut.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
+      );
 
-    // Format each result into a deal
-    // @ts-ignore
-    // const deals = multicallRes.results[exchange.name].callsReturnContext
-    //   // Filter out unsuccessful calls
-    //   .filter((callReturnContext) => callReturnContext.success)
-    //   // Format each result and shape them into deals
-    //   .forEach((callReturnContext) => {
-    //     const formattedResult = resultFormatter(callReturnContext);
-    //   });
+      updatedDeals.push({
+        timestamp: new Date(),
+        exchangeName: exchange.name,
+        fromToken: refToken,
+        fromTokenDecimalAmount: refTokenDecimalAmounts[resultIndex],
+        toToken: tradedToken,
+        toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
+        slippageAllowancePercent,
+        estimatedGasCost: gasPriceWei.multipliedBy(formattedResult.estimatedGas),
+      });
+    });
 
-    return updatedResults;
+    return updatedDeals;
   }, []);
+
+  console.log(sortedDeals);
 
   return [];
 };

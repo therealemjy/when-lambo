@@ -7,7 +7,6 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import './@moduleAliases';
 import config from './src/config';
 import CryptoComExchange from './src/exchanges/cryptoCom';
-import CurveV2Exchange from './src/exchanges/curveV2';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
@@ -58,7 +57,6 @@ const init = async () => {
     const sushiswapExchangeService = new SushiswapExchange();
     const kyberExchangeService = new KyberExchange();
     const cryptoComExchangeService = new CryptoComExchange();
-    const curveV2ExchangeService = new CurveV2Exchange();
 
     const onReceiveBlock = async (blockNumber: string) => {
       if (config.environment === 'development') {
@@ -86,13 +84,7 @@ const init = async () => {
           address: config.tradedToken.address,
           decimals: config.tradedToken.decimals,
         },
-        exchanges: [
-          uniswapV2ExchangeService,
-          sushiswapExchangeService,
-          kyberExchangeService,
-          cryptoComExchangeService,
-          curveV2ExchangeService,
-        ],
+        exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService, cryptoComExchangeService],
         slippageAllowancePercent: config.slippageAllowancePercent,
         gasPriceWei: global.currentGasPrices.rapid,
       });
