@@ -77,12 +77,12 @@ const init = async () => {
 
       const paths = await findBestPaths({
         multicall,
-        refTokenDecimalAmounts: config.tradedToken.weiAmounts,
-        refToken: WETH,
-        tradedToken: {
-          symbol: config.tradedToken.symbol,
-          address: config.tradedToken.address,
-          decimals: config.tradedToken.decimals,
+        fromTokenDecimalAmounts: config.toToken.weiAmounts,
+        fromToken: WETH,
+        toToken: {
+          symbol: config.toToken.symbol,
+          address: config.toToken.address,
+          decimals: config.toToken.decimals,
         },
         exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService, cryptoComExchangeService],
         slippageAllowancePercent: config.slippageAllowancePercent,

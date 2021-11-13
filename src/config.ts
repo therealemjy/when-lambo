@@ -11,11 +11,11 @@ export interface EnvConfig {
   };
   environment: 'development' | 'production';
   slippageAllowancePercent: number;
-  tradedToken: {
+  toToken: {
     address: string;
     symbol: string;
     decimals: number;
-    // TODO: move outside of tradedToken (confusing)
+    // TODO: move outside of toToken (confusing)
     weiAmounts: BigNumber[];
   };
   googleSpreadSheet: {
@@ -33,7 +33,7 @@ const config: EnvConfig = {
   },
   environment: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   slippageAllowancePercent: +process.env.SLIPPAGE_ALLOWANCE_PERCENT!,
-  tradedToken: {
+  toToken: {
     address: process.env.TRADED_TOKEN_ADDRESS!,
     symbol: process.env.TRADED_TOKEN_SYMBOL!,
     decimals: +process.env.TRADED_TOKEN_DECIMALS!,

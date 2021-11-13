@@ -7,28 +7,28 @@ import findBestDeals from './findBestDeals';
 
 const findBestPaths = async ({
   multicall,
-  refToken,
-  refTokenDecimalAmounts,
-  tradedToken,
+  fromToken,
+  fromTokenDecimalAmounts,
+  toToken,
   exchanges,
   slippageAllowancePercent,
   gasPriceWei,
 }: {
   multicall: Multicall;
-  refToken: Token;
-  refTokenDecimalAmounts: BigNumber[];
-  tradedToken: Token;
+  fromToken: Token;
+  fromTokenDecimalAmounts: BigNumber[];
+  toToken: Token;
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
   exchanges: Exchange[];
 }) => {
-  // Find the highest amount of tradedToken decimals we can buy with each
-  // refTokenDecimalAmount
+  // Find the highest amount of toToken decimals we can buy with each
+  // fromTokenDecimalAmount
   const bestBuyingDeals = await findBestDeals({
     multicall,
-    refToken,
-    refTokenDecimalAmounts,
-    tradedToken,
+    fromToken,
+    fromTokenDecimalAmounts,
+    toToken,
     exchanges,
     slippageAllowancePercent,
     gasPriceWei,
@@ -38,7 +38,7 @@ const findBestPaths = async ({
     return [];
   }
 
-  // List exchanges used for each refTokenDecimalAmount
+  // List exchanges used for each fromTokenDecimalAmount
   const usedExchangeNames = bestBuyingDeals.reduce<UsedExchangeNames>(
     (acc, bestBuyingDeal) => ({
       ...acc,
@@ -47,13 +47,13 @@ const findBestPaths = async ({
     {}
   );
 
-  // Find the highest amount of refToken decimals we can get back from selling
-  // each tradedToken decimals obtained from the selling deals
+  // Find the highest amount of fromToken decimals we can get back from selling
+  // each toToken decimals obtained from the selling deals
   const bestSellingDeals = await findBestDeals({
     multicall,
-    refToken: tradedToken,
-    refTokenDecimalAmounts: bestBuyingDeals.map((bestBuyingDeal) => bestBuyingDeal.toTokenDecimalAmount),
-    tradedToken: refToken,
+    fromToken: toToken,
+    fromTokenDecimalAmounts: bestBuyingDeals.map((bestBuyingDeal) => bestBuyingDeal.toTokenDecimalAmount),
+    toToken: fromToken,
     exchanges,
     slippageAllowancePercent,
     gasPriceWei,

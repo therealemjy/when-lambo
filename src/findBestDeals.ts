@@ -26,18 +26,18 @@ const getConvertedDealGasCost = (deal: Deal) => {
 
 const findBestDeals = async ({
   multicall,
-  refTokenDecimalAmounts,
-  refToken,
-  tradedToken,
+  fromTokenDecimalAmounts,
+  fromToken,
+  toToken,
   exchanges,
   slippageAllowancePercent,
   gasPriceWei,
-  usedExchangeNames, // Reference of all the exchanges used to obtain each refTokenDecimalAmount
+  usedExchangeNames, // Reference of all the exchanges used to obtain each fromTokenDecimalAmount
 }: {
   multicall: Multicall;
-  refTokenDecimalAmounts: BigNumber[];
-  refToken: Token;
-  tradedToken: Token;
+  fromTokenDecimalAmounts: BigNumber[];
+  fromToken: Token;
+  toToken: Token;
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
   exchanges: Exchange[];
@@ -49,19 +49,19 @@ const findBestDeals = async ({
   } = {};
 
   const multicallContexts = exchanges.reduce<ContractCallContext[]>((contexts, exchange) => {
-    const filteredRefTokenDecimalAmounts = !usedExchangeNames
-      ? refTokenDecimalAmounts
+    const filteredfromTokenDecimalAmounts = !usedExchangeNames
+      ? fromTokenDecimalAmounts
       : // If usedExchangeNames was provided, remove all the fromTokenDecimalAmounts
         // previously found on the exchange
-        refTokenDecimalAmounts.filter(
-          (refTokenDecimalAmount) => usedExchangeNames[refTokenDecimalAmount.toFixed()] !== exchange.name
+        fromTokenDecimalAmounts.filter(
+          (fromTokenDecimalAmount) => usedExchangeNames[fromTokenDecimalAmount.toFixed()] !== exchange.name
         );
 
     const { context, resultFormatter } = exchange.getDecimalAmountOutCallContext({
       callReference: exchange.name,
-      fromTokenDecimalAmounts: filteredRefTokenDecimalAmounts,
-      fromToken: refToken,
-      toToken: tradedToken,
+      fromTokenDecimalAmounts: filteredfromTokenDecimalAmounts,
+      fromToken,
+      toToken,
     });
 
     resultFormatters[exchange.name] = resultFormatter;
@@ -72,7 +72,7 @@ const findBestDeals = async ({
     gasLimit: 999999999999999, // Add stupid value to prevent issues with view functions running out of gas
   });
 
-  // Find the best deal for each refTokenDecimalAmount
+  // Find the best deal for each fromTokenDecimalAmount
   const bestDeals: {
     [key: string]: Deal;
   } = {};
@@ -87,7 +87,7 @@ const findBestDeals = async ({
     const resultFormatter = resultFormatters[exchange.name];
     const formattedResults = resultFormatter(multicallRes.results[exchange.name]);
 
-    // Go through each result to find the best deal for each refTokenDecimalAmount
+    // Go through each result to find the best deal for each fromTokenDecimalAmount
     formattedResults.forEach((formattedResult) => {
       // Apply maximum slippage allowance, which means any deal found is
       // calculated with the most pessimistic outcome (given our slippage
@@ -111,7 +111,7 @@ const findBestDeals = async ({
       const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()];
 
       // If no best deal has been determined for the current
-      // refTokenDecimalAmount, we assign this deal as the best
+      // fromTokenDecimalAmount, we assign this deal as the best
       if (!currentBestDeal) {
         bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()] = deal;
         return;
@@ -135,7 +135,7 @@ const findBestDeals = async ({
   });
 
   // Return best deals in the form of an array, sorted in the same order as the
-  // refTokenDecimalAmounts
+  // fromTokenDecimalAmounts
   return Object.keys(bestDeals).map((key) => bestDeals[key]);
 };
 
