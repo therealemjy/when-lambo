@@ -113,7 +113,7 @@ const findBestDeals = async ({
       const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()];
 
       // If no best deal has been determined for the current
-      // fromTokenDecimalAmount, we assign this deal as the best
+      // fromTokenDecimalAmount yet, we assign this deal as the current best
       if (!currentBestDeal) {
         bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()] = deal;
         return;
@@ -129,14 +129,14 @@ const findBestDeals = async ({
       );
 
       // If the deal is better than the current best deal, we assign is as the
-      // best deal
+      // new best deal
       if (dealRevenuesMinusGas.isGreaterThan(currentBestDealRevenuesMinusGas)) {
         bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()] = deal;
       }
     });
   });
 
-  // Return best deals in the form of an array, sorted in the same order as the
+  // Return best deals in the form of an array, sorted in the same order as
   // fromTokenDecimalAmounts
   return Object.keys(bestDeals).map((key) => bestDeals[key]);
 };
