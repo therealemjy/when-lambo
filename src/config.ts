@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js';
 import dotenv from 'dotenv';
-import { errors } from 'ethers';
 
 dotenv.config();
 
