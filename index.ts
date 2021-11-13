@@ -14,6 +14,7 @@ import findBestPaths from './src/findBestPaths';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import { WETH } from './src/tokens';
+import sendSlackMessage, { formatErrorToSlackBlock } from './src/utils/sendSlackMessage';
 
 const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
 
@@ -75,27 +76,39 @@ const init = async () => {
 
       isMonitoring = true;
 
-      const paths = await findBestPaths({
-        multicall,
-        fromTokenDecimalAmounts: config.toToken.weiAmounts,
-        fromToken: WETH,
-        toToken: {
-          symbol: config.toToken.symbol,
-          address: config.toToken.address,
-          decimals: config.toToken.decimals,
-        },
-        exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService, cryptoComExchangeService],
-        slippageAllowancePercent: config.slippageAllowancePercent,
-        gasPriceWei: global.currentGasPrices.rapid,
-      });
+      try {
+        const paths = await findBestPaths({
+          multicall,
+          fromTokenDecimalAmounts: config.toToken.weiAmounts,
+          fromToken: WETH,
+          toToken: {
+            symbol: config.toToken.symbol,
+            address: config.toToken.address,
+            decimals: config.toToken.decimals,
+          },
+          exchanges: [
+            uniswapV2ExchangeService,
+            sushiswapExchangeService,
+            kyberExchangeService,
+            cryptoComExchangeService,
+          ],
+          slippageAllowancePercent: config.slippageAllowancePercent,
+          gasPriceWei: global.currentGasPrices.rapid,
+        });
 
-      isMonitoring = false;
+        logPaths(paths, worksheet);
+      } catch (err: any) {
+        // Format the error to human readable format and send it to slack
+        const formattedError = formatErrorToSlackBlock(err, config.toToken.symbol);
+        sendSlackMessage(formattedError);
+      } finally {
+        // Make sure to reset monitoring status so the script doesn't stop
+        if (config.environment === 'development') {
+          console.timeEnd('monitorPrices');
+        }
 
-      if (config.environment === 'development') {
-        console.timeEnd('monitorPrices');
+        isMonitoring = false;
       }
-
-      logPaths(paths, worksheet);
     };
 
     provider.addListener('block', onReceiveBlock);

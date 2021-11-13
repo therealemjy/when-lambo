@@ -4,7 +4,7 @@ import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 import config from '@src/config';
 import { Path } from '@src/types';
 import calculateProfit from '@src/utils/calculateProfit';
-import sendSlackMessage from '@src/utils/sendSlackMessage';
+import sendSlackMessage, { formatErrorToSlackBlock } from '@src/utils/sendSlackMessage';
 
 type WorksheetRow = [string, number, string, number, string, number, number, number, string];
 
@@ -29,7 +29,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
       expenseDec: path[0].fromTokenDecimalAmount.plus(gasCost),
     });
 
-    // Only log profitable paths to Slack in production
+    // Only log profitable paths in production
     if (config.environment === 'production' && profitDec.isGreaterThan(0)) {
       slackBlocks.push([
         {
@@ -106,21 +106,26 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
     }
   }
 
-  if (config.environment === 'production' && worksheetRows.length > 0) {
-    // Send rows to Google Spreadsheet
-    await worksheet.addRows(worksheetRows);
-  }
+  try {
+    if (config.environment === 'production' && slackBlocks.length > 0) {
+      // Send alert to slack
+      await sendSlackMessage({
+        blocks: slackBlocks.flat(),
+      });
+    }
 
-  if (config.environment === 'production' && slackBlocks.length > 0) {
-    // Send alert to Slack
-    await sendSlackMessage({
-      blocks: slackBlocks.flat(),
-    });
-  }
+    if (config.environment === 'production' && worksheetRows.length > 0) {
+      // Send row to Google Spreadsheet
+      await worksheet.addRows(worksheetRows);
+    }
 
-  if (config.environment === 'development') {
-    // Log paths in console
-    console.table(tableRows);
+    if (config.environment === 'development') {
+      // Log paths in console
+      console.table(tableRows);
+    }
+  } catch (err: any) {
+    const formattedError = formatErrorToSlackBlock(err, config.toToken.symbol);
+    sendSlackMessage(formattedError);
   }
 };
 
