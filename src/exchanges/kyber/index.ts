@@ -1,5 +1,5 @@
-import BigNumber from 'bignumber.js';
 import { ContractCallReturnContext } from '@maxime.julian/ethereum-multicall';
+import BigNumber from 'bignumber.js';
 
 import { Exchange, ExchangeName, Token } from '@src/types';
 
@@ -15,14 +15,14 @@ class Kyber implements Exchange {
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = (args) => {
     const { callReference, fromTokenDecimalAmounts, fromToken, toToken } = args;
 
-    const calls = fromTokenDecimalAmounts.map(fromTokenDecimalAmount => {
+    const calls = fromTokenDecimalAmounts.map((fromTokenDecimalAmount) => {
       const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed();
 
       return {
         reference: `getExpectedRate-${fixedFromTokenDecimalAmount}`,
         methodName: 'getExpectedRate',
         methodParameters: [fromToken.address, toToken.address, fromTokenDecimalAmount.toFixed()],
-      }
+      };
     });
 
     return {
@@ -32,21 +32,21 @@ class Kyber implements Exchange {
         abi: kyberNetworkProxy.abi,
         calls,
       },
-      resultsFormatter: this._formatDecimalAmountOutCallResults
-    }
+      resultsFormatter: this._formatDecimalAmountOutCallResults,
+    };
   };
 
   _formatDecimalAmountOutCallResults = (
     callResult: ContractCallReturnContext,
-    { fromToken, toToken }: { fromToken: Token, toToken: Token }
-  ) => (
+    { fromToken, toToken }: { fromToken: Token; toToken: Token }
+  ) =>
     callResult.callsReturnContext
       // Filter out unsuccessful calls
-      .filter(callReturnContext => {
+      .filter((callReturnContext) => {
         const oneFromTokenSellRate = new BigNumber(callReturnContext.returnValues[0].hex);
-        return callReturnContext.success && oneFromTokenSellRate.isGreaterThan(0)
+        return callReturnContext.success && oneFromTokenSellRate.isGreaterThan(0);
       })
-      .map(callReturnContext => {
+      .map((callReturnContext) => {
         // Price of 1 fromToken in toToken decimals
         const oneFromTokenSellRate = new BigNumber(callReturnContext.returnValues[0].hex);
 
@@ -63,10 +63,9 @@ class Kyber implements Exchange {
           fromTokenDecimalAmount,
           toToken,
           toTokenDecimalAmount,
-          estimatedGas: new BigNumber(400000)
-        }
-      })
-  );
+          estimatedGas: new BigNumber(400000),
+        };
+      });
 }
 
 export default Kyber;
