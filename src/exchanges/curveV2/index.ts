@@ -12,7 +12,7 @@ class CurveV2 implements Exchange {
     this.name = ExchangeName.CurveV2;
   }
 
-  // This allow us to get the right contract address
+  // This allows us to get the right contract address
   // private async setUpSwapContract(provider: ethers.providers.Web3Provider){
     /*
       swapContract address and ABI can change if any error occurs, it might be

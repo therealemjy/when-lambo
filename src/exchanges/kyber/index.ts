@@ -47,7 +47,7 @@ class Kyber implements Exchange {
         return callReturnContext.success && oneFromTokenSellRate.isGreaterThan(0)
       })
       .map(callReturnContext => {
-          // Price of 1 fromToken in toToken decimals
+        // Price of 1 fromToken in toToken decimals
         const oneFromTokenSellRate = new BigNumber(callReturnContext.returnValues[0].hex);
 
         // Price of 1 fromToken decimal in toToken decimals
