@@ -2,5 +2,6 @@
   "singleQuote": true,
   "printWidth": 120,
   "importOrder": ["^@src/(.*)$", "^[./]"],
-  "importOrderSeparation": true
+  "importOrderSeparation": true,
+  "importOrderParserPlugins": ["classProperties", "typescript"]
 }

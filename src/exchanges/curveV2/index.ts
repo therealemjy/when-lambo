@@ -14,7 +14,7 @@ class CurveV2 implements Exchange {
 
   // This allows us to get the right contract address
   // private async setUpSwapContract(provider: ethers.providers.Web3Provider){
-    /*
+  /*
       swapContract address and ABI can change if any error occurs, it might be
       due to a new contract ABI that needs to be updated
 
@@ -28,14 +28,14 @@ class CurveV2 implements Exchange {
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = (args) => {
     const { callReference, fromTokenDecimalAmounts, fromToken, toToken } = args;
 
-    const calls = fromTokenDecimalAmounts.map(fromTokenDecimalAmount => {
+    const calls = fromTokenDecimalAmounts.map((fromTokenDecimalAmount) => {
       const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed();
 
       return {
         reference: `get_best_rate(address,address,uint256)-${fixedFromTokenDecimalAmount}`,
         methodName: 'get_best_rate(address,address,uint256)',
         methodParameters: [fromToken.address, toToken.address, fromTokenDecimalAmount.toFixed()],
-      }
+      };
     });
 
     return {
@@ -45,21 +45,21 @@ class CurveV2 implements Exchange {
         abi: swapContract.abi,
         calls,
       },
-      resultsFormatter: this._formatDecimalAmountOutCallResults
-    }
-  }
+      resultsFormatter: this._formatDecimalAmountOutCallResults,
+    };
+  };
 
   _formatDecimalAmountOutCallResults = (
     callResult: ContractCallReturnContext,
-    { fromToken, toToken }: { fromToken: Token, toToken: Token }
-  ) => (
+    { fromToken, toToken }: { fromToken: Token; toToken: Token }
+  ) =>
     callResult.callsReturnContext
       // Filter out unsuccessful calls
-      .filter(callReturnContext => {
+      .filter((callReturnContext) => {
         const oneFromTokenSellRate = new BigNumber(callReturnContext.returnValues[0].hex);
-        return callReturnContext.success && oneFromTokenSellRate.isGreaterThan(0)
+        return callReturnContext.success && oneFromTokenSellRate.isGreaterThan(0);
       })
-      .map(callReturnContext => {
+      .map((callReturnContext) => {
         // Price of 1 fromToken in toToken decimals
         const oneFromTokenSellRate = new BigNumber(callReturnContext.returnValues[0].hex);
 
@@ -76,10 +76,9 @@ class CurveV2 implements Exchange {
           fromTokenDecimalAmount,
           toToken,
           toTokenDecimalAmount,
-          estimatedGas: new BigNumber(115000)
-        }
-      })
-  )
+          estimatedGas: new BigNumber(115000),
+        };
+      });
 }
 
 export default CurveV2;

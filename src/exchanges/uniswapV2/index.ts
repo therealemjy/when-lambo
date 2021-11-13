@@ -1,5 +1,5 @@
-import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
+import { ethers } from 'ethers';
 
 import { Exchange, ExchangeName } from '@src/types';
 
@@ -14,15 +14,20 @@ class UniswapV2 implements Exchange {
     this.name = ExchangeName.UniswapV2;
   }
 
-  getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({ callReference, fromTokenDecimalAmounts, fromToken, toToken }) => {
-    const calls = fromTokenDecimalAmounts.map(fromTokenDecimalAmount => {
+  getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({
+    callReference,
+    fromTokenDecimalAmounts,
+    fromToken,
+    toToken,
+  }) => {
+    const calls = fromTokenDecimalAmounts.map((fromTokenDecimalAmount) => {
       const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed();
 
       return {
         reference: `getAmountsOut-${fixedFromTokenDecimalAmount}`,
         methodName: 'getAmountsOut',
         methodParameters: [fixedFromTokenDecimalAmount, [fromToken.address, toToken.address]],
-      }
+      };
     });
 
     return {
@@ -32,19 +37,18 @@ class UniswapV2 implements Exchange {
         abi: uniswapV2RouterContract.abi,
         calls,
       },
-      resultsFormatter: (callResult) => (
+      resultsFormatter: (callResult) =>
         callResult.callsReturnContext
           // Filter out unsuccessful calls
-          .filter(callReturnContext => callReturnContext.success && callReturnContext.returnValues.length >= 2)
-          .map(callReturnContext => ({
+          .filter((callReturnContext) => callReturnContext.success && callReturnContext.returnValues.length >= 2)
+          .map((callReturnContext) => ({
             fromToken,
             fromTokenDecimalAmount: new BigNumber(callReturnContext.methodParameters[0]),
             toToken,
             toTokenDecimalAmount: new BigNumber(callReturnContext.returnValues[1].hex),
-            estimatedGas: new BigNumber(115000)
-          }))
-      )
-    }
+            estimatedGas: new BigNumber(115000),
+          })),
+    };
   };
 }
 

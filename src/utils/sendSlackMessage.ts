@@ -49,7 +49,7 @@ function sendSlackMessage(message: any, type: keyof typeof slackChannels) {
   });
 }
 
-export function formatErrorToSlackBlock(error: Error, currentStrategy: string) {
+export function formatErrorToSlackBlock(error: Error, toTokenSymbol: string) {
   const serialized = serializeError(error);
   const json = JSON.stringify(serialized, null, 2);
 
@@ -66,7 +66,7 @@ export function formatErrorToSlackBlock(error: Error, currentStrategy: string) {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `Error found pair *WETH/${currentStrategy}*`,
+          text: `Faulty pair: *WETH/${toTokenSymbol}*`,
         },
       },
       {

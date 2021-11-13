@@ -60,23 +60,23 @@ const init = async () => {
     const cryptoComExchangeService = new CryptoComExchange();
 
     const onReceiveBlock = async (blockNumber: string) => {
+      if (config.environment === 'development') {
+        console.log(`New block received. Block # ${blockNumber}`);
+      }
+
+      if (isMonitoring && config.environment === 'development') {
+        console.log('Block skipped! Price monitoring ongoing.');
+      } else if (config.environment === 'development') {
+        console.time('monitorPrices');
+      }
+
+      if (isMonitoring) {
+        return;
+      }
+
+      isMonitoring = true;
+
       try {
-        if (config.environment === 'development') {
-          console.log(`New block received. Block # ${blockNumber}`);
-        }
-
-        if (isMonitoring && config.environment === 'development') {
-          console.log('Block skipped! Price monitoring ongoing.');
-        } else if (config.environment === 'development') {
-          console.time('monitorPrices');
-        }
-
-        if (isMonitoring) {
-          return;
-        }
-
-        isMonitoring = true;
-
         const paths = await findBestPaths({
           multicall,
           fromTokenDecimalAmounts: config.toToken.weiAmounts,
@@ -102,7 +102,7 @@ const init = async () => {
         const formattedError = formatErrorToSlackBlock(err, config.toToken.symbol);
         sendSlackMessage(formattedError, 'errors');
       } finally {
-        // Make sure to reset monitoring status the the script doesn't stop
+        // Make sure to reset monitoring status so the script doesn't stop
         if (config.environment === 'development') {
           console.timeEnd('monitorPrices');
         }
