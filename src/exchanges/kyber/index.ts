@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { ContractCallReturnContext } from '@maxime.julian/ethereum-multicall';
 
-import { Exchange, ExchangeName, IGetDecimalAmountOutCallContextInput } from '@src/types';
+import { Exchange, ExchangeName, Token } from '@src/types';
 
 import kyberNetworkProxy from './contracts/kyberNetworkProxy.json';
 
@@ -32,13 +32,13 @@ class Kyber implements Exchange {
         abi: kyberNetworkProxy.abi,
         calls,
       },
-      resultFormatter: (callResult: ContractCallReturnContext) => this._formatDecimalAmountOutCallResults(callResult, { callReference, fromTokenDecimalAmounts, fromToken, toToken })
+      resultFormatter: this._formatDecimalAmountOutCallResults
     }
   };
 
   _formatDecimalAmountOutCallResults = (
     callResult: ContractCallReturnContext,
-    { fromToken, toToken }: IGetDecimalAmountOutCallContextInput
+    { fromToken, toToken }: { fromToken: Token, toToken: Token }
   ) => (
     callResult.callsReturnContext
       // Filter out unsuccessful calls

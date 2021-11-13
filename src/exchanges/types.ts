@@ -18,7 +18,10 @@ export interface Exchange {
   };
 }
 
-export type ResultFormatter = (result: ContractCallReturnContext) => FormattedDecimalAmountOutCallResult;
+export type ResultFormatter = (
+  result: ContractCallReturnContext,
+  callParameters: { fromToken: Token; toToken: Token }
+) => FormattedDecimalAmountOutCallResult;
 
 export type FormattedDecimalAmountOutCallResult = Array<{
   fromToken: Token;

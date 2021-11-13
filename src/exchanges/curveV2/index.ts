@@ -1,7 +1,7 @@
 import { ContractCallReturnContext } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ExchangeName, IGetDecimalAmountOutCallContextInput } from '@src/types';
+import { Exchange, ExchangeName, Token } from '@src/types';
 
 import swapContract from './contracts/swapContract.json';
 
@@ -45,13 +45,13 @@ class CurveV2 implements Exchange {
         abi: swapContract.abi,
         calls,
       },
-      resultFormatter: (callResult: ContractCallReturnContext) => this._formatDecimalAmountOutCallResults(callResult, args)
+      resultFormatter: this._formatDecimalAmountOutCallResults
     }
   }
 
   _formatDecimalAmountOutCallResults = (
     callResult: ContractCallReturnContext,
-    { fromToken, toToken }: IGetDecimalAmountOutCallContextInput
+    { fromToken, toToken }: { fromToken: Token, toToken: Token }
   ) => (
     callResult.callsReturnContext
       // Filter out unsuccessful calls
