@@ -14,6 +14,7 @@ import findBestPaths from './src/findBestPaths';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import { WETH } from './src/tokens';
+import sendSlackMessage, { formatErrorToSlackBlock } from './src/utils/sendSlackMessage';
 
 const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
 
@@ -59,43 +60,55 @@ const init = async () => {
     const cryptoComExchangeService = new CryptoComExchange();
 
     const onReceiveBlock = async (blockNumber: string) => {
-      if (config.environment === 'development') {
-        console.log(`New block received. Block # ${blockNumber}`);
+      try {
+        if (config.environment === 'development') {
+          console.log(`New block received. Block # ${blockNumber}`);
+        }
+
+        if (isMonitoring && config.environment === 'development') {
+          console.log('Block skipped! Price monitoring ongoing.');
+        } else if (config.environment === 'development') {
+          console.time('monitorPrices');
+        }
+
+        if (isMonitoring) {
+          return;
+        }
+
+        isMonitoring = true;
+
+        const paths = await findBestPaths({
+          multicall,
+          refTokenDecimalAmounts: config.tradedToken.weiAmounts,
+          refToken: WETH,
+          tradedToken: {
+            symbol: config.tradedToken.symbol,
+            address: config.tradedToken.address,
+            decimals: config.tradedToken.decimals,
+          },
+          exchanges: [
+            uniswapV2ExchangeService,
+            sushiswapExchangeService,
+            kyberExchangeService,
+            cryptoComExchangeService,
+          ],
+          slippageAllowancePercent: config.slippageAllowancePercent,
+          gasPriceWei: global.currentGasPrices.rapid,
+        });
+
+        logPaths(paths, worksheet);
+      } catch (err: any) {
+        // Format the error to human readable format and send it to slack
+        const formattedError = formatErrorToSlackBlock(err, config.tradedToken.symbol);
+        sendSlackMessage(formattedError);
+      } finally {
+        // Make sure to reset monitoring status the the script doesn't stop
+        if (config.environment === 'development') {
+          console.timeEnd('monitorPrices');
+        }
+
+        isMonitoring = false;
       }
-
-      if (isMonitoring && config.environment === 'development') {
-        console.log('Block skipped! Price monitoring ongoing.');
-      } else if (config.environment === 'development') {
-        console.time('monitorPrices');
-      }
-
-      if (isMonitoring) {
-        return;
-      }
-
-      isMonitoring = true;
-
-      const paths = await findBestPaths({
-        multicall,
-        refTokenDecimalAmounts: config.tradedToken.weiAmounts,
-        refToken: WETH,
-        tradedToken: {
-          symbol: config.tradedToken.symbol,
-          address: config.tradedToken.address,
-          decimals: config.tradedToken.decimals,
-        },
-        exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService, cryptoComExchangeService],
-        slippageAllowancePercent: config.slippageAllowancePercent,
-        gasPriceWei: global.currentGasPrices.rapid,
-      });
-
-      isMonitoring = false;
-
-      if (config.environment === 'development') {
-        console.timeEnd('monitorPrices');
-      }
-
-      logPaths(paths, worksheet);
     };
 
     provider.addListener('block', onReceiveBlock);

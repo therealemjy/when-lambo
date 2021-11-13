@@ -1,4 +1,5 @@
 import * as https from 'https';
+import { serializeError } from 'serialize-error';
 
 // Doing it this way to avoid using 3rd party services
 // Verbose but works fine
@@ -39,6 +40,37 @@ function sendSlackMessage(message: any) {
     postReq.write(body);
     postReq.end();
   });
+}
+
+export function formatErrorToSlackBlock(error: Error, currentStrategy: string) {
+  const serialized = serializeError(error);
+  const json = JSON.stringify(serialized, null, 2);
+
+  return {
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: 'Fuck, something is wrong guys 😳',
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Error found pair *WETH/${currentStrategy}*`,
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: '```' + json + '```',
+        },
+      },
+    ],
+  };
 }
 
 export default sendSlackMessage;
