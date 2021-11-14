@@ -6,6 +6,7 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import './@moduleAliases';
 import config from './src/config';
+import eventEmitter from './src/eventEmitter';
 import CryptoComExchange from './src/exchanges/cryptoCom';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
@@ -39,7 +40,16 @@ const init = async () => {
   // Pull gas prices every 5 seconds
   gasPriceWatcher.updateEvery(5000);
 
+  // Handle errors
+  eventEmitter.on('error', (error) => {
+    // Format the error to a human-readable format and send it to slack
+    const formattedError = formatErrorToSlackBlock(error, config.toToken.symbol);
+    sendSlackMessage(formattedError, 'errors');
+  });
+
   const start = () => {
+    eventEmitter.emit('error', new Error('I love BBW'));
+
     const provider = new ethers.providers.Web3Provider(
       new AWSWebsocketProvider(config.aws.wsRpcUrl, {
         clientConfig: {
@@ -97,10 +107,8 @@ const init = async () => {
         });
 
         logPaths(paths, worksheet);
-      } catch (err: any) {
-        // Format the error to human readable format and send it to slack
-        const formattedError = formatErrorToSlackBlock(err, config.toToken.symbol);
-        sendSlackMessage(formattedError, 'errors');
+      } catch (err: unknown) {
+        eventEmitter.emit('error', err);
       } finally {
         // Make sure to reset monitoring status so the script doesn't stop
         if (config.environment === 'development') {

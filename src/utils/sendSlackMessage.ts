@@ -49,7 +49,7 @@ function sendSlackMessage(message: any, type: keyof typeof slackChannels) {
   });
 }
 
-export function formatErrorToSlackBlock(error: Error, toTokenSymbol: string) {
+export function formatErrorToSlackBlock(error: unknown, toTokenSymbol: string) {
   const serialized = serializeError(error);
   const json = JSON.stringify(serialized, null, 2);
 

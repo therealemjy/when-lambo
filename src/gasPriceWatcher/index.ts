@@ -1,6 +1,8 @@
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 
+import eventEmitter from '@src/eventEmitter';
+
 class GasPriceWatcher {
   constructor() {
     console.log('Gas price watcher started.');
@@ -28,8 +30,8 @@ class GasPriceWatcher {
         standard: new BigNumber(res.data.data.standard),
         slow: new BigNumber(res.data.data.slow),
       };
-    } catch (err) {
-      console.log('Error while pulling data from gasnow', err);
+    } catch (err: unknown) {
+      eventEmitter.emit('error', err);
     }
   }
 }
