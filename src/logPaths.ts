@@ -2,9 +2,10 @@ import formatDate from 'date-fns/format';
 import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 
 import config from '@src/config';
+import eventEmitter from '@src/eventEmitter';
 import { Path } from '@src/types';
 import calculateProfit from '@src/utils/calculateProfit';
-import sendSlackMessage, { formatErrorToSlackBlock } from '@src/utils/sendSlackMessage';
+import sendSlackMessage from '@src/utils/sendSlackMessage';
 
 type WorksheetRow = [string, number, string, number, string, number, number, number, string];
 
@@ -23,7 +24,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
     const gasCost = path[0].estimatedGasCost
       .plus(path[1].estimatedGasCost)
       // Added gasLimit margin
-      .multipliedBy(1 + config.gasLimitMarginPercent / 100);
+      .multipliedBy(config.gasLimitMultiplicator);
 
     const [profitDec, profitPercent] = calculateProfit({
       revenueDec: path[1].toTokenDecimalAmount,
@@ -129,9 +130,8 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
       // Log paths in console
       console.table(tableRows);
     }
-  } catch (err: any) {
-    const formattedError = formatErrorToSlackBlock(err, config.toToken.symbol);
-    sendSlackMessage(formattedError, 'errors');
+  } catch (err: unknown) {
+    eventEmitter.emit('error', err);
   }
 };
 
