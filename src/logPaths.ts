@@ -20,7 +20,10 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
     const revenues = path[1].toTokenDecimalAmount.toFixed(0);
     const bestSellingExchangeName = path[0].exchangeName;
     const bestBuyingExchangeName = path[1].exchangeName;
-    const gasCost = path[0].estimatedGasCost.plus(path[1].estimatedGasCost);
+    const gasCost = path[0].estimatedGasCost
+      .plus(path[1].estimatedGasCost)
+      // Added gasLimit margin
+      .multipliedBy(1 + config.gasLimitMarginPercent / 100);
 
     const [profitDec, profitPercent] = calculateProfit({
       revenueDec: path[1].toTokenDecimalAmount,
