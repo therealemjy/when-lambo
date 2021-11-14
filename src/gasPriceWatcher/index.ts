@@ -1,6 +1,7 @@
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 
+import config from '@src/config';
 import eventEmitter from '@src/eventEmitter';
 
 class GasPriceWatcher {
@@ -25,7 +26,10 @@ class GasPriceWatcher {
       }>('https://etherchain.org/api/gasnow');
 
       global.currentGasPrices = {
-        rapid: new BigNumber(res.data.data.rapid),
+        // In order to make sure transactions are mined as fast as possible, we
+        // multiply the gas price for rapid transactions by a given
+        // multiplicator
+        rapid: new BigNumber(res.data.data.rapid).multipliedBy(config.gasPriceMultiplicator),
         fast: new BigNumber(res.data.data.fast),
         standard: new BigNumber(res.data.data.standard),
         slow: new BigNumber(res.data.data.slow),

@@ -21,7 +21,8 @@ export interface EnvConfig {
   };
   environment: 'development' | 'production';
   slippageAllowancePercent: number;
-  gasLimitMarginPercent: number;
+  gasLimitMultiplicator: number;
+  gasPriceMultiplicator: number;
   toToken: {
     address: string;
     symbol: string;
@@ -48,7 +49,8 @@ const config: EnvConfig = {
   },
   environment: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
-  gasLimitMarginPercent: +env('GAS_LIMIT_MARGIN_PERCENT'),
+  gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
+  gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
   toToken: {
     address: env('TRADED_TOKEN_ADDRESS'),
     symbol: env('TRADED_TOKEN_SYMBOL'),

@@ -24,7 +24,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
     const gasCost = path[0].estimatedGasCost
       .plus(path[1].estimatedGasCost)
       // Added gasLimit margin
-      .multipliedBy(1 + config.gasLimitMarginPercent / 100);
+      .multipliedBy(config.gasLimitMultiplicator);
 
     const [profitDec, profitPercent] = calculateProfit({
       revenueDec: path[1].toTokenDecimalAmount,
