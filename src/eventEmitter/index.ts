@@ -5,7 +5,7 @@ import { Path } from '@src/types';
 
 interface MessageEvents {
   error: (error: unknown) => void;
-  profitablePath: (path: Path) => void;
+  paths: (paths: Path[]) => void;
 }
 
 const eventEmitter = new EventEmitter() as TypedEmitter<MessageEvents>;

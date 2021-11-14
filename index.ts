@@ -40,6 +40,9 @@ const init = async () => {
   // Pull gas prices every 5 seconds
   gasPriceWatcher.updateEvery(5000);
 
+  // Handle paths found
+  eventEmitter.on('paths', (paths) => logPaths(paths, worksheet));
+
   // Handle errors
   eventEmitter.on('error', (error) => {
     // Format the error to a human-readable format and send it to slack
@@ -48,8 +51,6 @@ const init = async () => {
   });
 
   const start = () => {
-    eventEmitter.emit('error', new Error('I love BBW'));
-
     const provider = new ethers.providers.Web3Provider(
       new AWSWebsocketProvider(config.aws.wsRpcUrl, {
         clientConfig: {
@@ -106,7 +107,7 @@ const init = async () => {
           gasPriceWei: global.currentGasPrices.rapid,
         });
 
-        logPaths(paths, worksheet);
+        eventEmitter.emit('paths', paths);
       } catch (err: unknown) {
         eventEmitter.emit('error', err);
       } finally {
