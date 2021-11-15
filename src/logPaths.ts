@@ -34,7 +34,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
     });
 
     // Only log profitable paths in production
-    if (config.environment === 'production' && profitDec.isGreaterThan(0)) {
+    if (config.isProd && profitDec.isGreaterThan(0)) {
       slackBlocks.push([
         {
           type: 'section',
@@ -95,7 +95,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
       ]);
     }
     // Log all paths in the console in development
-    else if (config.environment === 'development') {
+    else if (config.isDev) {
       tableRows.push({
         Timestamp: timestamp,
         [`${path[0].fromToken.symbol} decimals borrowed`]: borrowedDec,
@@ -111,7 +111,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
   }
 
   try {
-    if (config.environment === 'production' && slackBlocks.length > 0) {
+    if (config.isProd && slackBlocks.length > 0) {
       // Send alert to slack
       await sendSlackMessage(
         {
@@ -121,12 +121,12 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
       );
     }
 
-    if (config.environment === 'production' && worksheetRows.length > 0) {
+    if (config.isProd && worksheetRows.length > 0) {
       // Send row to Google Spreadsheet
       await worksheet.addRows(worksheetRows);
     }
 
-    if (config.environment === 'development') {
+    if (config.isDev) {
       // Log paths in console
       console.table(tableRows);
     }

@@ -19,7 +19,8 @@ export interface EnvConfig {
     accessKeyId: string;
     secretAccessKey: string;
   };
-  environment: 'development' | 'production';
+  isDev: boolean;
+  isProd: boolean;
   slippageAllowancePercent: number;
   gasLimitMultiplicator: number;
   gasPriceMultiplicator: number;
@@ -47,7 +48,8 @@ const config: EnvConfig = {
     accessKeyId: env('AWS_ACCESS_KEY_ID'),
     secretAccessKey: env('AWS_SECRET_ACCESS_KEY'),
   },
-  environment: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  isProd: process.env.NODE_ENV === 'production',
+  isDev: process.env.NODE_ENV === 'development',
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
