@@ -5,6 +5,16 @@ import { Exchange, Token, UsedExchangeNames, Path } from '@src/types';
 
 import findBestDeals from './findBestDeals';
 
+type FindBestPathsArgs = {
+  multicall: Multicall;
+  fromToken: Token;
+  fromTokenDecimalAmounts: BigNumber[];
+  toToken: Token;
+  slippageAllowancePercent: number;
+  gasPriceWei: BigNumber;
+  exchanges: Exchange[];
+};
+
 const findBestPaths = async ({
   multicall,
   fromToken,
@@ -13,15 +23,7 @@ const findBestPaths = async ({
   exchanges,
   slippageAllowancePercent,
   gasPriceWei,
-}: {
-  multicall: Multicall;
-  fromToken: Token;
-  fromTokenDecimalAmounts: BigNumber[];
-  toToken: Token;
-  slippageAllowancePercent: number;
-  gasPriceWei: BigNumber;
-  exchanges: Exchange[];
-}) => {
+}: FindBestPathsArgs) => {
   // Find the highest amount of toToken decimals we can buy with each
   // fromTokenDecimalAmount
   const bestBuyingDeals = await findBestDeals({
