@@ -20,6 +20,12 @@ const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
 
 global.isMonitoring = false;
 
+const sendErrorToSlack = (error: unknown) => {
+  // Format the error to a human-readable format and send it to slack
+  const formattedError = formatErrorToSlackBlock(error, config.toToken.symbol);
+  return sendSlackMessage(formattedError, 'errors');
+};
+
 const init = async () => {
   const worksheet = await getWorksheet();
 
@@ -30,11 +36,7 @@ const init = async () => {
   eventEmitter.on('paths', (paths) => logPaths(paths, worksheet));
 
   // Handle errors
-  eventEmitter.on('error', (error) => {
-    // Format the error to a human-readable format and send it to slack
-    const formattedError = formatErrorToSlackBlock(error, config.toToken.symbol);
-    sendSlackMessage(formattedError, 'errors');
-  });
+  eventEmitter.on('error', sendErrorToSlack);
 
   const start = () => {
     const provider = new ethers.providers.Web3Provider(
@@ -84,3 +86,10 @@ const init = async () => {
 };
 
 init();
+
+// Catch unhandled exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception', error);
+  sendErrorToSlack(error);
+  process.exit(1);
+});
