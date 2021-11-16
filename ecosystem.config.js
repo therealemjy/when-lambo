@@ -27,6 +27,8 @@ module.exports = {
     {
       name: 'when-lambo-bot',
       script: './dist/index.js',
+      wait_ready: false,
+      watch: false,
       env_dai: {
         ...baseEnvs,
         GOOGLE_SPREADSHEET_WORKSHEET_ID: '1ka3JbjlSSjNnvwLhJ11c-mKwK2TJ622_elG9evOf4JI',
