@@ -87,32 +87,32 @@ module.exports = {
     dai: {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env dai',
-      host: ['ec2-3-91-241-119.compute-1.amazonaws.com'],
+      host: ['ec2-54-237-88-119.compute-1.amazonaws.com'],
     },
     shib: {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env shib',
-      host: ['ec2-184-73-39-7.compute-1.amazonaws.com'],
+      host: ['ec2-18-207-139-178.compute-1.amazonaws.com'],
     },
     link: {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env link',
-      host: ['ec2-3-89-131-117.compute-1.amazonaws.com'],
+      host: ['ec2-54-160-123-253.compute-1.amazonaws.com'],
     },
     mana: {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env mana',
-      host: ['ec2-35-171-162-140.compute-1.amazonaws.com'],
+      host: ['ec2-52-201-212-7.compute-1.amazonaws.com'],
     },
     aave: {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env aave',
-      host: ['ec2-3-91-151-108.compute-1.amazonaws.com'],
+      host: ['ec2-18-214-87-99.compute-1.amazonaws.com'],
     },
     sand: {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env sand',
-      host: ['ec2-184-72-215-181.compute-1.amazonaws.com'],
+      host: ['ec2-54-165-201-252.compute-1.amazonaws.com'],
     },
   },
 };
