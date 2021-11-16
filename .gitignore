@@ -1,6 +1,7 @@
 # Truffle
 build
 build.zip
+dist
 
 # Node
 node_modules
