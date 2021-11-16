@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "tsc && NODE_ENV=development node dist/index",
     "start": "node dist/index.js",
-    "push:version": "npm run tsc && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master",
+    "push:version": "npm run tsc && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
     "deploy": "npx pm2 deploy dai update && npx pm2 deploy shib update && npx pm2 deploy link update && npx pm2 deploy mana update && npx pm2 deploy aave update && npx pm2 deploy sand update",
     "tsc": "tsc",
     "posttsc": "cp package.json dist/package.json && cd dist && npm install --only=production",
