@@ -4,7 +4,6 @@ build.zip
 
 # Node
 node_modules
-!dist/node_modules
 
 # Mac specific
 .DS_Store
