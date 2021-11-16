@@ -3,7 +3,6 @@ build
 build.zip
 
 # Node
-dist
 node_modules
 
 # Mac specific
