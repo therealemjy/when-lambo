@@ -26,21 +26,88 @@ const blockHandler = (multicall: Multicall, exchanges: Exchange[]) => async (blo
   global.isMonitoring = true;
 
   try {
-    const paths = await findBestPaths({
-      multicall,
-      fromTokenDecimalAmounts: config.toToken.weiAmounts,
-      fromToken: WETH,
-      toToken: {
-        symbol: config.toToken.symbol,
-        address: config.toToken.address,
-        decimals: config.toToken.decimals,
-      },
-      exchanges,
-      slippageAllowancePercent: config.slippageAllowancePercent,
-      gasPriceWei: global.currentGasPrices.rapid,
-    });
+    const paths = await Promise.all([
+      findBestPaths({
+        multicall,
+        fromTokenDecimalAmounts: config.toToken.weiAmounts,
+        fromToken: WETH,
+        toToken: {
+          symbol: config.toToken.symbol,
+          address: config.toToken.address,
+          decimals: config.toToken.decimals,
+        },
+        exchanges,
+        slippageAllowancePercent: config.slippageAllowancePercent,
+        gasPriceWei: global.currentGasPrices.rapid,
+      }),
+      findBestPaths({
+        multicall,
+        fromTokenDecimalAmounts: config.toToken.weiAmounts,
+        fromToken: WETH,
+        toToken: {
+          symbol: config.toToken.symbol,
+          address: config.toToken.address,
+          decimals: config.toToken.decimals,
+        },
+        exchanges,
+        slippageAllowancePercent: config.slippageAllowancePercent,
+        gasPriceWei: global.currentGasPrices.rapid,
+      }),
+      findBestPaths({
+        multicall,
+        fromTokenDecimalAmounts: config.toToken.weiAmounts,
+        fromToken: WETH,
+        toToken: {
+          symbol: config.toToken.symbol,
+          address: config.toToken.address,
+          decimals: config.toToken.decimals,
+        },
+        exchanges,
+        slippageAllowancePercent: config.slippageAllowancePercent,
+        gasPriceWei: global.currentGasPrices.rapid,
+      }),
+      findBestPaths({
+        multicall,
+        fromTokenDecimalAmounts: config.toToken.weiAmounts,
+        fromToken: WETH,
+        toToken: {
+          symbol: config.toToken.symbol,
+          address: config.toToken.address,
+          decimals: config.toToken.decimals,
+        },
+        exchanges,
+        slippageAllowancePercent: config.slippageAllowancePercent,
+        gasPriceWei: global.currentGasPrices.rapid,
+      }),
+      findBestPaths({
+        multicall,
+        fromTokenDecimalAmounts: config.toToken.weiAmounts,
+        fromToken: WETH,
+        toToken: {
+          symbol: config.toToken.symbol,
+          address: config.toToken.address,
+          decimals: config.toToken.decimals,
+        },
+        exchanges,
+        slippageAllowancePercent: config.slippageAllowancePercent,
+        gasPriceWei: global.currentGasPrices.rapid,
+      }),
+      findBestPaths({
+        multicall,
+        fromTokenDecimalAmounts: config.toToken.weiAmounts,
+        fromToken: WETH,
+        toToken: {
+          symbol: config.toToken.symbol,
+          address: config.toToken.address,
+          decimals: config.toToken.decimals,
+        },
+        exchanges,
+        slippageAllowancePercent: config.slippageAllowancePercent,
+        gasPriceWei: global.currentGasPrices.rapid,
+      }),
+    ]);
 
-    eventEmitter.emit('paths', paths);
+    paths.map((path) => eventEmitter.emit('paths', path));
   } catch (err: unknown) {
     eventEmitter.emit('error', err);
   } finally {

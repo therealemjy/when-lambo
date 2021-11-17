@@ -13,6 +13,25 @@ const env = (name: string): string => {
   return value;
 };
 
+interface ParsedStrategy {
+  GOOGLE_SPREADSHEET_ID: string;
+  TRADED_TOKEN_ADDRESS: string;
+  TRADED_TOKEN_SYMBOL: string;
+  TRADED_TOKEN_DECIMALS: string;
+  TRADED_TOKEN_WEI_AMOUNTS: string;
+}
+
+interface Strategy {
+  googleSpreadhSheetId: string;
+  toToken: {
+    address: string;
+    symbol: string;
+    decimals: number;
+    // TODO: move outside of toToken (confusing)
+    weiAmounts: BigNumber[];
+  };
+}
+
 export interface EnvConfig {
   aws: {
     wsRpcUrl: string;
@@ -24,15 +43,8 @@ export interface EnvConfig {
   slippageAllowancePercent: number;
   gasLimitMultiplicator: number;
   gasPriceMultiplicator: number;
-  toToken: {
-    address: string;
-    symbol: string;
-    decimals: number;
-    // TODO: move outside of toToken (confusing)
-    weiAmounts: BigNumber[];
-  };
+  strategies: Strategy[];
   googleSpreadSheet: {
-    worksheetId: string;
     clientEmail: string;
     privateKeyBase64: string;
   };
@@ -41,6 +53,8 @@ export interface EnvConfig {
     errors: string;
   };
 }
+
+const parsedStrategies: ParsedStrategy[] = JSON.parse(env('STRINGIFIED_STRATEGIES'));
 
 const config: EnvConfig = {
   aws: {
@@ -53,16 +67,7 @@ const config: EnvConfig = {
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
-  toToken: {
-    address: env('TRADED_TOKEN_ADDRESS'),
-    symbol: env('TRADED_TOKEN_SYMBOL'),
-    decimals: +env('TRADED_TOKEN_DECIMALS'),
-    weiAmounts: env('TRADED_TOKEN_WEI_AMOUNTS')
-      .split(',')
-      .map((amount) => new BigNumber(amount)),
-  },
   googleSpreadSheet: {
-    worksheetId: env('GOOGLE_SPREADSHEET_WORKSHEET_ID'),
     clientEmail: env('GOOGLE_SPREADSHEET_CLIENT_EMAIL'),
     privateKeyBase64: env('GOOGLE_SPREADSHEET_PRIVATE_KEY_BASE_64'),
   },
@@ -70,6 +75,15 @@ const config: EnvConfig = {
     deals: env('SLACK_HOOK_URL_DEALS'),
     errors: env('SLACK_HOOK_URL_ERRORS'),
   },
+  strategies: parsedStrategies.map((parsedStrategy: ParsedStrategy) => ({
+    googleSpreadhSheetId: parsedStrategy.GOOGLE_SPREADSHEET_ID,
+    toToken: {
+      address: parsedStrategy.TRADED_TOKEN_ADDRESS,
+      symbol: parsedStrategy.TRADED_TOKEN_SYMBOL,
+      decimals: +parsedStrategy.TRADED_TOKEN_DECIMALS,
+      weiAmounts: parsedStrategy.TRADED_TOKEN_WEI_AMOUNTS.split(',').map((amount: string) => new BigNumber(amount)),
+    },
+  })),
 };
 
 export default config;
