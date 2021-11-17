@@ -16,6 +16,13 @@ import logPaths from './src/logPaths';
 import getWorksheet from './src/utils/getWorksheet';
 import sendSlackMessage, { formatErrorToSlackBlock } from './src/utils/sendSlackMessage';
 
+// Catch unhandled exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception', error);
+  sendErrorToSlack(error);
+  process.exit(1);
+});
+
 const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
 
 global.isMonitoring = false;
@@ -86,10 +93,3 @@ const init = async () => {
 };
 
 init();
-
-// Catch unhandled exceptions
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught exception', error);
-  sendErrorToSlack(error);
-  process.exit(1);
-});
