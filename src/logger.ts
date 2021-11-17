@@ -8,6 +8,8 @@ import calculateProfit from '@src/utils/calculateProfit';
 import formatTimestamp from '@src/utils/formatTimestamp';
 import sendSlackMessage from '@src/utils/sendSlackMessage';
 
+type WorksheetRow = [string, number, string, number, string, number, number, number, string];
+
 const formatMessage = (message: unknown) => {
   const timestamp = formatTimestamp(new Date());
   return `[${timestamp}] ${message}`;
@@ -23,14 +25,12 @@ const error: typeof console.error = (message, ...args) => {
 
 const table = console.table;
 
-type WorksheetRow = [string, number, string, number, string, number, number, number, string];
-
-const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) => {
+const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) => {
   const slackBlocks: unknown[] = [];
   const tableRows: unknown[] = [];
   const worksheetRows: WorksheetRow[] = [];
 
-  for (const path of paths) {
+  for (const path of pathsToLog) {
     const timestamp = formatTimestamp(path[0].timestamp);
     const borrowedDec = path[0].fromTokenDecimalAmount.toFixed();
     const boughtDec = path[0].toTokenDecimalAmount.toFixed(0);
@@ -155,5 +155,5 @@ export default {
   log,
   error,
   table,
-  logPaths,
+  paths,
 };

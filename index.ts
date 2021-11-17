@@ -47,7 +47,7 @@ const init = async () => {
   gasPriceWatcher.updateEvery(5000);
 
   // Handle paths found
-  eventEmitter.on('paths', (paths) => logger.logPaths(paths, worksheet));
+  eventEmitter.on('paths', (paths) => logger.paths(paths, worksheet));
 
   // Handle errors
   eventEmitter.on('error', handleError);
