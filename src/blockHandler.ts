@@ -3,16 +3,17 @@ import { Multicall } from '@maxime.julian/ethereum-multicall';
 import config from './config';
 import eventEmitter from './eventEmitter';
 import findBestPaths from './findBestPaths';
+import logger from './logger';
 import { WETH } from './tokens';
 import { Exchange } from './types';
 
 const blockHandler = (multicall: Multicall, exchanges: Exchange[]) => async (blockNumber: string) => {
   if (config.isDev) {
-    console.log(`New block received. Block # ${blockNumber}`);
+    logger.log(`New block received. Block # ${blockNumber}`);
   }
 
   if (global.isMonitoring && config.isDev) {
-    console.log('Block skipped! Price monitoring ongoing.');
+    logger.log('Block skipped! Price monitoring ongoing.');
   } else if (config.isDev) {
     console.time('monitorPrices');
   }

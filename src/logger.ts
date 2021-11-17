@@ -1,18 +1,33 @@
+import 'console.table';
 import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 
 import config from '@src/config';
 import eventEmitter from '@src/eventEmitter';
 import { Path } from '@src/types';
 import calculateProfit from '@src/utils/calculateProfit';
+import formatTimestamp from '@src/utils/formatTimestamp';
 import sendSlackMessage from '@src/utils/sendSlackMessage';
 
-import formatTimestamp from './utils/formatTimestamp';
+const formatMessage = (message: unknown) => {
+  const timestamp = formatTimestamp(new Date());
+  return `[${timestamp}] ${message}`;
+};
+
+const log: typeof console.log = (message, ...args) => {
+  console.log(formatMessage(message), ...args);
+};
+
+const error: typeof console.error = (message, ...args) => {
+  console.error(formatMessage(message), ...args);
+};
+
+const table = console.table;
 
 type WorksheetRow = [string, number, string, number, string, number, number, number, string];
 
 const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) => {
-  const slackBlocks: any[] = [];
-  const tableRows: any[] = [];
+  const slackBlocks: unknown[] = [];
+  const tableRows: unknown[] = [];
   const worksheetRows: WorksheetRow[] = [];
 
   for (const path of paths) {
@@ -129,11 +144,16 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
 
     if (config.isDev) {
       // Log paths in console
-      console.table(tableRows);
+      table(tableRows);
     }
   } catch (err: unknown) {
     eventEmitter.emit('error', err);
   }
 };
 
-export default logPaths;
+export default {
+  log,
+  error,
+  table,
+  logPaths,
+};

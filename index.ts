@@ -1,6 +1,5 @@
 import AWSWebsocketProvider from '@aws/web3-ws-provider';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import 'console.table';
 import { ethers } from 'ethers';
 
 import './@moduleAliases';
@@ -12,7 +11,7 @@ import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
-import logPaths from './src/logPaths';
+import logger from './src/logger';
 import formatError from './src/utils/formatError';
 import formatTimestamp from './src/utils/formatTimestamp';
 import getWorksheet from './src/utils/getWorksheet';
@@ -33,7 +32,7 @@ const handleError = (error: unknown, isUncaughtException = false) => {
   const formattedError = formatError(error);
   const timestamp = formatTimestamp(new Date());
 
-  console.error(`[${timestamp}] ${isUncaughtException ? 'Uncaught exception:' : 'Emitted error:'}`, formatError);
+  logger.error(`[${timestamp}] ${isUncaughtException ? 'Uncaught exception:' : 'Emitted error:'}`, formattedError);
 
   if (config.isProd) {
     const slackBlock = formatErrorToSlackBlock(formattedError, config.toToken.symbol);
@@ -48,7 +47,7 @@ const init = async () => {
   gasPriceWatcher.updateEvery(5000);
 
   // Handle paths found
-  eventEmitter.on('paths', (paths) => logPaths(paths, worksheet));
+  eventEmitter.on('paths', (paths) => logger.logPaths(paths, worksheet));
 
   // Handle errors
   eventEmitter.on('error', handleError);
@@ -83,11 +82,11 @@ const init = async () => {
       ])
     );
 
-    console.log('Price monitoring bot started.');
+    logger.log('Price monitoring bot started.');
 
     // Regularly restart the bot so the websocket connection doesn't idle
     setTimeout(() => {
-      console.log('Restarting bot...');
+      logger.log('Restarting bot...');
 
       // Shut down bot
       provider.removeAllListeners();
