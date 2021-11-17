@@ -1,5 +1,4 @@
 import * as https from 'https';
-import { serializeError } from 'serialize-error';
 
 import config from '@src/config';
 
@@ -49,10 +48,7 @@ function sendSlackMessage(message: any, type: keyof typeof slackChannels) {
   });
 }
 
-export function formatErrorToSlackBlock(error: unknown, toTokenSymbol: string) {
-  const serialized = serializeError(error);
-  const json = JSON.stringify(serialized, null, 2);
-
+export function formatErrorToSlackBlock(stringifiedError: string, toTokenSymbol: string) {
   return {
     blocks: [
       {
@@ -73,7 +69,7 @@ export function formatErrorToSlackBlock(error: unknown, toTokenSymbol: string) {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: '```' + json + '```',
+          text: '```' + stringifiedError + '```',
         },
       },
     ],

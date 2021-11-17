@@ -13,13 +13,13 @@ import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
+import formatError from './src/utils/formatError';
 import getWorksheet from './src/utils/getWorksheet';
 import sendSlackMessage, { formatErrorToSlackBlock } from './src/utils/sendSlackMessage';
 
 // Catch unhandled exceptions
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught exception', error);
-  sendErrorToSlack(error);
+  handleError(error, true);
   process.exit(1);
 });
 
@@ -27,10 +27,16 @@ const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
 
 global.isMonitoring = false;
 
-const sendErrorToSlack = (error: unknown) => {
+const handleError = (error: unknown, isUncaughtException = false) => {
   // Format the error to a human-readable format and send it to slack
-  const formattedError = formatErrorToSlackBlock(error, config.toToken.symbol);
-  return sendSlackMessage(formattedError, 'errors');
+  const formattedError = formatError(error);
+
+  console.error(isUncaughtException ? 'Uncaught exception' : 'Emitted error', formatError);
+
+  if (config.isProd) {
+    const slackBlock = formatErrorToSlackBlock(formattedError, config.toToken.symbol);
+    sendSlackMessage(slackBlock, 'errors');
+  }
 };
 
 const init = async () => {
@@ -43,7 +49,7 @@ const init = async () => {
   eventEmitter.on('paths', (paths) => logPaths(paths, worksheet));
 
   // Handle errors
-  eventEmitter.on('error', sendErrorToSlack);
+  eventEmitter.on('error', handleError);
 
   const start = () => {
     const provider = new ethers.providers.Web3Provider(
