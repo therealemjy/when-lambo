@@ -17,6 +17,7 @@ const blockHandler = (multicall: Multicall, exchanges: Exchange[]) => async (blo
     console.time('monitorPrices');
   }
 
+  // Check script isn't currently running
   if (global.isMonitoring) {
     return;
   }
@@ -42,11 +43,11 @@ const blockHandler = (multicall: Multicall, exchanges: Exchange[]) => async (blo
   } catch (err: unknown) {
     eventEmitter.emit('error', err);
   } finally {
-    // Make sure to reset monitoring status so the script doesn't stop
     if (config.isDev) {
       console.timeEnd('monitorPrices');
     }
 
+    // Reset monitoring status so the script doesn't stop
     global.isMonitoring = false;
   }
 };

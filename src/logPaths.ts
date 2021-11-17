@@ -1,4 +1,3 @@
-import formatDate from 'date-fns/format';
 import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 
 import config from '@src/config';
@@ -6,6 +5,8 @@ import eventEmitter from '@src/eventEmitter';
 import { Path } from '@src/types';
 import calculateProfit from '@src/utils/calculateProfit';
 import sendSlackMessage from '@src/utils/sendSlackMessage';
+
+import formatTimestamp from './utils/formatTimestamp';
 
 type WorksheetRow = [string, number, string, number, string, number, number, number, string];
 
@@ -15,7 +16,7 @@ const logPaths = async (paths: Path[], worksheet: GoogleSpreadsheetWorksheet) =>
   const worksheetRows: WorksheetRow[] = [];
 
   for (const path of paths) {
-    const timestamp = formatDate(path[0].timestamp, 'd/M/yy HH:mm:ss');
+    const timestamp = formatTimestamp(path[0].timestamp);
     const borrowedDec = path[0].fromTokenDecimalAmount.toFixed();
     const boughtDec = path[0].toTokenDecimalAmount.toFixed(0);
     const revenues = path[1].toTokenDecimalAmount.toFixed(0);

@@ -14,6 +14,7 @@ import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logPaths from './src/logPaths';
 import formatError from './src/utils/formatError';
+import formatTimestamp from './src/utils/formatTimestamp';
 import getWorksheet from './src/utils/getWorksheet';
 import sendSlackMessage, { formatErrorToSlackBlock } from './src/utils/sendSlackMessage';
 
@@ -30,8 +31,9 @@ global.isMonitoring = false;
 const handleError = (error: unknown, isUncaughtException = false) => {
   // Format the error to a human-readable format and send it to slack
   const formattedError = formatError(error);
+  const timestamp = formatTimestamp(new Date());
 
-  console.error(isUncaughtException ? 'Uncaught exception' : 'Emitted error', formatError);
+  console.error(`[${timestamp}] ${isUncaughtException ? 'Uncaught exception:' : 'Emitted error:'}`, formatError);
 
   if (config.isProd) {
     const slackBlock = formatErrorToSlackBlock(formattedError, config.toToken.symbol);
