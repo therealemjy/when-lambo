@@ -9,7 +9,7 @@
     "dev": "tsc && NODE_ENV=development node dist/index",
     "start": "node dist/index.js",
     "predeploy": "npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
-    "deploy": "npx pm2 deploy 1 update && npx pm2 deploy 2 update && npx pm2 deploy 3 update && npx pm2 deploy 4 update",
+    "deploy": "npx pm2 deploy one update && npx pm2 deploy two update && npx pm2 deploy three update && npx pm2 deploy four update",
     "tsc": "tsc",
     "lint": "eslint .",
     "format": "npm-run-all format:*",
