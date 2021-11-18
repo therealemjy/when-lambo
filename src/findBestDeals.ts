@@ -49,7 +49,7 @@ const findBestDeals = async ({
 
   // Get prices from all the exchanges
   const multicallContexts = exchanges.reduce<ContractCallContext[]>((contexts, exchange) => {
-    const filteredfromTokenDecimalAmounts = !usedExchangeNames
+    const filteredFromTokenDecimalAmounts = !usedExchangeNames
       ? fromTokenDecimalAmounts
       : // If usedExchangeNames was provided, remove all the fromTokenDecimalAmounts
         // previously found on the exchange. We do this to prevent front-running
@@ -61,7 +61,7 @@ const findBestDeals = async ({
 
     const { context, resultsFormatter } = exchange.getDecimalAmountOutCallContext({
       callReference: exchange.name,
-      fromTokenDecimalAmounts: filteredfromTokenDecimalAmounts,
+      fromTokenDecimalAmounts: filteredFromTokenDecimalAmounts,
       fromToken,
       toToken,
     });
