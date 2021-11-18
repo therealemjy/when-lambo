@@ -229,19 +229,19 @@ module.exports = {
       env_one: {
         ...baseEnvs,
         SERVER_ID: '1',
-        STRINGIFIED_STRATEGY: JSON.stringify(strategy1),
+        STRINGIFIED_STRATEGIES: JSON.stringify(strategy1),
       },
       env_two: {
         ...baseEnvs,
-        STRINGIFIED_STRATEGY: JSON.stringify(strategy2),
+        STRINGIFIED_STRATEGIES: JSON.stringify(strategy2),
       },
       env_three: {
         ...baseEnvs,
-        STRINGIFIED_STRATEGY: JSON.stringify(strategy3),
+        STRINGIFIED_STRATEGIES: JSON.stringify(strategy3),
       },
       env_four: {
         ...baseEnvs,
-        STRINGIFIED_STRATEGY: JSON.stringify(strategy4),
+        STRINGIFIED_STRATEGIES: JSON.stringify(strategy4),
       },
     },
   ],
