@@ -58,22 +58,22 @@ module.exports = {
     one: {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 1',
-      host: ['ec2-3-80-38-132.compute-1.amazonaws.com'],
+      host: ['ec2-54-145-167-115.compute-1.amazonaws.com'],
     },
     two: {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 2',
-      host: ['ec2-100-25-213-70.compute-1.amazonaws.com'],
+      host: ['ec2-52-23-163-124.compute-1.amazonaws.com	'],
     },
     three: {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 3',
-      host: ['ec2-54-234-74-21.compute-1.amazonaws.com'],
+      host: ['ec2-54-163-43-1.compute-1.amazonaws.com'],
     },
     four: {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 4',
-      host: ['ec2-54-226-250-234.compute-1.amazonaws.com'],
+      host: ['ec2-52-87-227-199.compute-1.amazonaws.com'],
     },
   },
 };
