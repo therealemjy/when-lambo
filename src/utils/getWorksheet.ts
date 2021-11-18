@@ -2,9 +2,9 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import config from '../config';
 
-const getWorksheet = async () => {
+const getWorksheet = async (worksheetId: string) => {
   // Initialize Google Spreadsheet instance
-  const spreadsheet = new GoogleSpreadsheet(config.googleSpreadSheet.worksheetId);
+  const spreadsheet = new GoogleSpreadsheet(worksheetId);
 
   await spreadsheet.useServiceAccountAuth({
     client_email: config.googleSpreadSheet.clientEmail,

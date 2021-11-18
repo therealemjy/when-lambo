@@ -6,6 +6,17 @@ import Token from '@src/tokens/Token';
 export type { Token };
 export type { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput };
 
+export interface Strategy {
+  googleSpreadSheetId: string;
+  toToken: {
+    address: string;
+    symbol: string;
+    decimals: number;
+    // TODO: move outside of toToken (confusing)
+    weiAmounts: BigNumber[];
+  };
+}
+
 export enum ExchangeName {
   UniswapV2 = 'Uniswap V2',
   Kyber = 'Kyber',

@@ -38,6 +38,7 @@ module.exports = {
       watch: false,
       env_1: {
         ...baseEnvs,
+        SERVER_ID: '1',
         STRINGIFIED_STRATEGY: JSON.stringify(strategy1),
       },
       env_2: {
