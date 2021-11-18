@@ -126,28 +126,24 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
     }
   }
 
-  try {
-    if (config.isProd && slackBlocks.length > 0) {
-      // Send alert to slack
-      await sendSlackMessage(
-        {
-          blocks: slackBlocks.flat(),
-        },
-        'deals'
-      );
-    }
+  if (config.isProd && slackBlocks.length > 0) {
+    // Send alert to slack
+    sendSlackMessage(
+      {
+        blocks: slackBlocks.flat(),
+      },
+      'deals'
+    ).catch((err) => eventEmitter.emit('error', err));
+  }
 
-    if (config.isProd && worksheetRows.length > 0) {
-      // Send row to Google Spreadsheet
-      await worksheet.addRows(worksheetRows);
-    }
+  if (config.isProd && worksheetRows.length > 0) {
+    // Send rows to Google Spreadsheet
+    worksheet.addRows(worksheetRows).catch((err) => eventEmitter.emit('error', err));
+  }
 
-    if (config.isDev) {
-      // Log paths in console
-      table(tableRows);
-    }
-  } catch (err: unknown) {
-    eventEmitter.emit('error', err);
+  if (config.isDev) {
+    // Log paths in console
+    table(tableRows);
   }
 };
 

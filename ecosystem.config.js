@@ -1,3 +1,10 @@
+import strategy1 from './strategies/1.json';
+import strategy2 from './strategies/2.json';
+import strategy3 from './strategies/3.json';
+import strategy4 from './strategies/4.json';
+import strategy5 from './strategies/5.json';
+import strategy6 from './strategies/6.json';
+
 const baseEnvs = {
   NODE_ENV: 'production',
   AWS_WS_RPC_URL: 'wss://nd-omssuug64ravhkl6euczd7ixwq.wss.ethereum.managedblockchain.us-east-1.amazonaws.com',
@@ -29,91 +36,62 @@ module.exports = {
       script: './dist/index.js',
       wait_ready: false,
       watch: false,
-      env_dai: {
+      env_1: {
         ...baseEnvs,
-        GOOGLE_SPREADSHEET_WORKSHEET_ID: '1ka3JbjlSSjNnvwLhJ11c-mKwK2TJ622_elG9evOf4JI',
-        TRADED_TOKEN_ADDRESS: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-        TRADED_TOKEN_SYMBOL: 'DAI',
-        TRADED_TOKEN_DECIMALS: '18',
-        TRADED_TOKEN_WEI_AMOUNTS:
-          '10000000000000000000,20000000000000000000,30000000000000000000,40000000000000000000,50000000000000000000,60000000000000000000,70000000000000000000,80000000000000000000,90000000000000000000,100000000000000000000',
+        SERVER_ID: '1',
+        STRINGIFIED_STRATEGY: JSON.stringify(strategy1),
       },
-      env_shib: {
+      env_2: {
         ...baseEnvs,
-        GOOGLE_SPREADSHEET_WORKSHEET_ID: '18XDhR2ICyAwfux1xeZ8o0i2HqsyjodF0NFLcnEUZYn0',
-        TRADED_TOKEN_ADDRESS: '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce',
-        TRADED_TOKEN_SYMBOL: 'SHIB',
-        TRADED_TOKEN_DECIMALS: '18',
-        TRADED_TOKEN_WEI_AMOUNTS:
-          '650000000000000000,600000000000000000,550000000000000000,500000000000000000,450000000000000000,400000000000000000,350000000000000000,300000000000000000,250000000000000000,200000000000000000',
+        STRINGIFIED_STRATEGY: JSON.stringify(strategy2),
       },
-      env_link: {
+      env_3: {
         ...baseEnvs,
-        GOOGLE_SPREADSHEET_WORKSHEET_ID: '1_BU34XkJ4z6jEaY77SH-TFeoB1moD8Fqdw25823KnAM',
-        TRADED_TOKEN_ADDRESS: '0x514910771af9ca656af840dff83e8264ecf986ca',
-        TRADED_TOKEN_SYMBOL: 'LINK',
-        TRADED_TOKEN_DECIMALS: '18',
-        TRADED_TOKEN_WEI_AMOUNTS:
-          '850000000000000000,875000000000000000,900000000000000000,925000000000000000,950000000000000000,1000000000000000000,1050000000000000000,1100000000000000000,1150000000000000000,1200000000000000000',
+        STRINGIFIED_STRATEGY: JSON.stringify(strategy3),
       },
-      env_mana: {
+      env_4: {
         ...baseEnvs,
-        GOOGLE_SPREADSHEET_WORKSHEET_ID: '11hKz-0mILcJY1FrLTIORcidw27tYsF0G10xRkkegIHQ',
-        TRADED_TOKEN_ADDRESS: '0x0f5d2fb29fb7d3cfee444a200298f468908cc942',
-        TRADED_TOKEN_SYMBOL: 'MANA',
-        TRADED_TOKEN_DECIMALS: '18',
-        TRADED_TOKEN_WEI_AMOUNTS:
-          '2000000000000000000,2500000000000000000,3000000000000000000,3500000000000000000,4500000000000000000,5000000000000000000,5500000000000000000,6000000000000000000,6500000000000000000,7000000000000000000',
+        STRINGIFIED_STRATEGY: JSON.stringify(strategy4),
       },
-      env_aave: {
+      env_5: {
         ...baseEnvs,
-        GOOGLE_SPREADSHEET_WORKSHEET_ID: '1-e3vMLwLPvSv8Fq2NpSUngke-oMxtsocaQxT_metpOA',
-        TRADED_TOKEN_ADDRESS: '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
-        TRADED_TOKEN_SYMBOL: 'AAVE',
-        TRADED_TOKEN_DECIMALS: '18',
-        TRADED_TOKEN_WEI_AMOUNTS:
-          '5000000000000000000,6000000000000000000,7000000000000000000,8000000000000000000,9000000000000000000,10000000000000000000,20000000000000000000,30000000000000000000,20000000000000000000,10000000000000000000',
+        STRINGIFIED_STRATEGY: JSON.stringify(strategy5),
       },
-      env_sand: {
+      env_6: {
         ...baseEnvs,
-        GOOGLE_SPREADSHEET_WORKSHEET_ID: '13Px9n9sqNXQd25PNEzFCBhKv1pIQ4zbUIBVTyywJGIQ',
-        TRADED_TOKEN_ADDRESS: '0x3845badade8e6dff049820680d1f14bd3903a5d0',
-        TRADED_TOKEN_SYMBOL: 'SAND',
-        TRADED_TOKEN_DECIMALS: '18',
-        TRADED_TOKEN_WEI_AMOUNTS:
-          '1000000000000000000,1500000000000000000,2000000000000000000,2500000000000000000,3000000000000000000,3500000000000000000,4000000000000000000,4500000000000000000,5000000000000000000,5500000000000000000',
+        STRINGIFIED_STRATEGY: JSON.stringify(strategy6),
       },
     },
   ],
   deploy: {
-    dai: {
+    1: {
       ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env dai',
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 1',
       host: ['ec2-3-80-38-132.compute-1.amazonaws.com'],
     },
-    shib: {
+    2: {
       ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env shib',
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 2',
       host: ['ec2-100-25-213-70.compute-1.amazonaws.com'],
     },
-    link: {
+    3: {
       ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env link',
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 3',
       host: ['ec2-54-234-74-21.compute-1.amazonaws.com'],
     },
-    mana: {
+    4: {
       ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env mana',
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 4',
       host: ['ec2-54-226-250-234.compute-1.amazonaws.com'],
     },
-    aave: {
+    5: {
       ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env aave',
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 5',
       host: ['ec2-34-227-193-72.compute-1.amazonaws.com'],
     },
-    sand: {
+    6: {
       ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env sand',
+      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 6',
       host: ['ec2-52-200-34-110.compute-1.amazonaws.com'],
     },
   },
