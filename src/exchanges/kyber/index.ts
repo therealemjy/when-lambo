@@ -47,9 +47,6 @@ class Kyber implements Exchange {
         return callReturnContext.success && oneFromTokenSellRate.isGreaterThan(0);
       })
       .map((callReturnContext) => {
-        console.log(fromToken.symbol, toToken.symbol);
-        console.log(new BigNumber(callReturnContext.returnValues[0].hex).toFixed());
-
         // Price of 1 fromToken in toToken decimals. Note that the price given
         // by Kyber is expressed using 18 decimal places (see
         // https://developer.kyber.network/docs/Integrations-SmartContractGuide/#fetching-rates),

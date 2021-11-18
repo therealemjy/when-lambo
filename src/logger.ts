@@ -1,8 +1,10 @@
+import BigNumber from 'bignumber.js';
 import 'console.table';
 import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 
 import config from '@src/config';
 import eventEmitter from '@src/eventEmitter';
+import { WETH } from '@src/tokens';
 import { Path } from '@src/types';
 import calculateProfit from '@src/utils/calculateProfit';
 import formatTimestamp from '@src/utils/formatTimestamp';
@@ -25,6 +27,9 @@ const error: typeof console.error = (message, ...args) => {
 
 const table = console.table;
 
+const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) =>
+  amount.dividedBy(10 ** tokenDecimals).toFixed(tokenDecimals);
+
 const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) => {
   const slackBlocks: unknown[] = [];
   const tableRows: unknown[] = [];
@@ -32,15 +37,18 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
 
   for (const path of pathsToLog) {
     const timestamp = formatTimestamp(path[0].timestamp);
-    const borrowedDec = path[0].fromTokenDecimalAmount.toFixed();
-    const boughtDec = path[0].toTokenDecimalAmount.toFixed(0);
-    const revenues = path[1].toTokenDecimalAmount.toFixed(0);
+    const borrowedTokens = _convertToHumanReadableAmount(path[0].fromTokenDecimalAmount, path[0].fromToken.decimals);
+    const boughtTokens = _convertToHumanReadableAmount(path[0].toTokenDecimalAmount, path[0].toToken.decimals);
+    const revenues = _convertToHumanReadableAmount(path[1].toTokenDecimalAmount, path[1].toToken.decimals);
+
     const bestSellingExchangeName = path[0].exchangeName;
     const bestBuyingExchangeName = path[1].exchangeName;
+
     const gasCost = path[0].estimatedGasCost
       .plus(path[1].estimatedGasCost)
-      // Added gasLimit margin
+      // Add gasLimit margin
       .multipliedBy(config.gasLimitMultiplicator);
+    const gasCostWETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);
 
     const [profitDec, profitPercent] = calculateProfit({
       revenueDec: path[1].toTokenDecimalAmount,
@@ -48,6 +56,8 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
       // start and end the path with WETH
       expenseDec: path[0].fromTokenDecimalAmount.plus(gasCost),
     });
+
+    const profitTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
 
     // Only log profitable paths in production
     if (config.isProd && profitDec.isGreaterThan(0)) {
@@ -61,7 +71,7 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
             },
             {
               type: 'mrkdwn',
-              text: `*${path[0].fromToken.symbol} decimals borrowed:*\n${borrowedDec}`,
+              text: `*${path[0].fromToken.symbol} borrowed:*\n${borrowedTokens}`,
             },
             {
               type: 'mrkdwn',
@@ -69,7 +79,7 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
             },
             {
               type: 'mrkdwn',
-              text: `*${path[0].toToken.symbol} decimals bought:*\n${boughtDec}`,
+              text: `*${path[0].toToken.symbol} bought:*\n${boughtTokens}`,
             },
             {
               type: 'mrkdwn',
@@ -77,15 +87,15 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
             },
             {
               type: 'mrkdwn',
-              text: `*${path[0].fromToken.symbol} decimals bought back:*\n${revenues}`,
+              text: `*${path[0].fromToken.symbol} bought back:*\n${revenues}`,
             },
             {
               type: 'mrkdwn',
-              text: `*Gas cost (in wei):*\n${gasCost.toFixed()}`,
+              text: `*Gas cost (in wei):*\n${gasCost}`,
             },
             {
               type: 'mrkdwn',
-              text: `*Profit (in ${path[0].fromToken.symbol} decimals):*\n${profitDec.toFixed(0)}`,
+              text: `*Profit (in ${path[0].fromToken.symbol}):*\n${profitTokens}`,
             },
             {
               type: 'mrkdwn',
@@ -100,12 +110,12 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
 
       worksheetRows.push([
         timestamp,
-        +borrowedDec,
+        +borrowedTokens,
         bestSellingExchangeName,
-        +boughtDec,
+        +boughtTokens,
         bestBuyingExchangeName,
         +revenues,
-        +gasCost.toFixed(),
+        +gasCostWETH,
         +profitDec.toFixed(0),
         `${profitPercent}%`,
       ]);
@@ -114,13 +124,13 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
     else if (config.isDev) {
       tableRows.push({
         Timestamp: timestamp,
-        [`${path[0].fromToken.symbol} decimals borrowed`]: borrowedDec,
+        [`${path[0].fromToken.symbol} borrowed`]: borrowedTokens,
         'Best selling exchange': bestSellingExchangeName,
-        [`${path[0].toToken.symbol} decimals bought`]: boughtDec,
+        [`${path[0].toToken.symbol} bought`]: boughtTokens,
         'Best buying exchange': bestBuyingExchangeName,
-        [`${path[0].fromToken.symbol} decimals bought back`]: revenues,
-        'Gas cost (in wei)': gasCost.toFixed(),
-        [`Profit (in ${path[0].fromToken.symbol} decimals)`]: profitDec.toFixed(0),
+        [`${path[0].fromToken.symbol} bought back`]: revenues,
+        'Gas cost (in WETH)': gasCostWETH,
+        [`Profit (in ${path[0].fromToken.symbol})`]: profitTokens,
         'Profit (%)': profitPercent + '%',
       });
     }
