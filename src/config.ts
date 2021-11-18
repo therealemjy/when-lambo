@@ -20,7 +20,8 @@ interface ParsedStrategy {
   TRADED_TOKEN_ADDRESS: string;
   TRADED_TOKEN_SYMBOL: string;
   TRADED_TOKEN_DECIMALS: string;
-  TRADED_TOKEN_WEI_AMOUNTS: string;
+  STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: string;
+  STRATEGY_BORROWED_INCREMENT_PERCENT: string;
 }
 
 export interface EnvConfig {
@@ -48,6 +49,26 @@ export interface EnvConfig {
 
 const parsedStrategies: ParsedStrategy[] = JSON.parse(env('STRINGIFIED_STRATEGIES'));
 
+const strategyToWeiAmounts = (baseWei: string, incrementPercent: number, incrementAmount: number): BigNumber[] => {
+  const strategy = Array.from(Array(incrementAmount).keys()) as unknown as BigNumber[];
+  const middleIndex = Math.round(strategy.length / 2);
+
+  strategy.forEach((_, index) => {
+    // If middle value we set the base value
+    if (index === middleIndex) {
+      strategy[index] = new BigNumber(baseWei);
+      return;
+    }
+
+    const positionFromBase = index - middleIndex;
+    const percent = (incrementPercent * positionFromBase) / 100 + 1;
+
+    strategy[index] = new BigNumber(baseWei).multipliedBy(percent);
+  });
+
+  return strategy;
+};
+
 const config: EnvConfig = {
   serverId: env('SERVER_ID'),
   aws: {
@@ -74,7 +95,11 @@ const config: EnvConfig = {
       address: parsedStrategy.TRADED_TOKEN_ADDRESS,
       symbol: parsedStrategy.TRADED_TOKEN_SYMBOL,
       decimals: +parsedStrategy.TRADED_TOKEN_DECIMALS,
-      weiAmounts: parsedStrategy.TRADED_TOKEN_WEI_AMOUNTS.split(',').map((amount: string) => new BigNumber(amount)),
+      weiAmounts: strategyToWeiAmounts(
+        parsedStrategy.STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT,
+        +parsedStrategy.STRATEGY_BORROWED_INCREMENT_PERCENT,
+        +env('STRATEGY_BORROWED_AMOUNTS_COUNT')
+      ),
     },
   })),
 };
