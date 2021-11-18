@@ -91,15 +91,15 @@ const config: EnvConfig = {
   },
   strategies: parsedStrategies.map((parsedStrategy: ParsedStrategy) => ({
     googleSpreadSheetId: parsedStrategy.GOOGLE_SPREADSHEET_WORKSHEET_ID,
+    borrowedAmounts: strategyToWeiAmounts(
+      parsedStrategy.STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT,
+      +parsedStrategy.STRATEGY_BORROWED_INCREMENT_PERCENT,
+      +env('STRATEGY_BORROWED_AMOUNTS_COUNT')
+    ),
     toToken: {
       address: parsedStrategy.TRADED_TOKEN_ADDRESS,
       symbol: parsedStrategy.TRADED_TOKEN_SYMBOL,
       decimals: +parsedStrategy.TRADED_TOKEN_DECIMALS,
-      weiAmounts: strategyToWeiAmounts(
-        parsedStrategy.STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT,
-        +parsedStrategy.STRATEGY_BORROWED_INCREMENT_PERCENT,
-        +env('STRATEGY_BORROWED_AMOUNTS_COUNT')
-      ),
     },
   })),
 };
