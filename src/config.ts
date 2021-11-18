@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js';
 import dotenv from 'dotenv';
 
+import { Strategy } from '@src/types';
+
 dotenv.config();
 
 const env = (name: string): string => {
@@ -14,25 +16,15 @@ const env = (name: string): string => {
 };
 
 interface ParsedStrategy {
-  GOOGLE_SPREADSHEET_ID: string;
+  GOOGLE_SPREADSHEET_WORKSHEET_ID: string;
   TRADED_TOKEN_ADDRESS: string;
   TRADED_TOKEN_SYMBOL: string;
   TRADED_TOKEN_DECIMALS: string;
   TRADED_TOKEN_WEI_AMOUNTS: string;
 }
 
-interface Strategy {
-  googleSpreadhSheetId: string;
-  toToken: {
-    address: string;
-    symbol: string;
-    decimals: number;
-    // TODO: move outside of toToken (confusing)
-    weiAmounts: BigNumber[];
-  };
-}
-
 export interface EnvConfig {
+  serverId: string;
   aws: {
     wsRpcUrl: string;
     accessKeyId: string;
@@ -57,6 +49,7 @@ export interface EnvConfig {
 const parsedStrategies: ParsedStrategy[] = JSON.parse(env('STRINGIFIED_STRATEGIES'));
 
 const config: EnvConfig = {
+  serverId: env('SERVER_ID'),
   aws: {
     wsRpcUrl: env('AWS_WS_RPC_URL'),
     accessKeyId: env('AWS_ACCESS_KEY_ID'),
@@ -76,7 +69,7 @@ const config: EnvConfig = {
     errors: env('SLACK_HOOK_URL_ERRORS'),
   },
   strategies: parsedStrategies.map((parsedStrategy: ParsedStrategy) => ({
-    googleSpreadhSheetId: parsedStrategy.GOOGLE_SPREADSHEET_ID,
+    googleSpreadSheetId: parsedStrategy.GOOGLE_SPREADSHEET_WORKSHEET_ID,
     toToken: {
       address: parsedStrategy.TRADED_TOKEN_ADDRESS,
       symbol: parsedStrategy.TRADED_TOKEN_SYMBOL,

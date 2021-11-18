@@ -9,7 +9,7 @@ const slackChannels = {
 
 // Doing it this way to avoid using 3rd party services
 // Verbose but works fine
-function sendSlackMessage(message: any, type: keyof typeof slackChannels) {
+function sendSlackMessage(message: unknown, type: keyof typeof slackChannels) {
   return new Promise((resolve) => {
     const body = JSON.stringify(message);
 
@@ -25,7 +25,7 @@ function sendSlackMessage(message: any, type: keyof typeof slackChannels) {
     };
 
     const postReq = https.request(options, (res) => {
-      const chunks: any[] = [];
+      const chunks: unknown[] = [];
 
       res.setEncoding('utf8');
       res.on('data', (chunk) => {
@@ -48,7 +48,7 @@ function sendSlackMessage(message: any, type: keyof typeof slackChannels) {
   });
 }
 
-export function formatErrorToSlackBlock(stringifiedError: string, toTokenSymbol: string) {
+export function formatErrorToSlackBlock(stringifiedError: string, serverId: string) {
   return {
     blocks: [
       {
@@ -62,7 +62,7 @@ export function formatErrorToSlackBlock(stringifiedError: string, toTokenSymbol:
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `Faulty pair: *WETH/${toTokenSymbol}*`,
+          text: `Server ID: ${serverId}*`,
         },
       },
       {
