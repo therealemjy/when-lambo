@@ -22,7 +22,7 @@ const executeStrategy = async ({
   try {
     const paths = await findBestPaths({
       multicall,
-      fromTokenDecimalAmounts: strategy.toToken.weiAmounts,
+      fromTokenDecimalAmounts: strategy.borrowedAmounts,
       fromToken: WETH,
       toToken: {
         symbol: strategy.toToken.symbol,

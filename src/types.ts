@@ -8,12 +8,11 @@ export type { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput }
 
 export interface Strategy {
   googleSpreadSheetId: string;
+  borrowedAmounts: BigNumber[];
   toToken: {
     address: string;
     symbol: string;
     decimals: number;
-    // TODO: move outside of toToken (confusing)
-    weiAmounts: BigNumber[];
   };
 }
 
