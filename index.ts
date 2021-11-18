@@ -69,8 +69,8 @@ const init = async () => {
       // Instantiate exchange services
       const uniswapV2ExchangeService = new UniswapV2Exchange();
       const sushiswapExchangeService = new SushiswapExchange();
-      const kyberExchangeService = new KyberExchange();
       const cryptoComExchangeService = new CryptoComExchange();
+      const kyberExchangeService = new KyberExchange();
 
       provider.addListener(
         'block',
