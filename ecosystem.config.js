@@ -2,8 +2,6 @@ import strategy1 from './strategies/1.json';
 import strategy2 from './strategies/2.json';
 import strategy3 from './strategies/3.json';
 import strategy4 from './strategies/4.json';
-import strategy5 from './strategies/5.json';
-import strategy6 from './strategies/6.json';
 
 const baseEnvs = {
   NODE_ENV: 'production',
@@ -53,14 +51,6 @@ module.exports = {
         ...baseEnvs,
         STRINGIFIED_STRATEGY: JSON.stringify(strategy4),
       },
-      env_5: {
-        ...baseEnvs,
-        STRINGIFIED_STRATEGY: JSON.stringify(strategy5),
-      },
-      env_6: {
-        ...baseEnvs,
-        STRINGIFIED_STRATEGY: JSON.stringify(strategy6),
-      },
     },
   ],
   deploy: {
@@ -83,16 +73,6 @@ module.exports = {
       ...baseOptions,
       'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 4',
       host: ['ec2-54-226-250-234.compute-1.amazonaws.com'],
-    },
-    5: {
-      ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 5',
-      host: ['ec2-34-227-193-72.compute-1.amazonaws.com'],
-    },
-    6: {
-      ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env 6',
-      host: ['ec2-52-200-34-110.compute-1.amazonaws.com'],
     },
   },
 };
