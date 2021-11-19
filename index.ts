@@ -22,8 +22,6 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
-
 global.isMonitoring = false;
 
 const handleError = (error: unknown, isUncaughtException = false) => {
@@ -56,9 +54,20 @@ const init = async () => {
       const provider = new ethers.providers.Web3Provider(
         new AWSWebsocketProvider(config.aws.wsRpcUrl, {
           clientConfig: {
+            maxReceivedFrameSize: 100000000, // bytes - default: 1MiB
+            maxReceivedMessageSize: 100000000, // bytes - default: 8MiB
             credentials: {
               accessKeyId: config.aws.accessKeyId,
               secretAccessKey: config.aws.secretAccessKey,
+            },
+            keepalive: true,
+            keepaliveInterval: 60000, // ms
+            // Enable auto reconnection
+            reconnect: {
+              auto: true,
+              delay: 5000, // ms
+              maxAttempts: 5,
+              onTimeout: false,
             },
           },
         })
@@ -87,16 +96,6 @@ const init = async () => {
       );
 
       logger.log('Price monitoring bot started.');
-
-      // Regularly restart the bot so the websocket connection doesn't idle
-      setTimeout(() => {
-        logger.log('Restarting bot...');
-
-        // Shut down bot
-        provider.removeAllListeners();
-
-        start();
-      }, THIRTY_MINUTES_IN_MILLISECONDS);
     };
 
     // Start bot
