@@ -1,5 +1,4 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 
 import config from './config';
 import eventEmitter from './eventEmitter';
@@ -12,12 +11,10 @@ const executeStrategy = async ({
   multicall,
   strategy,
   exchanges,
-  worksheet,
 }: {
   multicall: Multicall;
   strategy: Strategy;
   exchanges: Exchange[];
-  worksheet: GoogleSpreadsheetWorksheet;
 }) => {
   try {
     const paths = await findBestPaths({
@@ -34,22 +31,14 @@ const executeStrategy = async ({
       gasPriceWei: global.currentGasPrices.rapid,
     });
 
-    eventEmitter.emit('paths', paths, worksheet);
+    eventEmitter.emit('paths', paths);
   } catch (error: unknown) {
     eventEmitter.emit('error', error);
   }
 };
 
 const blockHandler =
-  ({
-    multicall,
-    worksheets,
-    exchanges,
-  }: {
-    multicall: Multicall;
-    worksheets: GoogleSpreadsheetWorksheet[];
-    exchanges: Exchange[];
-  }) =>
+  ({ multicall, exchanges }: { multicall: Multicall; exchanges: Exchange[] }) =>
   async (blockNumber: string) => {
     if (config.isDev) {
       logger.log(`New block received. Block # ${blockNumber}`);
@@ -75,7 +64,6 @@ const blockHandler =
           multicall,
           strategy,
           exchanges,
-          worksheet: worksheets.find((worksheet) => worksheet.sheetId === strategy.googleSpreadSheetId)!,
         })
       )
     );

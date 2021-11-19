@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import 'console.table';
-import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
+import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import config from '@src/config';
 import eventEmitter from '@src/eventEmitter';
@@ -30,10 +30,12 @@ const table = console.table;
 const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) =>
   amount.dividedBy(10 ** tokenDecimals).toFixed(tokenDecimals);
 
-const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) => {
+const paths = async (pathsToLog: Path[], spreadsheet: GoogleSpreadsheet) => {
   const slackBlocks: unknown[] = [];
   const tableRows: unknown[] = [];
-  const worksheetRows: WorksheetRow[] = [];
+  const worksheetRowsMapping: {
+    [key: string]: WorksheetRow[];
+  } = {};
 
   for (const path of pathsToLog) {
     const timestamp = formatTimestamp(path[0].timestamp);
@@ -108,7 +110,12 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
         },
       ]);
 
-      worksheetRows.push([
+      // Initialize worksheet if it hasn't been initialized yet
+      const worksheetTitle = `${path[0].fromToken.symbol} / ${path[0].toToken.symbol}`;
+      worksheetRowsMapping[worksheetTitle] = worksheetRowsMapping[worksheetTitle] || [];
+
+      // Add row
+      worksheetRowsMapping[worksheetTitle].push([
         timestamp,
         +borrowedTokens,
         bestSellingExchangeName,
@@ -116,7 +123,7 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
         bestBuyingExchangeName,
         +revenues,
         +gasCostWETH,
-        +profitDec.toFixed(0),
+        +profitTokens,
         `${profitPercent}%`,
       ]);
     }
@@ -136,8 +143,14 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
     }
   }
 
-  if (config.isProd && slackBlocks.length > 0) {
-    // Send alert to slack
+  // Log paths in console in dev
+  if (config.isDev) {
+    table(tableRows);
+    return;
+  }
+
+  // Send profitable paths to slack in prod
+  if (slackBlocks.length > 0) {
     sendSlackMessage(
       {
         blocks: slackBlocks.flat(),
@@ -146,14 +159,15 @@ const paths = async (pathsToLog: Path[], worksheet: GoogleSpreadsheetWorksheet) 
     ).catch((err) => eventEmitter.emit('error', err));
   }
 
-  if (config.isProd && worksheetRows.length > 0) {
-    // Send rows to Google Spreadsheet
-    worksheet.addRows(worksheetRows).catch((err) => eventEmitter.emit('error', err));
-  }
+  // Then update the Google Spreadsheet document
+  for (const worksheetTitle of Object.keys(worksheetRowsMapping)) {
+    const worksheet = spreadsheet.sheetsByTitle[worksheetTitle];
 
-  if (config.isDev) {
-    // Log paths in console
-    table(tableRows);
+    if (!worksheet) {
+      eventEmitter.emit('error', new Error(`Could not find sheet with title ${worksheetTitle}`));
+    }
+
+    worksheet.addRows(worksheetRowsMapping[worksheetTitle]).catch((err) => eventEmitter.emit('error', err));
   }
 };
 

@@ -16,7 +16,6 @@ const env = (name: string): string => {
 };
 
 interface ParsedStrategy {
-  GOOGLE_SPREADSHEET_WORKSHEET_ID: string;
   TRADED_TOKEN_ADDRESS: string;
   TRADED_TOKEN_SYMBOL: string;
   TRADED_TOKEN_DECIMALS: string;
@@ -38,6 +37,7 @@ export interface EnvConfig {
   gasPriceMultiplicator: number;
   strategies: Strategy[];
   googleSpreadSheet: {
+    id: string;
     clientEmail: string;
     privateKeyBase64: string;
   };
@@ -82,6 +82,7 @@ const config: EnvConfig = {
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
   googleSpreadSheet: {
+    id: env('GOOGLE_SPREADSHEET_SPREADSHEET_ID'),
     clientEmail: env('GOOGLE_SPREADSHEET_CLIENT_EMAIL'),
     privateKeyBase64: env('GOOGLE_SPREADSHEET_PRIVATE_KEY_BASE_64'),
   },
@@ -90,7 +91,6 @@ const config: EnvConfig = {
     errors: env('SLACK_HOOK_URL_ERRORS'),
   },
   strategies: parsedStrategies.map((parsedStrategy: ParsedStrategy) => ({
-    googleSpreadSheetId: parsedStrategy.GOOGLE_SPREADSHEET_WORKSHEET_ID,
     borrowedAmounts: strategyToWeiAmounts(
       parsedStrategy.STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT,
       +parsedStrategy.STRATEGY_BORROWED_INCREMENT_PERCENT,

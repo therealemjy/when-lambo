@@ -7,7 +7,6 @@ export type { Token };
 export type { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput };
 
 export interface Strategy {
-  googleSpreadSheetId: string;
   borrowedAmounts: BigNumber[];
   toToken: {
     address: string;

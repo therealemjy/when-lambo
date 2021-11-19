@@ -12,9 +12,8 @@ import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
 import logger from './src/logger';
-import formatError from './src/utils/formatError';
-import getWorksheet from './src/utils/getWorksheet';
-import sendSlackMessage, { formatErrorToSlackBlock } from './src/utils/sendSlackMessage';
+import getSpreadsheet from './src/utils/getSpreadsheet';
+import handleError from './src/utils/handleError';
 
 // Catch unhandled exceptions
 process.on('uncaughtException', (error) => {
@@ -24,28 +23,15 @@ process.on('uncaughtException', (error) => {
 
 global.isMonitoring = false;
 
-const handleError = (error: unknown, isUncaughtException = false) => {
-  // Format the error to a human-readable format and send it to slack
-  const formattedError = formatError(error);
-  logger.error(isUncaughtException ? 'Uncaught exception:' : 'Emitted error:', formattedError);
-
-  if (config.isProd) {
-    const slackBlock = formatErrorToSlackBlock(formattedError, config.serverId);
-    sendSlackMessage(slackBlock, 'errors');
-  }
-};
-
 const init = async () => {
   try {
-    const worksheets = await Promise.all(
-      config.strategies.map((strategy) => getWorksheet(strategy.googleSpreadSheetId))
-    );
+    const spreadsheet = await getSpreadsheet();
 
     // Pull gas prices every 5 seconds
     gasPriceWatcher.updateEvery(5000);
 
     // Handle paths found
-    eventEmitter.on('paths', (paths, worksheet) => logger.paths(paths, worksheet));
+    eventEmitter.on('paths', (paths) => logger.paths(paths, spreadsheet));
 
     // Handle errors
     eventEmitter.on('error', handleError);
@@ -85,7 +71,6 @@ const init = async () => {
         'block',
         blockHandler({
           multicall,
-          worksheets,
           exchanges: [
             uniswapV2ExchangeService,
             sushiswapExchangeService,
