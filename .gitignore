@@ -3,6 +3,13 @@ build
 build.zip
 dist
 
+# typechain
+types
+
+# buidler
+artifacts
+cache
+
 # Node
 node_modules
 

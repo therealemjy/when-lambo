@@ -1,4 +1,4 @@
-# ChainSkills Truffle Box
+# When Lambo - test
 
 This Truffle Box has all you need to create a DApp by following the course delivered by [ChainSkills](https://www.udemy.com/getting-started-with-ethereum-solidity-development/).
 
@@ -6,29 +6,34 @@ This box has been based from [pet-shop-box](https://github.com/truffle-box/pet-s
 
 ## Installation
 
-1. Install Truffle globally.
-    ```javascript
-    npm install -g truffle
-    ```
+1. Install dependencies
 
-2. Download the box. This also takes care of installing the necessary dependencies.
-    ```javascript
-    truffle unbox chainskills/chainskills-box
-    ```
+```console
+npm install
+```
 
-3. Run the development console.
-    ```javascript
-    truffle develop
-    ```
+2. Generate types for smart contracts
 
-4. Compile and migrate the smart contracts. Note inside the development console we don't preface commands with `truffle`.
-    ```javascript
-    compile
-    migrate
-    ```
+```console
+   npm run generate-smart-contract-types
+```
 
-5. Run the `liteserver` development server (outside the development console) for front-end hot reloading. Smart contract changes must be manually recompiled and migrated.
-    ```javascript
-    // Serves the front-end on http://localhost:3000
-    npm run dev
-    ```
+## Run script
+
+```console
+npm run dev
+```
+
+## Test contracts
+
+1. Migrate contracts to local network
+
+```console
+npm run migrate:test
+```
+
+2. Run tests
+
+```console
+npm run test:contracts
+```

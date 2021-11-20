@@ -6,7 +6,11 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
+<<<<<<< HEAD
     "dev": "rm -rf dist && tsc && NODE_ENV=development node dist/index | ./node_modules/.bin/bunyan",
+=======
+    "dev": "tsc && NODE_ENV=development node dist/index",
+>>>>>>> 98f5572 (update setup for tests)
     "start": "node dist/index.js",
     "predeploy": "npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
     "deploy": "npx pm2 deploy one update && npx pm2 deploy two update && npx pm2 deploy three update && npx pm2 deploy four update",
@@ -14,7 +18,10 @@
     "lint": "eslint .",
     "format": "npm-run-all format:*",
     "format:json": "prettier --write \"**/*.json\"",
-    "format:ts": "prettier --write \"**/*.ts\""
+    "format:ts": "prettier --write \"**/*.ts\"",
+    "generate-smart-contract-types": "npx typechain --target=truffle-v5 'build/contracts/*.json'",
+    "migrate:test": "truffle migrate --compile-all --reset --network ganache",
+    "test:contracts": "truffle test --network ganache"
   },
   "dependencies": {
     "@aws/web3-ws-provider": "^1.0.3",
@@ -42,7 +49,11 @@
     "@babel/preset-typescript": "^7.16.0",
     "@trivago/prettier-plugin-sort-imports": "^3.0.0",
     "@types/bunyan": "^1.8.8",
+    "@typechain/truffle-v5": "^6.0.0",
+    "@types/chai": "^4.2.22",
     "@types/google-spreadsheet": "^3.1.5",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.11.9",
     "@types/websocket": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
@@ -56,6 +67,8 @@
     "lint-staged": "^11.2.6",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.4.1",
+    "truffle": "^5.4.21",
+    "typechain": "^6.0.3",
     "typed-emitter": "^1.4.0",
     "typescript": "^4.4.4"
   },
