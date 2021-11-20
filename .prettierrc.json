@@ -1,6 +1,7 @@
 {
   "singleQuote": true,
   "printWidth": 120,
+  "tabWidth": 2,
   "importOrder": ["^@src/(.*)$", "^[./]"],
   "importOrderSeparation": true,
   "importOrderParserPlugins": ["classProperties", "typescript"]
