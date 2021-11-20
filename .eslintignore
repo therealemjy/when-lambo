@@ -2,6 +2,7 @@
 
 # Truffle
 build
+migrations
 
 # Node
 dist

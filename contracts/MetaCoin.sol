@@ -9,7 +9,7 @@ import './ConvertLib.sol';
 // token, see: https://github.com/ConsenSys/Tokens. Cheers!
 
 contract MetaCoin {
-  mapping(address => uint256) balances;
+  mapping(address => uint256) public balances;
 
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
