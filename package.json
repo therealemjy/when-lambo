@@ -15,7 +15,7 @@
     "predeploy": "npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
     "deploy": "npx pm2 deploy one update && npx pm2 deploy two update && npx pm2 deploy three update && npx pm2 deploy four update",
     "tsc": "tsc",
-    "lint": "eslint .",
+    "lint": "eslint . && npm run lint:contracts",
     "lint:contracts": "./node_modules/.bin/solhint -f table contracts/**/*.sol",
     "format": "npm-run-all format:*",
     "format:json": "prettier --write \"**/*.json\"",
