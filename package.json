@@ -39,6 +39,7 @@
     "ethers": "^5.5.1",
     "module-alias": "^2.2.2",
     "serialize-error": "^8.1.0",
+    "truffle-hdwallet-provider": "^1.0.17",
     "web3": "^1.6.0",
     "web3-eth-contract": "^1.6.0",
     "web3-providers-ws": "^1.6.0",

@@ -1,8 +1,26 @@
-const ConvertLib = artifacts.require('ConvertLib');
-const MetaCoin = artifacts.require('MetaCoin');
+// eslint-disable-next-line
+const dotenv = require('dotenv');
+dotenv.config();
 
-module.exports = async function (deployer) {
-  await deployer.deploy(ConvertLib);
-  await deployer.link(ConvertLib, MetaCoin);
-  await deployer.deploy(MetaCoin);
+const Owner = artifacts.require('Owner');
+const Transactor = artifacts.require('Transactor');
+
+const contractAddresses = require('./contractAddresses');
+
+const getTransactorConstructorParameters = (network) => {
+  switch (network) {
+    case 'ropsten':
+    case 'ropsten-fork': // Used by Truffle for dry-run migrations
+      return [contractAddresses.ROPSTEN_UNISWAP_V2_ROUTER_ADDRESS];
+    default:
+      return [];
+  }
+};
+
+module.exports = async function (deployer, network) {
+  await deployer.deploy(Owner);
+  await deployer.link(Owner, Transactor);
+
+  const transactorConstructorParameters = getTransactorConstructorParameters(network);
+  await deployer.deploy(Transactor, ...transactorConstructorParameters);
 };

@@ -23,12 +23,23 @@ interface ParsedStrategy {
   STRATEGY_BORROWED_INCREMENT_PERCENT: string;
 }
 
+interface Wallet {
+  address: string;
+  mnemonic: string;
+}
+
 export interface EnvConfig {
   serverId: string;
   aws: {
-    wsRpcUrl: string;
+    mainnetWssRpcUrl: string;
     accessKeyId: string;
     secretAccessKey: string;
+  };
+  infura: {
+    ropstenHttpsRpcUrl: string;
+  };
+  wallets: {
+    ropsten: Wallet;
   };
   isDev: boolean;
   isProd: boolean;
@@ -72,9 +83,18 @@ const strategyToWeiAmounts = (baseWei: string, incrementPercent: number, increme
 const config: EnvConfig = {
   serverId: env('SERVER_ID'),
   aws: {
-    wsRpcUrl: env('AWS_WS_RPC_URL'),
+    mainnetWssRpcUrl: env('AWS_WSS_RPC_URL'),
     accessKeyId: env('AWS_ACCESS_KEY_ID'),
     secretAccessKey: env('AWS_SECRET_ACCESS_KEY'),
+  },
+  infura: {
+    ropstenHttpsRpcUrl: env('INFURA_ROPSTEN_HTTPS_RPC_URL'),
+  },
+  wallets: {
+    ropsten: {
+      address: env('ROPSTEN_ACCOUNT_ADDRESS'),
+      mnemonic: env('ROPSTEN_ACCOUNT_PRIVATE_KEY'),
+    },
   },
   isProd: process.env.NODE_ENV === 'production',
   isDev: process.env.NODE_ENV === 'development',
