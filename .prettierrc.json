@@ -2,7 +2,7 @@
   "singleQuote": true,
   "printWidth": 120,
   "tabWidth": 2,
-  "importOrder": ["^@src/(.*)$", "^[./]"],
+  "importOrder": ["^@src/(.*)$", "^@constants/(.*)$", "^[./]"],
   "importOrderSeparation": true,
   "importOrderParserPlugins": ["classProperties", "typescript"]
 }

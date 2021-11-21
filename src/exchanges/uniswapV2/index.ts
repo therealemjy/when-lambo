@@ -3,7 +3,9 @@ import { ethers } from 'ethers';
 
 import { Exchange, ExchangeName } from '@src/types';
 
-import uniswapV2RouterContract from './contracts/uniswapV2Router.json';
+import contractAddresses from '@constants/contractAddresses';
+
+import uniswapV2RouterAbi from './abis/uniswapV2Router.json';
 
 class UniswapV2 implements Exchange {
   name: ExchangeName;
@@ -33,8 +35,8 @@ class UniswapV2 implements Exchange {
     return {
       context: {
         reference: callReference,
-        contractAddress: uniswapV2RouterContract.address,
-        abi: uniswapV2RouterContract.abi,
+        contractAddress: contractAddresses.mainnet.uniswapV2Router,
+        abi: uniswapV2RouterAbi,
         calls,
       },
       resultsFormatter: (callResult) =>

@@ -1,6 +1,8 @@
 // @ts-ignore
 const MetaCoin = artifacts.require('MetaCoin');
 
+// TODO: rewrite
+
 contract('MetaCoin', (accounts) => {
   it('should put 10000 MetaCoin in the first account', async () => {
     const metaCoinInstance = await MetaCoin.deployed();

@@ -22,8 +22,8 @@
     "format:ts": "prettier --write \"**/*.ts\"",
     "format:sol": "./node_modules/.bin/prettier --write contracts/**/*.sol",
     "generate-smart-contract-types": "npx typechain --target=truffle-v5 'build/contracts/*.json'",
-    "migrate:test": "truffle migrate --compile-all --reset --network ganache",
-    "test:contracts": "truffle test --network ganache"
+    "migrate:ropsten": "tsc -p ./tsconfig.migrate.json --outDir ./migrations && truffle migrate --compile-all --reset --network ropsten",
+    "test:contracts": "truffle test --network ropsten"
   },
   "dependencies": {
     "@aws/web3-ws-provider": "^1.0.3",
@@ -88,6 +88,7 @@
     "node": ">=16.13.0"
   },
   "_moduleAliases": {
-    "@src": "./dist/src"
+    "@src": "./dist/src",
+    "@constants": "./dist/constants"
   }
 }

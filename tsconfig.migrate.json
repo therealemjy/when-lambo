@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["./typedMigrations/**/*.ts", "./types/**/*.ts"]
+}

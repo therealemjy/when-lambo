@@ -7,6 +7,7 @@ types
 # buidler
 artifacts
 cache
+migrations
 
 # Node
 node_modules
