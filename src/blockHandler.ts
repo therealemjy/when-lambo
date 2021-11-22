@@ -8,10 +8,12 @@ import { WETH } from './tokens';
 import { Exchange, Strategy } from './types';
 
 const executeStrategy = async ({
+  blockNumber,
   multicall,
   strategy,
   exchanges,
 }: {
+  blockNumber: string;
   multicall: Multicall;
   strategy: Strategy;
   exchanges: Exchange[];
@@ -31,7 +33,7 @@ const executeStrategy = async ({
       gasPriceWei: global.currentGasPrices.rapid,
     });
 
-    eventEmitter.emit('paths', paths);
+    eventEmitter.emit('paths', blockNumber, paths);
   } catch (error: unknown) {
     eventEmitter.emit('error', error);
   }
@@ -61,6 +63,7 @@ const blockHandler =
     await Promise.all(
       config.strategies.map((strategy) =>
         executeStrategy({
+          blockNumber,
           multicall,
           strategy,
           exchanges,
