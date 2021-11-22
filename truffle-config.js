@@ -19,6 +19,11 @@ module.exports = {
       network_id: 3,
       gas: 4000000,
     },
+    mainnetFork: {
+      host: '127.0.0.1',
+      port: 8545,
+      network_id: '999',
+    },
   },
   compilers: {
     solc: {
