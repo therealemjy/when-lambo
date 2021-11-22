@@ -18,10 +18,10 @@ const bunyanLogger = Bunyan.createLogger({
   name: 'bot',
 });
 
-// Output logs in files in prod
+// Save logs in files in prod
 if (config.isProd) {
   bunyanLogger.addStream({
-    // @ts-ignore For some reason, the type definition of RotatingFileStream
+    // @ts-ignore For some reason, the type definition of RotatingFileStream is incorrect
     stream: new RotatingFileStream({
       path: './logs/logs.log',
       period: '1d',
