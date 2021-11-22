@@ -3,14 +3,15 @@ import BigNumber from 'bignumber.js';
 
 import config from '@src/config';
 import eventEmitter from '@src/eventEmitter';
+import logger from '@src/logger';
 
 class GasPriceWatcher {
   constructor() {
-    console.log('Gas price watcher started.');
     this.getPrices();
   }
 
-  public async updateEvery(interval: number) {
+  public async start(interval: number) {
+    logger.log('Gas price watcher started.');
     setInterval(this.getPrices, interval);
   }
 

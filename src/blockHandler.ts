@@ -8,10 +8,12 @@ import { WETH } from './tokens';
 import { Exchange, Strategy } from './types';
 
 const executeStrategy = async ({
+  blockNumber,
   multicall,
   strategy,
   exchanges,
 }: {
+  blockNumber: string;
   multicall: Multicall;
   strategy: Strategy;
   exchanges: Exchange[];
@@ -31,7 +33,7 @@ const executeStrategy = async ({
       gasPriceWei: global.currentGasPrices.rapid,
     });
 
-    eventEmitter.emit('paths', paths);
+    eventEmitter.emit('paths', blockNumber, paths);
   } catch (error: unknown) {
     eventEmitter.emit('error', error);
   }
@@ -40,14 +42,10 @@ const executeStrategy = async ({
 const blockHandler =
   ({ multicall, exchanges }: { multicall: Multicall; exchanges: Exchange[] }) =>
   async (blockNumber: string) => {
-    if (config.isDev) {
-      logger.log(`New block received. Block # ${blockNumber}`);
-    }
+    logger.log(`New block received. Block # ${blockNumber}`);
 
-    if (global.isMonitoring && config.isDev) {
+    if (global.isMonitoring) {
       logger.log('Block skipped! Price monitoring ongoing.');
-    } else if (config.isDev) {
-      console.time('monitorPrices');
     }
 
     // Check script isn't currently running
@@ -57,10 +55,15 @@ const blockHandler =
 
     global.isMonitoring = true;
 
+    if (config.isDev) {
+      console.time('monitorPrices');
+    }
+
     // Execute all strategies simultaneously
     await Promise.all(
       config.strategies.map((strategy) =>
         executeStrategy({
+          blockNumber,
           multicall,
           strategy,
           exchanges,

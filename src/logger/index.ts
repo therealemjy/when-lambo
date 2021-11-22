@@ -1,4 +1,6 @@
 import BigNumber from 'bignumber.js';
+import Bunyan from 'bunyan';
+import RotatingFileStream from 'bunyan-rotating-file-stream';
 import 'console.table';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
@@ -10,32 +12,36 @@ import calculateProfit from '@src/utils/calculateProfit';
 import formatTimestamp from '@src/utils/formatTimestamp';
 import sendSlackMessage from '@src/utils/sendSlackMessage';
 
-type WorksheetRow = [string, number, string, number, string, number, number, number, string];
+import { WorksheetRow } from './types';
 
-const formatMessage = (message: unknown) => {
-  const timestamp = formatTimestamp(new Date());
-  return `[${timestamp}] ${message}`;
-};
+const bunyanLogger = Bunyan.createLogger({
+  name: 'bot',
+});
 
-const log: typeof console.log = (message, ...args) => {
-  console.log(formatMessage(message), ...args);
-};
+// Save logs in files in prod
+if (config.isProd) {
+  bunyanLogger.addStream({
+    // @ts-ignore For some reason, the type definition of RotatingFileStream is incorrect
+    stream: new RotatingFileStream({
+      path: './logs/logs.log',
+      period: '1d',
+      totalFiles: 3, // Keep up to 3 days worth of logs
+      rotateExisting: true,
+    }),
+  });
+}
 
-const error: typeof console.error = (message, ...args) => {
-  console.error(formatMessage(message), ...args);
-};
-
+const log: typeof console.log = (...args) => bunyanLogger.info(...args);
+const error: typeof console.error = (...args) => bunyanLogger.error(...args);
 const table = console.table;
 
 const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) =>
   amount.dividedBy(10 ** tokenDecimals).toFixed(tokenDecimals);
 
-const paths = async (pathsToLog: Path[], spreadsheet: GoogleSpreadsheet) => {
+const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: GoogleSpreadsheet) => {
   const slackBlocks: unknown[] = [];
   const tableRows: unknown[] = [];
-  const worksheetRowsMapping: {
-    [key: string]: WorksheetRow[];
-  } = {};
+  const worksheetRows: WorksheetRow[] = [];
 
   for (const path of pathsToLog) {
     const timestamp = formatTimestamp(path[0].timestamp);
@@ -110,15 +116,13 @@ const paths = async (pathsToLog: Path[], spreadsheet: GoogleSpreadsheet) => {
         },
       ]);
 
-      // Initialize worksheet if it hasn't been initialized yet
-      const worksheetTitle = `${path[0].fromToken.symbol} / ${path[0].toToken.symbol}`;
-      worksheetRowsMapping[worksheetTitle] = worksheetRowsMapping[worksheetTitle] || [];
-
       // Add row
-      worksheetRowsMapping[worksheetTitle].push([
+      worksheetRows.push([
         timestamp,
+        blockNumber,
         +borrowedTokens,
         bestSellingExchangeName,
+        path[0].toToken.symbol,
         +boughtTokens,
         bestBuyingExchangeName,
         +revenues,
@@ -160,15 +164,8 @@ const paths = async (pathsToLog: Path[], spreadsheet: GoogleSpreadsheet) => {
   }
 
   // Then update the Google Spreadsheet document
-  for (const worksheetTitle of Object.keys(worksheetRowsMapping)) {
-    const worksheet = spreadsheet.sheetsByTitle[worksheetTitle];
-
-    if (!worksheet) {
-      eventEmitter.emit('error', new Error(`Could not find sheet with title ${worksheetTitle}`));
-    }
-
-    worksheet.addRows(worksheetRowsMapping[worksheetTitle]).catch((err) => eventEmitter.emit('error', err));
-  }
+  const worksheet = spreadsheet.sheetsByIndex[0];
+  worksheet.addRows(worksheetRows).catch((err) => eventEmitter.emit('error', err));
 };
 
 export default {
