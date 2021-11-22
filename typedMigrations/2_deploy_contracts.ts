@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-import contractAddresses from '../constants/contractAddresses';
+import contractAddresses from './contractAddresses';
 
 dotenv.config();
 

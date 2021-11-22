@@ -17,7 +17,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.10+commit.fc410830\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Owner.sol\":\"Owner\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/Owner.sol\":{\"keccak256\":\"0x72500703d407155d9040f9feac506cb00291210162c3cb739a16b4c36b2ccd01\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://befc0d666b1d5b423b68ca2935ee117ef4b263177d78f0d3525555255b424f1a\",\"dweb:/ipfs/QmQt415sZhYfLaiANJQWMtBcLuZYcDX6QPt7XhbUtFrLRf\"]}},\"version\":1}",
@@ -959,12 +960,13 @@
     "3": {
       "events": {},
       "links": {},
-      "address": "0xC15d77f9524Ea8c353d9efdC22780CaaF04816A4",
-      "transactionHash": "0x7dd87478e2512268b2b0a7b4213eb79364b1341770c65e2eb22ceaf21ce157ec"
+      "address": "0x34f2968309Ea8B815BF4bd33d4f75bCc52bBD2c9",
+      "transactionHash": "0x6aba9a9ee951b1d1ed2c98b155786e40b5bdb450281c77e10ec8b09e0e86a9c3"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-11-21T21:55:00.211Z",
+  "updatedAt": "2021-11-22T00:00:03.159Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},

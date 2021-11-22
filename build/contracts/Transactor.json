@@ -23,7 +23,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -36,7 +37,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.10+commit.fc410830\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_uniswapV2RouterAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"uniswapV2RouterAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Transactor.sol\":\"Transactor\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/Owner.sol\":{\"keccak256\":\"0x72500703d407155d9040f9feac506cb00291210162c3cb739a16b4c36b2ccd01\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://befc0d666b1d5b423b68ca2935ee117ef4b263177d78f0d3525555255b424f1a\",\"dweb:/ipfs/QmQt415sZhYfLaiANJQWMtBcLuZYcDX6QPt7XhbUtFrLRf\"]},\"project:/contracts/Transactor.sol\":{\"keccak256\":\"0x0edd20354ceb000ee6aa2d8d0a69633ca042f93e2976ee922625031913ced66e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://1a6155feb0c2f157cd376493aa6a248b2481c706fc09d5f1e5b09498be62a156\",\"dweb:/ipfs/QmUMxDpZCNKH9r1VVGwt5gox6TndaouC4vyw5Z84eCMx9x\"]}},\"version\":1}",
@@ -1378,12 +1380,13 @@
     "3": {
       "events": {},
       "links": {},
-      "address": "0x38EfE64F8B53De98177ee4AD916f61b4fFbE8274",
-      "transactionHash": "0x4b6b8f9e992c1fd838b5154805a93098a253c2346d650d6eeb8aeef7af6e2595"
+      "address": "0xD8cc17b28B98C553181A8DDaB7391AC6206D5Dd5",
+      "transactionHash": "0x9dd191db7aa6f298bd8584a3e1760725e48b90bcff7f1d8bcc0d1ac8ed686d16"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-11-21T21:55:00.212Z",
+  "updatedAt": "2021-11-22T00:00:03.161Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},
