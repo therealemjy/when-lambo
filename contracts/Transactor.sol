@@ -13,7 +13,15 @@ contract Transactor is Owner {
     uniswapV2Router = IUniswapV2Router(_uniswapV2RouterAddress);
   }
 
-  function trade(
+  function getBalance() public view owned returns (uint256 balance) {
+    return address(this).balance;
+  }
+
+  function withdraw(address _token, uint256 _tokenAmount) public owned {
+    IERC20(_token).transfer(address(owner), _tokenAmount);
+  }
+
+  function execute(
     address _fromToken,
     uint256 _fromTokenAmount,
     address _toToken,

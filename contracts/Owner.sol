@@ -12,4 +12,8 @@ contract Owner {
   constructor() {
     owner = msg.sender;
   }
+
+  function setOwner(address _newOwner) public owned {
+    owner = _newOwner;
+  }
 }
