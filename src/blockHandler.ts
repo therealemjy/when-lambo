@@ -40,14 +40,10 @@ const executeStrategy = async ({
 const blockHandler =
   ({ multicall, exchanges }: { multicall: Multicall; exchanges: Exchange[] }) =>
   async (blockNumber: string) => {
-    if (config.isDev) {
-      logger.log(`New block received. Block # ${blockNumber}`);
-    }
+    logger.log(`New block received. Block # ${blockNumber}`);
 
-    if (global.isMonitoring && config.isDev) {
+    if (global.isMonitoring) {
       logger.log('Block skipped! Price monitoring ongoing.');
-    } else if (config.isDev) {
-      console.time('monitorPrices');
     }
 
     // Check script isn't currently running
@@ -56,6 +52,10 @@ const blockHandler =
     }
 
     global.isMonitoring = true;
+
+    if (config.isDev) {
+      console.time('monitorPrices');
+    }
 
     // Execute all strategies simultaneously
     await Promise.all(

@@ -28,7 +28,7 @@ const init = async () => {
     const spreadsheet = await getSpreadsheet();
 
     // Pull gas prices every 5 seconds
-    gasPriceWatcher.updateEvery(5000);
+    gasPriceWatcher.start(5000);
 
     // Handle paths found
     eventEmitter.on('paths', (paths) => logger.paths(paths, spreadsheet));

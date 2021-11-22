@@ -1,4 +1,6 @@
 import BigNumber from 'bignumber.js';
+import Bunyan from 'bunyan';
+import RotatingFileStream from 'bunyan-rotating-file-stream';
 import 'console.table';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
@@ -10,21 +12,27 @@ import calculateProfit from '@src/utils/calculateProfit';
 import formatTimestamp from '@src/utils/formatTimestamp';
 import sendSlackMessage from '@src/utils/sendSlackMessage';
 
-type WorksheetRow = [string, number, string, number, string, number, number, number, string];
+import { WorksheetRow } from './types';
 
-const formatMessage = (message: unknown) => {
-  const timestamp = formatTimestamp(new Date());
-  return `[${timestamp}] ${message}`;
-};
+const bunyanLogger = Bunyan.createLogger({
+  name: 'bot',
+});
 
-const log: typeof console.log = (message, ...args) => {
-  console.log(formatMessage(message), ...args);
-};
+// Output logs in files in prod
+if (config.isProd) {
+  bunyanLogger.addStream({
+    // @ts-ignore For some reason, the type definition of RotatingFileStream
+    stream: new RotatingFileStream({
+      path: './logs/logs.log',
+      period: '1d',
+      totalFiles: 3, // Keep up to 3 days worth of logs
+      rotateExisting: true,
+    }),
+  });
+}
 
-const error: typeof console.error = (message, ...args) => {
-  console.error(formatMessage(message), ...args);
-};
-
+const log: typeof console.log = (...args) => bunyanLogger.info(...args);
+const error: typeof console.error = (...args) => bunyanLogger.error(...args);
 const table = console.table;
 
 const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) =>
