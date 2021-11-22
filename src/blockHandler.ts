@@ -77,6 +77,7 @@ const blockHandler =
 
     // Reset monitoring status so the script doesn't stop
     global.isMonitoring = false;
+    global.lastMonitoringDateTime = new Date().getTime();
   };
 
 export default blockHandler;

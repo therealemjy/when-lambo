@@ -7,32 +7,20 @@ import './@moduleAliases';
 import blockHandler from './src/blockHandler';
 import config from './src/config';
 import eventEmitter from './src/eventEmitter';
+import { registerEventListeners } from './src/eventEmitter/registerEvents';
 import CryptoComExchange from './src/exchanges/cryptoCom';
 import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import gasPriceWatcher from './src/gasPriceWatcher';
+import { setupGlobalStateVariables } from './src/globalState';
 import logger from './src/logger';
-import getSpreadsheet from './src/utils/getSpreadsheet';
 import handleError from './src/utils/handleError';
 
-const fastify = Fastify({ logger: config.isDev });
-
-global.isMonitoring = false;
+const server = Fastify({ logger: config.isDev });
 
 const init = async () => {
   try {
-    const spreadsheet = await getSpreadsheet();
-
-    // Pull gas prices every 5 seconds
-    gasPriceWatcher.start(5000);
-
-    // Handle paths found
-    eventEmitter.on('paths', (blockNumber, paths) => logger.paths(blockNumber, paths, spreadsheet));
-
-    // Handle errors
-    eventEmitter.on('error', handleError);
-
     const start = () => {
       const provider = new ethers.providers.Web3Provider(
         new AWSWebsocketProvider(config.aws.wsRpcUrl, {
@@ -87,21 +75,38 @@ const init = async () => {
   }
 };
 
-fastify.get('/health', async () => {
-  return true;
+// Health check endpoint
+server.get('/health', async () => {
+  if (!global.lastMonitoringDateTime) {
+    throw Error('Monitoring not started yet');
+  }
+
+  const currentDateTime = new Date().getTime();
+  const secondsElapsedSinceLastMonitoring = (currentDateTime - global.lastMonitoringDateTime) / 1000;
+
+  if (secondsElapsedSinceLastMonitoring >= 60) {
+    throw Error(`Last monitoring was more than 60 seconds ago (${secondsElapsedSinceLastMonitoring}s)`);
+  }
+
+  return { secondsElapsedSinceLastMonitoring };
 });
 
-// Catch unhandled exceptions
-process.on('uncaughtException', (error) => {
-  handleError(error, true);
-  process.exit(1);
-});
-
-//Run the server!
+//Run the server
 const startServer = async () => {
   try {
-    await fastify.listen(3000);
-    init();
+    // Start server on port 3000 (Use for health check)
+    await server.listen(3000);
+
+    // Register event listeners
+    await registerEventListeners();
+
+    // Setup the global state
+    setupGlobalStateVariables();
+
+    // Pull gas prices every 5 seconds
+    gasPriceWatcher.start(5000);
+
+    await init();
   } catch (err) {
     eventEmitter.emit('error', err);
     process.exit(1);
@@ -109,3 +114,9 @@ const startServer = async () => {
 };
 
 startServer();
+
+// Catch unhandled exceptions
+process.on('uncaughtException', (error) => {
+  handleError(error, true);
+  process.exit(1);
+});
