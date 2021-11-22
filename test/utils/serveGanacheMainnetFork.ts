@@ -5,7 +5,7 @@ const port = 8545;
 
 const server = ganache.server({
   port,
-  fork: `https://mainnet.infura.io/v3/64b45f4612074272a32e82d4428e2127@${startBlockNumber}`,
+  fork: `https://eth-mainnet.alchemyapi.io/v2/riG17C292D4AAxmWW0cSzqqIIgR7TYhu@${startBlockNumber}`,
   network_id: '999',
 });
 
