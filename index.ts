@@ -1,6 +1,7 @@
 import AWSWebsocketProvider from '@aws/web3-ws-provider';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import { ethers } from 'ethers';
+import Fastify from 'fastify';
 
 import './@moduleAliases';
 import blockHandler from './src/blockHandler';
@@ -15,11 +16,7 @@ import logger from './src/logger';
 import getSpreadsheet from './src/utils/getSpreadsheet';
 import handleError from './src/utils/handleError';
 
-// Catch unhandled exceptions
-process.on('uncaughtException', (error) => {
-  handleError(error, true);
-  process.exit(1);
-});
+const fastify = Fastify({ logger: config.isDev });
 
 global.isMonitoring = false;
 
@@ -90,4 +87,25 @@ const init = async () => {
   }
 };
 
-init();
+fastify.get('/health', async () => {
+  return true;
+});
+
+// Catch unhandled exceptions
+process.on('uncaughtException', (error) => {
+  handleError(error, true);
+  process.exit(1);
+});
+
+//Run the server!
+const startServer = async () => {
+  try {
+    await fastify.listen(3000);
+    init();
+  } catch (err) {
+    eventEmitter.emit('error', err);
+    process.exit(1);
+  }
+};
+
+startServer();
