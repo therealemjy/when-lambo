@@ -28,6 +28,7 @@
   "dependencies": {
     "@aws/web3-ws-provider": "^1.0.3",
     "@maxime.julian/ethereum-multicall": "^3.0.0",
+    "@openzeppelin/contracts": "^4.3.3",
     "aws-sdk": "^2.1016.0",
     "axios": "^0.24.0",
     "bignumber.js": "^9.0.1",
