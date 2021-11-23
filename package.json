@@ -6,12 +6,8 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
-<<<<<<< HEAD
-    "dev": "rm -rf dist && tsc && NODE_ENV=development node dist/index | ./node_modules/.bin/bunyan",
-=======
-    "dev": "tsc && NODE_ENV=development node dist/index",
->>>>>>> 98f5572 (update setup for tests)
-    "start": "node dist/index.js",
+    "dev": "rm -rf ./dist && tsc && NODE_ENV=development node dist/index | ./node_modules/.bin/bunyan",
+    "start": "node ./dist/index.js",
     "predeploy": "npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
     "deploy": "npx pm2 deploy one update && npx pm2 deploy two update && npx pm2 deploy three update && npx pm2 deploy four update",
     "tsc": "tsc",
@@ -21,8 +17,8 @@
     "format:json": "prettier --write \"**/*.json\"",
     "format:ts": "prettier --write \"**/*.ts\"",
     "format:sol": "./node_modules/.bin/prettier --write contracts/**/*.sol",
-    "generate-smart-contract-types": "npx typechain --target=truffle-v5 'build/contracts/*.json'",
-    "migrate:test": "tsc -p ./tsconfig.migrate.json --outDir ./migrations && truffle migrate --compile-all --reset --network test",
+    "generate-smart-contract-types": "rm -rf ./types && npx typechain --target=truffle-v5 'build/contracts/*.json'",
+    "migrate:test": "rm -rf ./migrations && tsc -p ./tsconfig.migrate.json --outDir ./migrations && truffle migrate --compile-all --reset --network test",
     "test:contracts": "truffle test --network test",
     "start:test-node": "node ./test/utils/serveGanacheMainnetFork.js"
   },
