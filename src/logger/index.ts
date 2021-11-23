@@ -164,8 +164,10 @@ const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: Googl
   }
 
   // Then update the Google Spreadsheet document
-  const worksheet = spreadsheet.sheetsByIndex[0];
-  worksheet.addRows(worksheetRows).catch((err) => eventEmitter.emit('error', err));
+  if (worksheetRows.length > 0) {
+    const worksheet = spreadsheet.sheetsByIndex[0];
+    worksheet.addRows(worksheetRows).catch((err) => eventEmitter.emit('error', err));
+  }
 };
 
 export default {
