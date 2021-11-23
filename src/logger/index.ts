@@ -23,7 +23,7 @@ if (config.isProd) {
   bunyanLogger.addStream({
     // @ts-ignore For some reason, the type definition of RotatingFileStream is incorrect
     stream: new RotatingFileStream({
-      path: './logs/logs.log',
+      path: `/var/tmp/logs.log`,
       period: '1d',
       totalFiles: 3, // Keep up to 3 days worth of logs
       rotateExisting: true,
