@@ -1,7 +1,7 @@
 import AWSWebsocketProvider from '@aws/web3-ws-provider';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import { ethers } from 'ethers';
-import Fastify from 'fastify';
+import http from 'http';
 
 import './@moduleAliases';
 import blockHandler from './src/blockHandler';
@@ -16,8 +16,6 @@ import gasPriceWatcher from './src/gasPriceWatcher';
 import { setupGlobalStateVariables } from './src/globalState';
 import logger from './src/logger';
 import handleError from './src/utils/handleError';
-
-const server = Fastify({ logger: config.isDev });
 
 const init = async () => {
   try {
@@ -75,28 +73,32 @@ const init = async () => {
   }
 };
 
-// Health check endpoint
-server.get('/health', async () => {
-  if (!global.lastMonitoringDateTime) {
-    throw Error('Monitoring not started yet');
+const server = http.createServer(function (req, res) {
+  if (req.url === '/health') {
+    if (!global.lastMonitoringDateTime) {
+      res.writeHead(500);
+      res.end('Monitoring not started yet');
+      return;
+    }
+
+    const currentDateTime = new Date().getTime();
+    const secondsElapsedSinceLastMonitoring = (currentDateTime - global.lastMonitoringDateTime) / 1000;
+
+    if (secondsElapsedSinceLastMonitoring >= 60) {
+      res.writeHead(500);
+      res.end(`Last monitoring was more than 60 seconds ago (${secondsElapsedSinceLastMonitoring}s)`);
+      return;
+    }
+
+    res.writeHead(200);
+    res.end();
   }
-
-  const currentDateTime = new Date().getTime();
-  const secondsElapsedSinceLastMonitoring = (currentDateTime - global.lastMonitoringDateTime) / 1000;
-
-  if (secondsElapsedSinceLastMonitoring >= 60) {
-    throw Error(`Last monitoring was more than 60 seconds ago (${secondsElapsedSinceLastMonitoring}s)`);
-  }
-
-  return { secondsElapsedSinceLastMonitoring };
 });
 
-//Run the server
-const startServer = async () => {
-  try {
-    // Start server on port 3000 (Use for health check)
-    await server.listen(3000);
+server.listen(3000, async () => {
+  console.log(`Server running at port 3000.`);
 
+  try {
     // Register event listeners
     await registerEventListeners();
 
@@ -111,9 +113,7 @@ const startServer = async () => {
     eventEmitter.emit('error', err);
     process.exit(1);
   }
-};
-
-startServer();
+});
 
 // Catch unhandled exceptions
 process.on('uncaughtException', (error) => {

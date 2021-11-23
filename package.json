@@ -28,7 +28,6 @@
     "dotenv": "^8.2.0",
     "eslint-plugin-prettier": "^4.0.0",
     "ethers": "^5.5.1",
-    "fastify": "^3.24.0",
     "module-alias": "^2.2.2",
     "serialize-error": "^8.1.0",
     "web3": "^1.6.0",
