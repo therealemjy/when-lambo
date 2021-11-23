@@ -77,20 +77,18 @@ const init = async () => {
 
 // Health check endpoint
 server.get('/health', async () => {
-  throw Error('Monitoring not started yet');
+  if (!global.lastMonitoringDateTime) {
+    throw Error('Monitoring not started yet');
+  }
 
-  // if (!global.lastMonitoringDateTime) {
-  //   throw Error('Monitoring not started yet');
-  // }
+  const currentDateTime = new Date().getTime();
+  const secondsElapsedSinceLastMonitoring = (currentDateTime - global.lastMonitoringDateTime) / 1000;
 
-  // const currentDateTime = new Date().getTime();
-  // const secondsElapsedSinceLastMonitoring = (currentDateTime - global.lastMonitoringDateTime) / 1000;
+  if (secondsElapsedSinceLastMonitoring >= 60) {
+    throw Error(`Last monitoring was more than 60 seconds ago (${secondsElapsedSinceLastMonitoring}s)`);
+  }
 
-  // if (secondsElapsedSinceLastMonitoring >= 60) {
-  //   throw Error(`Last monitoring was more than 60 seconds ago (${secondsElapsedSinceLastMonitoring}s)`);
-  // }
-
-  // return { secondsElapsedSinceLastMonitoring };
+  return { secondsElapsedSinceLastMonitoring };
 });
 
 //Run the server
