@@ -94,8 +94,8 @@ server.get('/health', async () => {
 //Run the server
 const startServer = async () => {
   try {
-    // Start server on port 80 (Use for health check)
-    await server.listen(80);
+    // Start server on port 3000 (Use for health check)
+    await server.listen(3000);
 
     // Register event listeners
     await registerEventListeners();

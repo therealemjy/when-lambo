@@ -206,7 +206,6 @@ module.exports = {
       watch: false,
       env_one: {
         ...baseEnvs,
-        SERVER_ID: '1',
         STRINGIFIED_STRATEGIES: JSON.stringify(strategy1),
       },
       env_two: {
@@ -226,22 +225,22 @@ module.exports = {
   deploy: {
     one: {
       ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env one',
+      'post-deploy': 'npm install && rm -R ./dist && npm run tsc && pm2 start ecosystem.config.js --env one',
       host: ['ec2-54-145-167-115.compute-1.amazonaws.com'],
     },
     two: {
       ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env two',
+      'post-deploy': 'npm install && rm -R ./dist && npm run tsc && pm2 start ecosystem.config.js --env two',
       host: ['ec2-52-23-163-124.compute-1.amazonaws.com	'],
     },
     three: {
       ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env three',
+      'post-deploy': 'npm install && rm -R ./dist && npm run tsc && pm2 start ecosystem.config.js --env three',
       host: ['ec2-54-163-43-1.compute-1.amazonaws.com'],
     },
     four: {
       ...baseOptions,
-      'post-deploy': 'npm install && npm run tsc && pm2 start ecosystem.config.js --env four',
+      'post-deploy': 'npm install && rm -R ./dist && npm run tsc && pm2 start ecosystem.config.js --env four',
       host: ['ec2-52-87-227-199.compute-1.amazonaws.com'],
     },
   },
