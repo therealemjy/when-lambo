@@ -22,8 +22,9 @@
     "format:ts": "prettier --write \"**/*.ts\"",
     "format:sol": "./node_modules/.bin/prettier --write contracts/**/*.sol",
     "generate-smart-contract-types": "npx typechain --target=truffle-v5 'build/contracts/*.json'",
-    "migrate:ropsten": "tsc -p ./tsconfig.migrate.json --outDir ./migrations && truffle migrate --compile-all --reset --network ropsten",
-    "test:contracts": "truffle test --network ropsten"
+    "migrate:test": "tsc -p ./tsconfig.migrate.json --outDir ./migrations && truffle migrate --compile-all --reset --network test",
+    "test:contracts": "truffle test --network test",
+    "start:test-node": "node ./test/utils/serveGanacheMainnetFork.js"
   },
   "dependencies": {
     "@aws/web3-ws-provider": "^1.0.3",
@@ -52,8 +53,8 @@
     "@babel/plugin-proposal-optional-catch-binding": "^7.16.0",
     "@babel/preset-typescript": "^7.16.0",
     "@trivago/prettier-plugin-sort-imports": "^3.0.0",
-    "@types/bunyan": "^1.8.8",
     "@typechain/truffle-v5": "^6.0.0",
+    "@types/bunyan": "^1.8.8",
     "@types/chai": "^4.2.22",
     "@types/google-spreadsheet": "^3.1.5",
     "@types/mocha": "^9.0.0",

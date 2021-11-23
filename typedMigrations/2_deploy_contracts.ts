@@ -4,7 +4,7 @@ import contractAddresses from './contractAddresses';
 
 dotenv.config();
 
-export type Network = 'ganache' | 'ropsten' | 'ropsten-fork';
+export type Network = 'ganache' | 'mainnet' | 'mainnet-fork' | 'ropsten' | 'ropsten-fork';
 
 const Owner = artifacts.require('Owner');
 const Transactor = artifacts.require('Transactor');
@@ -15,7 +15,7 @@ const getTransactorConstructorParameters = (network: Network) => {
     case 'ropsten-fork': // Used by Truffle for dry-run migrations
       return [contractAddresses.ropsten.uniswapV2Router];
     default:
-      return [];
+      return [contractAddresses.mainnet.uniswapV2Router];
   }
 };
 
@@ -24,6 +24,7 @@ module.exports = function (deployer, network: Network) {
   deployer.link(Owner, Transactor);
 
   const transactorConstructorParameters = getTransactorConstructorParameters(network);
+
   // TODO: improve typing
   deployer.deploy<any>(Transactor, ...transactorConstructorParameters);
 } as Truffle.Migration;
