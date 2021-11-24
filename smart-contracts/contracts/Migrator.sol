@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "./Owner.sol";
+import './Owner.sol';
 
 contract Migrator is Owner {
-    uint256 public lastCompletedMigration;
+  uint256 public lastCompletedMigration;
 
-    function setCompleted(uint256 _completed) public owned {
-        lastCompletedMigration = _completed;
-    }
+  function setCompleted(uint256 _completed) public owned {
+    lastCompletedMigration = _completed;
+  }
 }
