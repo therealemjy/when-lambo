@@ -25,7 +25,6 @@ contract Transactor is Owner {
     IERC20(_token).transfer(address(owner), _tokenAmount);
   }
 
-  // TODO: check if we need these functions to receive funds on the contract (if we receive ETH)
   // Function to receive Ether. msg.data must be empty
   receive() external payable {}
 
