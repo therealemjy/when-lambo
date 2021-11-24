@@ -17,18 +17,19 @@ contract Transactor is Owner {
     return IERC20(_fromToken).balanceOf(address(this));
   }
 
-  function getETHBalance() public view returns (uint256 balance) {
-    return address(this).balance;
-  }
-
   function withdraw(address _token, uint256 _tokenAmount) public owned {
     IERC20(_token).transfer(address(owner), _tokenAmount);
   }
 
-  // Function to receive Ether. msg.data must be empty
+  // TODO: check if we need this
+  // function withdrawETH(uint256 _amount) public owned {
+  //   address(owner).transfer(_amount);
+  // }
+
+  // Function to receive ethers. Note that msg.data must be empty
   receive() external payable {}
 
-  // Fallback function is called when msg.data is not empty
+  // Fallback function to receive ethers when msg.data is not empty
   fallback() external payable {}
 
   function execute(

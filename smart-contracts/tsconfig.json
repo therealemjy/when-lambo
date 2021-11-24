@@ -5,8 +5,9 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "declaration": true
+    "declaration": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["./scripts", "./test", "./typechain"],
+  "include": ["./hardhat.config.ts", "./scripts", "./deploy", "./test", "typechain/**/*"],
   "files": ["./hardhat.config.ts"]
 }
