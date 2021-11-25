@@ -19,7 +19,7 @@
     "skipLibCheck": true,
     "rootDirs": ["./"],
     "baseUrl": "./",
-    "types": ["@types/node", "@types/chai", "@types/mocha"],
+    "types": ["@types/node"],
     "sourceMap": true,
     "outDir": "dist",
     "paths": {
