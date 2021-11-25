@@ -242,7 +242,7 @@ module.exports = {
       ...baseOptions,
       "post-deploy":
         "cd bot && npm install && rm -R ./dist && npm run tsc && pm2 start ecosystem.config.js --env two",
-      host: ["ec2-52-23-163-124.compute-1.amazonaws.com	"],
+      host: ["ec2-52-23-163-124.compute-1.amazonaws.com"],
     },
     three: {
       ...baseOptions,
