@@ -202,6 +202,9 @@ const baseOptions = {
   path: "/home/ubuntu/when-lambo",
 };
 
+const getHookDeployCommand = (envName) =>
+  `cd bot && sudo rm -R ./node_modules && npm install && sudo rm -R ./dist && npm run tsc && cd .. && pm2 start ecosystem.config.js --env ${envName}`;
+
 module.exports = {
   apps: [
     {
@@ -234,26 +237,22 @@ module.exports = {
   deploy: {
     one: {
       ...baseOptions,
-      "post-deploy":
-        "cd bot && npm install && rm -R ./dist && npm run tsc && cd .. && pm2 start ecosystem.config.js --env one",
+      "post-deploy": getHookDeployCommand("one"),
       host: ["ec2-54-145-167-115.compute-1.amazonaws.com"],
     },
     two: {
       ...baseOptions,
-      "post-deploy":
-        "cd bot && npm install && rm -R ./dist && npm run tsc && cd .. && pm2 start ecosystem.config.js --env two",
+      "post-deploy": getHookDeployCommand("two"),
       host: ["ec2-52-23-163-124.compute-1.amazonaws.com"],
     },
     three: {
       ...baseOptions,
-      "post-deploy":
-        "cd bot && npm install && rm -R ./dist && npm run tsc && cd .. && pm2 start ecosystem.config.js --env three",
+      "post-deploy": getHookDeployCommand("three"),
       host: ["ec2-54-163-43-1.compute-1.amazonaws.com"],
     },
     four: {
       ...baseOptions,
-      "post-deploy":
-        "cd bot && npm install && rm -R ./dist && npm run tsc && cd .. && pm2 start ecosystem.config.js --env four",
+      "post-deploy": getHookDeployCommand("four"),
       host: ["ec2-52-87-227-199.compute-1.amazonaws.com"],
     },
   },
