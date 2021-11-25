@@ -238,7 +238,7 @@ module.exports = {
     one: {
       ...baseOptions,
       "post-deploy": getHookDeployCommand("one"),
-      host: ["ec2-54-145-167-115.compute-1.amazonaws.com"],
+      host: ["ec2-3-88-144-73.compute-1.amazonaws.com"],
     },
     two: {
       ...baseOptions,
