@@ -1,5 +1,5 @@
+import logger from '@src/bootstrap/logger';
 import config from '@src/config';
-import logger from '@src/logger';
 import formatError from '@src/utils/formatError';
 import sendSlackMessage, { formatErrorToSlackBlock } from '@src/utils/sendSlackMessage';
 
