@@ -4,7 +4,7 @@
   "description": "The bot that will make us rich",
   "author": "Two beautiful guys",
   "private": true,
-  "main": "bot/dist/index.js",
+  "main": "index.ts",
   "scripts": {
     "dev": "rm -rf ./dist && tsc && NODE_ENV=development node dist/index | ./node_modules/.bin/bunyan",
     "start": "node ./dist/index.js",
