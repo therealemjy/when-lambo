@@ -243,17 +243,17 @@ module.exports = {
     two: {
       ...baseOptions,
       "post-deploy": getHookDeployCommand("two"),
-      host: ["ec2-52-23-163-124.compute-1.amazonaws.com"],
+      host: ["ec2-54-90-38-81.compute-1.amazonaws.com"],
     },
     three: {
       ...baseOptions,
       "post-deploy": getHookDeployCommand("three"),
-      host: ["ec2-54-163-43-1.compute-1.amazonaws.com"],
+      host: ["ec2-100-26-120-69.compute-1.amazonaws.com"],
     },
     four: {
       ...baseOptions,
       "post-deploy": getHookDeployCommand("four"),
-      host: ["ec2-52-87-227-199.compute-1.amazonaws.com"],
+      host: ["ec2-54-84-121-157.compute-1.amazonaws.com"],
     },
   },
 };
