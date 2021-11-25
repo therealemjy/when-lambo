@@ -27,10 +27,10 @@ const config: HardhatUserConfig = {
     currency: 'USD',
   },
   namedAccounts: {
-    deployer: {
+    deployerAddress: {
       default: 0, // assign the first user as deployer
     },
-    externalUser: {
+    externalUserAddress: {
       default: 1, // assign another account as external user (used in tests only)
     },
   },

@@ -1,19 +1,36 @@
-// import { expect } from 'chai';
-// import { ethers } from 'hardhat';
+import { expect } from 'chai';
+import { ethers, deployments, getNamedAccounts } from 'hardhat';
 
-// describe('Transactor', function () {
-//   it("Should return the new greeting once it's changed", async function () {
-//     const Greeter = await ethers.getContractFactory('Greeter');
-//     const greeter = await Greeter.deploy('Hello, world!');
-//     await greeter.deployed();
+import { Transactor as ITransactorContract } from '../typechain';
 
-//     expect(await greeter.greet()).to.equal('Hello, world!');
+const WETH_CONTRACT_MAINNET_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 
-//     const setGreetingTx = await greeter.setGreeting('Hola, mundo!');
+const setup = deployments.createFixture(async () => {
+  await deployments.fixture(['Transactor']);
+  const TransactorContract: ITransactorContract = await ethers.getContract('Transactor');
 
-//     // wait until the transaction is mined
-//     await setGreetingTx.wait();
+  return { TransactorContract };
+});
 
-//     expect(await greeter.greet()).to.equal('Hola, mundo!');
-//   });
-// });
+describe('Transactor', function () {
+  describe('getBalance', function () {
+    it('reverts when being called from an account that is not the owner', async function () {
+      const { TransactorContract } = await setup();
+      const { deployerAddress, externalUserAddress } = await getNamedAccounts();
+
+      await expect(
+        TransactorContract.connect(externalUserAddress).getBalance(WETH_CONTRACT_MAINNET_ADDRESS)
+      ).to.be.revertedWith('Owner only');
+      expect(await TransactorContract.owner()).to.equal(deployerAddress);
+    });
+  });
+
+  // it('should execute basic trade', async function () {
+  //   const { TransactorContract } = await setup();
+  //   const { externalUser } = await getNamedAccounts();
+
+  //   const res = await TransactorContract.connect(externalUser).getBalance(WETH_CONTRACT_MAINNET_ADDRESS);
+
+  //   console.log(res.toString());
+  // });
+});
