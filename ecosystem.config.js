@@ -235,25 +235,25 @@ module.exports = {
     one: {
       ...baseOptions,
       "post-deploy":
-        "cd bot && npm install && rm -R ./dist && npm run tsc && pm2 start ecosystem.config.js --env one",
+        "cd bot && npm install && rm -R ./dist && npm run tsc && cd .. && pm2 start ecosystem.config.js --env one",
       host: ["ec2-54-145-167-115.compute-1.amazonaws.com"],
     },
     two: {
       ...baseOptions,
       "post-deploy":
-        "cd bot && npm install && rm -R ./dist && npm run tsc && pm2 start ecosystem.config.js --env two",
+        "cd bot && npm install && rm -R ./dist && npm run tsc && cd .. && pm2 start ecosystem.config.js --env two",
       host: ["ec2-52-23-163-124.compute-1.amazonaws.com"],
     },
     three: {
       ...baseOptions,
       "post-deploy":
-        "cd bot && npm install && rm -R ./dist && npm run tsc && pm2 start ecosystem.config.js --env three",
+        "cd bot && npm install && rm -R ./dist && npm run tsc && cd .. && pm2 start ecosystem.config.js --env three",
       host: ["ec2-54-163-43-1.compute-1.amazonaws.com"],
     },
     four: {
       ...baseOptions,
       "post-deploy":
-        "cd bot && npm install && rm -R ./dist && npm run tsc && pm2 start ecosystem.config.js --env four",
+        "cd bot && npm install && rm -R ./dist && npm run tsc && cd .. && pm2 start ecosystem.config.js --env four",
       host: ["ec2-52-87-227-199.compute-1.amazonaws.com"],
     },
   },
