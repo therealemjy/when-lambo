@@ -25,12 +25,24 @@ describe('Transactor', function () {
     });
   });
 
-  // it('should execute basic trade', async function () {
-  //   const { TransactorContract } = await setup();
-  //   const { externalUser } = await getNamedAccounts();
+  it('should execute fake trade', async function () {
+    const { TransactorContract } = await setup();
+    const [deployer] = await ethers.getSigners();
 
-  //   const res = await TransactorContract.connect(externalUser).getBalance(WETH_CONTRACT_MAINNET_ADDRESS);
+    // Send 1 ether to contract to cover flashloan fee (2 wei) TODO: chacal
+    // mode, send exactly 2 wei and check contract's balance is 0 after
+    // executing trade
+    await deployer.sendTransaction({
+      to: TransactorContract.address,
+      value: ethers.utils.parseEther('1.0'),
+    });
 
-  //   console.log(res.toString());
-  // });
+    const contractBalanceBeforeTrade = await TransactorContract.provider.getBalance(TransactorContract.address);
+    console.log('Contract balance before trade: ', contractBalanceBeforeTrade.toString());
+
+    // Execute trade (borrow 100000 WETH)
+    await TransactorContract.execute(ethers.utils.parseEther('100000'));
+
+    // console.log(res.toString());
+  });
 });

@@ -3,13 +3,27 @@ pragma solidity ^0.8.4;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import './Owner.sol';
+import './interfaces/IDyDxCallee.sol';
+import './interfaces/IDyDxSoloMargin.sol';
 import './interfaces/IUniswapV2Router.sol';
 
+// TODO: remove in prod
+import 'hardhat/console.sol';
+
 contract Transactor is Owner {
+  IERC20 private weth;
+  IDyDxSoloMargin private dydxSoloMargin;
   IUniswapV2Router private uniswapV2Router;
 
-  constructor(address _uniswapV2RouterAddress) {
+  constructor(
+    address _wethAddress,
+    address _dydxSoloMarginAddress,
+    address _uniswapV2RouterAddress
+  ) {
+    weth = IERC20(_wethAddress);
+
     // Initialize exchange contracts
+    dydxSoloMargin = IDyDxSoloMargin(_dydxSoloMarginAddress);
     uniswapV2Router = IUniswapV2Router(_uniswapV2RouterAddress);
   }
 
@@ -21,10 +35,13 @@ contract Transactor is Owner {
     IERC20(_token).transfer(address(owner), _tokenAmount);
   }
 
-  // TODO: check if we need this
+  // TODO: update
   // function withdrawETH(uint256 _amount) public owned {
   //   address(owner).transfer(_amount);
   // }
+
+  // We need our contract to be able to receive ETH to repay the flashloan
+  // fee of DyDx
 
   // Function to receive ethers. Note that msg.data must be empty
   receive() external payable {}
@@ -32,22 +49,115 @@ contract Transactor is Owner {
   // Fallback function to receive ethers when msg.data is not empty
   fallback() external payable {}
 
-  function execute(
-    address _fromToken,
-    uint256 _fromTokenAmount,
-    address _toToken,
-    uint256 _minToTokenAmount,
-    uint256 _deadline
-  ) public owned {
-    require(IERC20(_fromToken).balanceOf(address(this)) >= _fromTokenAmount, 'Not enough fromToken on contract');
+  function execute(uint256 _wethAmountToBorrow) public owned {
+    /*
+      The first step is to initiate a Flashloan with DyDx.
 
-    IERC20(_fromToken).approve(address(uniswapV2Router), _fromTokenAmount);
+      The flash loan functionality in DyDx is predicated by their "operate" function,
+      which takes a list of operations to execute, and defers validating the state of
+      things until it's done executing them.
 
-    // For now, we only handle simple paths from one token to another
-    address[] memory path = new address[](2);
-    path[0] = address(_fromToken);
-    path[1] = address(_toToken);
+      We thus create three operations, a Withdraw (which loans us the funds), a Call
+      (which invokes the callFunction method on this contract), and a Deposit (which
+      repays the loan, plus the 2 wei fee), and pass them all to "operate".
 
-    uniswapV2Router.swapExactTokensForTokens(_fromTokenAmount, _minToTokenAmount, path, msg.sender, _deadline);
+      Note that the Deposit operation will invoke the transferFrom to pay the loan
+      (or whatever amount it was initialised with) back to itself, there is no need
+      to pay it back explicitly.
+
+      At the moment, we only make flashloans in WETH.
+    */
+
+    // DyDx take a fee of 2 wei to execute the flashloan
+    uint256 amountToRepay = _wethAmountToBorrow + 2;
+
+    // Give DyDx permission to withdraw amount to repay. This amount
+    // will only be withdrawn after we've executed our trade.
+    weth.approve(address(dydxSoloMargin), amountToRepay);
+
+    Actions.ActionArgs[] memory operations = new Actions.ActionArgs[](3);
+
+    // Borrow funds
+    operations[0] = Actions.ActionArgs({
+      actionType: Actions.ActionType.Withdraw,
+      accountId: 0,
+      amount: Types.AssetAmount({
+        sign: false,
+        denomination: Types.AssetDenomination.Wei,
+        ref: Types.AssetReference.Delta,
+        value: _wethAmountToBorrow // Amount to borrow
+      }),
+      primaryMarketId: 0, // WETH
+      secondaryMarketId: 0,
+      otherAddress: address(this),
+      otherAccountId: 0,
+      data: ''
+    });
+
+    // Call callFunction to execute the rest of the trade
+    operations[1] = Actions.ActionArgs({
+      actionType: Actions.ActionType.Call,
+      accountId: 0,
+      amount: Types.AssetAmount({
+        sign: false,
+        denomination: Types.AssetDenomination.Wei,
+        ref: Types.AssetReference.Delta,
+        value: 0
+      }),
+      primaryMarketId: 0,
+      secondaryMarketId: 0,
+      otherAddress: address(this),
+      otherAccountId: 0,
+      data: abi.encode(
+        // TODO: add any relevant data that needs to be sent to
+        // callFunction to execute the trade
+        // Replace or add any additional variables that you want
+        // to be available to the receiver function
+        _wethAmountToBorrow
+      )
+    });
+
+    // Repay borrowed funds + fee
+    operations[2] = Actions.ActionArgs({
+      actionType: Actions.ActionType.Deposit,
+      accountId: 0,
+      amount: Types.AssetAmount({
+        sign: true,
+        denomination: Types.AssetDenomination.Wei,
+        ref: Types.AssetReference.Delta,
+        value: amountToRepay // Amount to repay
+      }),
+      primaryMarketId: 0, // market ID of the WETH
+      secondaryMarketId: 0,
+      otherAddress: address(this),
+      otherAccountId: 0,
+      data: ''
+    });
+
+    Account.Info[] memory accountInfos = new Account.Info[](1);
+    accountInfos[0] = Account.Info({owner: address(this), number: 1});
+
+    console.log('Executing operations');
+
+    dydxSoloMargin.operate(accountInfos, operations);
+
+    console.log('This is called');
+  }
+
+  // Function called by DyDx after giving us the loan
+  // Note: the type of this function comes from DyDx, do not update it
+  // (even if a warning shows saying some of the parameters are unused)!
+  function callFunction(
+    address sender,
+    Account.Info memory accountInfo,
+    bytes memory data
+  ) external view {
+    console.log('Callback called by DyDx');
+
+    // Decode the passed variables from the data object
+    uint256 loanAmount = abi.decode(data, (uint256));
+
+    console.log('Received amount of WETH: %s', loanAmount);
+    console.log('Actual contract balance: %s', weth.balanceOf(address(this)));
   }
 }
