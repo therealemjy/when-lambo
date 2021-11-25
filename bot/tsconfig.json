@@ -9,7 +9,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strictPropertyInitialization": false,
-    "module": "commonjs",
+    "module": "ESNext",
     "moduleResolution": "node",
     "noImplicitReturns": true,
     "noImplicitThis": true,
