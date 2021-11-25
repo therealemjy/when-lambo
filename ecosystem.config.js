@@ -203,7 +203,7 @@ const baseOptions = {
 };
 
 const getHookDeployCommand = (envName) =>
-  `cd bot && sudo rm -R ./node_modules && npm install && sudo rm -R ./dist && npm run tsc && cd .. && pm2 start ecosystem.config.js --env ${envName}`;
+  `cd bot && npm install && rm -R ./dist && npm run tsc && pm2 start ../ecosystem.config.js --env ${envName}`;
 
 module.exports = {
   apps: [
