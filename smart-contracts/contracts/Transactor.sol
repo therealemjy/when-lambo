@@ -52,6 +52,8 @@ contract Transactor is Owner, IDyDxCallee {
   fallback() external payable {}
 
   function execute(uint256 _borrowedWethAmount) public owned {
+    console.log('Contract balance: %s', weth.balanceOf(address(this)));
+
     /*
       The first step is to initiate a Flashloan with DyDx.
 
@@ -157,7 +159,9 @@ contract Transactor is Owner, IDyDxCallee {
     // Decode the passed variables from the data object
     uint256 loanAmount = abi.decode(data, (uint256));
 
-    console.log('Received amount of WETH: %s', loanAmount);
-    console.log('Actual contract balance: %s', weth.balanceOf(address(this)));
+    console.log('Expected amount of WETH received: %s', loanAmount);
+    console.log('Contract balance: %s', weth.balanceOf(address(this)));
+
+    require(weth.balanceOf(address(this)) > loanAmount + 2, 'CANNOT REPAY LOAN');
   }
 }

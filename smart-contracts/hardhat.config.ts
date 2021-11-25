@@ -23,8 +23,8 @@ const config: HardhatUserConfig = {
     },
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
-    currency: 'USD',
+    enabled: true,
+    currency: 'ETH',
   },
   namedAccounts: {
     deployerAddress: {
