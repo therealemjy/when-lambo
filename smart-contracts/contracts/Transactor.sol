@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
+pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import './Owner.sol';
 import './interfaces/IDyDxCallee.sol';
 import './interfaces/IDyDxSoloMargin.sol';
 import './interfaces/IUniswapV2Router.sol';
+import './libraries/DyDx.sol';
 
 // TODO: remove in prod
 import 'hardhat/console.sol';
 
-contract Transactor is Owner {
+contract Transactor is Owner, IDyDxCallee {
   IERC20 private weth;
   IDyDxSoloMargin private dydxSoloMargin;
   IUniswapV2Router private uniswapV2Router;
@@ -49,7 +51,7 @@ contract Transactor is Owner {
   // Fallback function to receive ethers when msg.data is not empty
   fallback() external payable {}
 
-  function execute(uint256 _wethAmountToBorrow) public owned {
+  function execute(uint256 _borrowedWethAmount) public owned {
     /*
       The first step is to initiate a Flashloan with DyDx.
 
@@ -69,11 +71,11 @@ contract Transactor is Owner {
     */
 
     // DyDx take a fee of 2 wei to execute the flashloan
-    uint256 amountToRepay = _wethAmountToBorrow + 2;
+    uint256 repayAmount = _borrowedWethAmount + 2;
 
     // Give DyDx permission to withdraw amount to repay. This amount
     // will only be withdrawn after we've executed our trade.
-    weth.approve(address(dydxSoloMargin), amountToRepay);
+    weth.approve(address(dydxSoloMargin), repayAmount);
 
     Actions.ActionArgs[] memory operations = new Actions.ActionArgs[](3);
 
@@ -85,7 +87,7 @@ contract Transactor is Owner {
         sign: false,
         denomination: Types.AssetDenomination.Wei,
         ref: Types.AssetReference.Delta,
-        value: _wethAmountToBorrow // Amount to borrow
+        value: _borrowedWethAmount // Amount to borrow
       }),
       primaryMarketId: 0, // WETH
       secondaryMarketId: 0,
@@ -113,7 +115,7 @@ contract Transactor is Owner {
         // callFunction to execute the trade
         // Replace or add any additional variables that you want
         // to be available to the receiver function
-        _wethAmountToBorrow
+        _borrowedWethAmount
       )
     });
 
@@ -125,7 +127,7 @@ contract Transactor is Owner {
         sign: true,
         denomination: Types.AssetDenomination.Wei,
         ref: Types.AssetReference.Delta,
-        value: amountToRepay // Amount to repay
+        value: repayAmount // Amount to repay
       }),
       primaryMarketId: 0, // market ID of the WETH
       secondaryMarketId: 0,
@@ -140,8 +142,6 @@ contract Transactor is Owner {
     console.log('Executing operations');
 
     dydxSoloMargin.operate(accountInfos, operations);
-
-    console.log('This is called');
   }
 
   // Function called by DyDx after giving us the loan
@@ -151,7 +151,7 @@ contract Transactor is Owner {
     address sender,
     Account.Info memory accountInfo,
     bytes memory data
-  ) external view {
+  ) external view override {
     console.log('Callback called by DyDx');
 
     // Decode the passed variables from the data object

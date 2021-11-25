@@ -40,9 +40,7 @@ describe('Transactor', function () {
     const contractBalanceBeforeTrade = await TransactorContract.provider.getBalance(TransactorContract.address);
     console.log('Contract balance before trade: ', contractBalanceBeforeTrade.toString());
 
-    // Execute trade (borrow 100000 WETH)
-    await TransactorContract.execute(ethers.utils.parseEther('100000'));
-
-    // console.log(res.toString());
+    // Execute trade (borrow 1000 WETH)
+    await TransactorContract.execute(ethers.utils.parseEther('1000'));
   });
 });
