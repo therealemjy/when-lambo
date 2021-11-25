@@ -22,24 +22,12 @@ interface ParsedStrategy {
   STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: string;
   STRATEGY_BORROWED_INCREMENT_PERCENT: string;
 }
-
-interface Wallet {
-  address: string;
-  mnemonic: string;
-}
-
 export interface EnvConfig {
   serverId: string;
   aws: {
     mainnetWssRpcUrl: string;
     accessKeyId: string;
     secretAccessKey: string;
-  };
-  infura: {
-    ropstenHttpsRpcUrl: string;
-  };
-  wallets: {
-    ropsten: Wallet;
   };
   isDev: boolean;
   isProd: boolean;
@@ -86,15 +74,6 @@ const config: EnvConfig = {
     mainnetWssRpcUrl: env('AWS_WSS_RPC_URL'),
     accessKeyId: env('AWS_ACCESS_KEY_ID'),
     secretAccessKey: env('AWS_SECRET_ACCESS_KEY'),
-  },
-  infura: {
-    ropstenHttpsRpcUrl: env('INFURA_ROPSTEN_HTTPS_RPC_URL'),
-  },
-  wallets: {
-    ropsten: {
-      address: env('ROPSTEN_ACCOUNT_ADDRESS'),
-      mnemonic: env('ROPSTEN_ACCOUNT_PRIVATE_KEY'),
-    },
   },
   isProd: process.env.NODE_ENV === 'production',
   isDev: process.env.NODE_ENV === 'development',

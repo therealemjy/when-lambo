@@ -1,16 +1,16 @@
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 
-import config from '@src/config';
-import eventEmitter from '@src/eventEmitter';
-import logger from '@src/logger';
+import config from '@src/bootstrap/config';
+import eventEmitter from '@src/bootstrap/eventEmitter';
+import logger from '@src/bootstrap/logger';
 
 class GasPriceWatcher {
   constructor() {
     this.getPrices();
   }
 
-  public async start(interval: number) {
+  public start(interval: number) {
     logger.log('Gas price watcher started.');
     setInterval(this.getPrices, interval);
   }
