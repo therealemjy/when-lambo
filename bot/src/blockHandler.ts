@@ -1,8 +1,8 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 
+import config from './bootstrap/config';
 import eventEmitter from './bootstrap/eventEmitter';
 import logger from './bootstrap/logger';
-import config from './config';
 import findBestPaths from './findBestPaths';
 import { WETH } from './tokens';
 import { Exchange, Strategy } from './types';

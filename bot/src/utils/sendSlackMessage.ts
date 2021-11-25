@@ -1,6 +1,6 @@
 import * as https from 'https';
 
-import config from '@src/config';
+import config from '@src/bootstrap/config';
 
 const slackChannels = {
   errors: config.slackChannelsWebhooks.errors,
