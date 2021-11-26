@@ -7,6 +7,7 @@ import './Owner.sol';
 import './interfaces/IDyDxCallee.sol';
 import './interfaces/IDyDxSoloMargin.sol';
 import './interfaces/IUniswapV2Router.sol';
+import './interfaces/ISushiswapRouter.sol';
 import './libraries/DyDx.sol';
 
 // TODO: remove in prod
@@ -16,17 +17,20 @@ contract Transactor is Owner, IDyDxCallee {
   IERC20 private weth;
   IDyDxSoloMargin private dydxSoloMargin;
   IUniswapV2Router private uniswapV2Router;
+  ISushiswapRouter private sushiswapRouter;
 
   constructor(
     address _wethAddress,
     address _dydxSoloMarginAddress,
-    address _uniswapV2RouterAddress
+    address _uniswapV2RouterAddress,
+    address _sushiswapRouterAddress
   ) {
     weth = IERC20(_wethAddress);
 
     // Initialize exchange contracts
     dydxSoloMargin = IDyDxSoloMargin(_dydxSoloMarginAddress);
     uniswapV2Router = IUniswapV2Router(_uniswapV2RouterAddress);
+    sushiswapRouter = ISushiswapRouter(_sushiswapRouterAddress);
   }
 
   function getBalance(address _fromToken) public view owned returns (uint256 balance) {
@@ -166,9 +170,9 @@ contract Transactor is Owner, IDyDxCallee {
     // require(weth.balanceOf(address(this)) > repayAmount, 'Cannot repay loan');
 
     // Exchange tokens on Uniswap
-    address[] memory path = new address[](2);
-    path[0] = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address
-    path[1] = 0x0F5D2fB29fb7d3CFeE444a200298f468908cC942; // MANA address
+    address[] memory sellPath = new address[](2);
+    sellPath[0] = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address
+    sellPath[1] = 0x0F5D2fB29fb7d3CFeE444a200298f468908cC942; // MANA address
     uint256 deadline = block.timestamp + 1 days;
 
     // Allow Uniswap to withdraw the amount of WETH we want to exchange
@@ -176,12 +180,30 @@ contract Transactor is Owner, IDyDxCallee {
 
     uint256 amountReceived = uniswapV2Router.swapExactTokensForTokens(
       loanAmount,
-      601431781392274, // Random number (we'll need to set one based on the trade)
-      path,
+      6014317813922740000000, // Arbitrary number (we'll need to set one based on the trade)
+      sellPath,
       address(this),
       deadline
     )[1];
 
-    console.log('Amount received %s', amountReceived);
+    console.log('Amount received from selling: %s MANA decimals', amountReceived);
+
+    address[] memory buyPath = new address[](2);
+    buyPath[0] = 0x0F5D2fB29fb7d3CFeE444a200298f468908cC942; // MANA address
+    buyPath[1] = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address
+
+    // Allow Sushiswap to withdraw the amount of MANA we want to exchange
+    IERC20(0x0F5D2fB29fb7d3CFeE444a200298f468908cC942).approve(address(sushiswapRouter), amountReceived);
+
+    // Exchange amount received on Sushiswap
+    uint256 finalAmount = sushiswapRouter.swapExactTokensForTokens(
+      amountReceived,
+      6818466095429090000, // Arbitrary number (we'll need to set one based on the trade)
+      buyPath,
+      address(this),
+      deadline
+    )[1];
+
+    console.log('Amount received from buying: %s WETH decimals', finalAmount);
   }
 }
