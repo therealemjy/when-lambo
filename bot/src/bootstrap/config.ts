@@ -53,16 +53,17 @@ const strategyToWeiAmounts = (baseWei: string, incrementPercent: number, increme
   const middleIndex = Math.round(strategy.length / 2);
 
   strategy.forEach((_, index) => {
+    strategy[index] = new BigNumber(baseWei);
+
     // If middle value we set the base value
     if (index === middleIndex) {
-      strategy[index] = new BigNumber(baseWei);
       return;
     }
 
     const positionFromBase = index - middleIndex;
     const percent = (incrementPercent * positionFromBase) / 100 + 1;
 
-    strategy[index] = new BigNumber(baseWei).multipliedBy(percent);
+    strategy[index] = new BigNumber(strategy[index].multipliedBy(percent).toFixed(0));
   });
 
   return strategy;
