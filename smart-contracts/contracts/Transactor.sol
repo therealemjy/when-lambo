@@ -8,6 +8,7 @@ import './interfaces/IDyDxCallee.sol';
 import './interfaces/IDyDxSoloMargin.sol';
 import './interfaces/IUniswapV2Router.sol';
 import './interfaces/ISushiswapRouter.sol';
+import './interfaces/ICryptoComRouter.sol';
 import './libraries/DyDx.sol';
 
 // TODO: remove in prod
@@ -18,12 +19,14 @@ contract Transactor is Owner, IDyDxCallee {
   IDyDxSoloMargin private dydxSoloMargin;
   IUniswapV2Router private uniswapV2Router;
   ISushiswapRouter private sushiswapRouter;
+  ICryptoComRouter private cryptoComRouter;
 
   constructor(
     address _wethAddress,
     address _dydxSoloMarginAddress,
     address _uniswapV2RouterAddress,
-    address _sushiswapRouterAddress
+    address _sushiswapRouterAddress,
+    address _cryptoComRouterAddress
   ) {
     weth = IERC20(_wethAddress);
 
@@ -31,6 +34,7 @@ contract Transactor is Owner, IDyDxCallee {
     dydxSoloMargin = IDyDxSoloMargin(_dydxSoloMarginAddress);
     uniswapV2Router = IUniswapV2Router(_uniswapV2RouterAddress);
     sushiswapRouter = ISushiswapRouter(_sushiswapRouterAddress);
+    cryptoComRouter = ICryptoComRouter(_cryptoComRouterAddress);
   }
 
   function getBalance(address _fromToken) public view owned returns (uint256 balance) {
@@ -167,8 +171,6 @@ contract Transactor is Owner, IDyDxCallee {
     console.log('Expected amount of WETH received: %s', loanAmount);
     console.log('Contract balance: %s', weth.balanceOf(address(this)));
 
-    // require(weth.balanceOf(address(this)) > repayAmount, 'Cannot repay loan');
-
     // Exchange tokens on Uniswap
     address[] memory sellPath = new address[](2);
     sellPath[0] = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address
@@ -203,6 +205,19 @@ contract Transactor is Owner, IDyDxCallee {
       address(this),
       deadline
     )[1];
+
+    // IERC20(0x0F5D2fB29fb7d3CFeE444a200298f468908cC942).approve(address(cryptoComRouter), amountReceived);
+
+    // // Exchange amount received on Sushiswap
+    // uint256 finalAmount = cryptoComRouter.swapExactTokensForTokens(
+    //   amountReceived,
+    //   1, // Arbitrary number (we'll need to set one based on the trade)
+    //   buyPath,
+    //   address(this),
+    //   deadline
+    // )[1];
+
+    // require(weth.balanceOf(address(this)) > repayAmount, 'Cannot repay loan');
 
     console.log('Amount received from buying: %s WETH decimals', finalAmount);
   }
