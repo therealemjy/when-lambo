@@ -17,7 +17,7 @@ const config: HardhatUserConfig = {
       // TODO: check if we need to pass undefined once we'll deploy the contracts onto the mainnet
       forking: {
         url: process.env.MAINNET_FORKING_RPC_URL || '',
-        blockNumber: 13680260, // Juicy deal (see tests)
+        blockNumber: 13679843, // Juicy deal (see tests)
       },
     },
   },
