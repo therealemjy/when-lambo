@@ -9,7 +9,6 @@ import config from './src/bootstrap/config';
 import eventEmitter from './src/bootstrap/eventEmitter';
 import logger from './src/bootstrap/logger';
 import CryptoComExchange from './src/exchanges/cryptoCom';
-import KyberExchange from './src/exchanges/kyber';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import handleError from './src/utils/handleError';
@@ -52,13 +51,12 @@ const init = async () => {
     const uniswapV2ExchangeService = new UniswapV2Exchange();
     const sushiswapExchangeService = new SushiswapExchange();
     const cryptoComExchangeService = new CryptoComExchange();
-    const kyberExchangeService = new KyberExchange();
 
     provider.addListener(
       'block',
       blockHandler({
         multicall,
-        exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, kyberExchangeService, cryptoComExchangeService],
+        exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, cryptoComExchangeService],
       })
     );
 
