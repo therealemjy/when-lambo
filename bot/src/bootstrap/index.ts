@@ -10,6 +10,8 @@ const setupGlobalStateVariables = () => {
   global.isMonitoring = false;
   // Set to the last date the bot checked prices
   global.lastMonitoringDateTime = null;
+  global.botExecutionMonitoringTick = 0;
+  global.perfMonitoringRecords = [];
 };
 
 const server = http.createServer(function (req, res) {
@@ -56,10 +58,9 @@ export const bootstrap = async () => {
     // Register event listeners
     await registerEventListeners();
 
-    // Setup the global state
-    setupGlobalStateVariables();
-
     // Pull gas prices every 5 seconds
     gasPriceWatcher.start(5000);
+
+    setupGlobalStateVariables();
   });
 };

@@ -6,7 +6,7 @@
   "private": true,
   "main": "./dist/index.js",
   "scripts": {
-    "dev": "rm -rf ./dist && tsc && NODE_ENV=development node dist/index | ./node_modules/.bin/bunyan",
+    "dev": "rm -rf ./dist && tsc && NODE_ENV=development node --inspect dist/index | ./node_modules/.bin/bunyan",
     "start": "node ./dist/index.js",
     "tsc": "tsc",
     "lint": "eslint .",

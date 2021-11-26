@@ -10,8 +10,6 @@ const registerExecutionTime = (): void => {
     logger.log(`[PERF] - Executed in ${executionTimeMS}ms.`);
   }
 
-  if (!global.perfMonitoringRecords) global.perfMonitoringRecords = [];
-
   // Used for perf "How long on average does it take to monitor prices"
   global.perfMonitoringRecords.push(executionTimeMS);
 
