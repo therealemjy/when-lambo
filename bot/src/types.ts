@@ -17,13 +17,8 @@ export interface Strategy {
 
 export enum ExchangeName {
   UniswapV2 = 'Uniswap V2',
-  Kyber = 'Kyber',
   Sushiswap = 'Sushiswap',
-  BalancerV1 = 'Balancer V1',
-  CurveV2 = 'Curve V2',
   CryptoCom = 'Crypto.com',
-  OneInch = '1inch',
-  ZeroX = 'ZeroX',
 }
 
 export interface Deal {
