@@ -1,6 +1,5 @@
 import 'hardhat-deploy';
 import '@nomiclabs/hardhat-ethers';
-
 import * as dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 import '@nomiclabs/hardhat-etherscan';
@@ -18,7 +17,7 @@ const config: HardhatUserConfig = {
       // TODO: check if we need to pass undefined once we'll deploy the contracts onto the mainnet
       forking: {
         url: process.env.MAINNET_FORKING_RPC_URL || '',
-        blockNumber: 11095000,
+        blockNumber: 13680260, // Juicy deal (see tests)
       },
     },
   },

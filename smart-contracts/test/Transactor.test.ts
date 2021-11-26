@@ -39,6 +39,6 @@ describe('Transactor', function () {
     console.log('Contract balance before trade: ', contractBalanceBeforeTrade.toString());
 
     // Execute trade (borrow 1000 WETH)
-    await TransactorContract.execute(ethers.utils.parseEther('1000'));
+    await TransactorContract.execute(ethers.utils.parseEther('6.3'));
   });
 });

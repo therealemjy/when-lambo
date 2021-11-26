@@ -117,7 +117,8 @@ contract Transactor is Owner, IDyDxCallee {
         // callFunction to execute the trade
         // Replace or add any additional variables that you want
         // to be available to the receiver function
-        _borrowedWethAmount
+        _borrowedWethAmount,
+        repayAmount
       )
     });
 
@@ -153,15 +154,34 @@ contract Transactor is Owner, IDyDxCallee {
     address sender,
     Account.Info memory accountInfo,
     bytes memory data
-  ) external view override {
+  ) external override {
     console.log('Callback called by DyDx');
 
     // Decode the passed variables from the data object
-    uint256 loanAmount = abi.decode(data, (uint256));
+    (uint256 loanAmount, uint256 repayAmount) = abi.decode(data, (uint256, uint256));
 
     console.log('Expected amount of WETH received: %s', loanAmount);
     console.log('Contract balance: %s', weth.balanceOf(address(this)));
 
-    require(weth.balanceOf(address(this)) > loanAmount + 2, 'CANNOT REPAY LOAN');
+    // require(weth.balanceOf(address(this)) > repayAmount, 'Cannot repay loan');
+
+    // Exchange tokens on Uniswap
+    address[] memory path = new address[](2);
+    path[0] = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address
+    path[1] = 0x0F5D2fB29fb7d3CFeE444a200298f468908cC942; // MANA address
+    uint256 deadline = block.timestamp + 1 days;
+
+    // Allow Uniswap to withdraw the amount of WETH we want to exchange
+    weth.approve(address(uniswapV2Router), loanAmount);
+
+    uint256 amountReceived = uniswapV2Router.swapExactTokensForTokens(
+      loanAmount,
+      601431781392274, // Random number (we'll need to set one based on the trade)
+      path,
+      address(this),
+      deadline
+    )[1];
+
+    console.log('Amount received %s', amountReceived);
   }
 }
