@@ -5,6 +5,51 @@ import { Strategy } from '@src/types';
 
 dotenv.config();
 
+const testingCoins = [
+  {
+    TRADED_TOKEN_ADDRESS: '0x50d1c9771902476076ecfc8b2a83ad6b9355a4c9',
+    TRADED_TOKEN_SYMBOL: 'FTT',
+    TRADED_TOKEN_DECIMALS: '18',
+    STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '1300000000000000000',
+    STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+  },
+  {
+    TRADED_TOKEN_ADDRESS: '0xc18360217d8f7ab5e7c516566761ea12ce7f9d72',
+    TRADED_TOKEN_SYMBOL: 'ENS',
+    TRADED_TOKEN_DECIMALS: '18',
+    STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '1300000000000000000',
+    STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+  },
+  {
+    TRADED_TOKEN_ADDRESS: '0xbc396689893d065f41bc2c6ecbee5e0085233447',
+    TRADED_TOKEN_SYMBOL: 'PERP',
+    TRADED_TOKEN_DECIMALS: '18',
+    STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '2820000000000000000',
+    STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+  },
+  {
+    TRADED_TOKEN_ADDRESS: '0x111111111117dc0aa78b770fa6a738034120c302',
+    TRADED_TOKEN_SYMBOL: '1INCH',
+    TRADED_TOKEN_DECIMALS: '18',
+    STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '4300000000000000000',
+    STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+  },
+  {
+    TRADED_TOKEN_ADDRESS: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
+    TRADED_TOKEN_SYMBOL: 'MATIC',
+    TRADED_TOKEN_DECIMALS: '18',
+    STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '6020000000000000000',
+    STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+  },
+  {
+    TRADED_TOKEN_ADDRESS: '0xc00e94cb662c3520282e6f5717214004a7f26888',
+    TRADED_TOKEN_SYMBOL: 'COMP',
+    TRADED_TOKEN_DECIMALS: '18',
+    STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '4300000000000000000',
+    STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+  },
+];
+
 const env = (name: string): string => {
   const value = process.env[`${name}`];
 
@@ -46,7 +91,8 @@ export interface EnvConfig {
   };
 }
 
-const parsedStrategies: ParsedStrategy[] = JSON.parse(env('STRINGIFIED_STRATEGIES'));
+const parsedStrategies: ParsedStrategy[] =
+  process.env.NODE_ENV === 'development' ? testingCoins : JSON.parse(env('STRINGIFIED_STRATEGIES'));
 
 const strategyToWeiAmounts = (baseWei: string, incrementPercent: number, incrementAmount: number): BigNumber[] => {
   const strategy = Array.from(Array(incrementAmount).keys()) as unknown as BigNumber[];
