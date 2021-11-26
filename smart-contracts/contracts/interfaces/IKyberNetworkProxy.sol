@@ -10,4 +10,11 @@ interface IKyberNetworkProxy {
     IERC20 dest,
     uint256 minConversionRate
   ) external returns (uint256 destAmount);
+
+  // TODO: remove
+  function getExpectedRate(
+    IERC20 src,
+    IERC20 dest,
+    uint256 srcQty
+  ) external view returns (uint256 expectedRate, uint256 worstRate);
 }

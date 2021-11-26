@@ -174,6 +174,16 @@ contract Transactor is Owner, IDyDxCallee {
     console.log('Expected amount of WETH received: %s', loanAmount);
     console.log('Contract balance: %s', weth.balanceOf(address(this)));
 
+    // TODO: remove
+    (uint256 expectedRate, uint256 worstRate) = kyberNetworkProxy.getExpectedRate(
+      weth,
+      IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F),
+      loanAmount
+    );
+
+    console.log('expectedRate %s', expectedRate);
+    console.log('worstRate %s', worstRate);
+
     // Exchange tokens on Uniswap
 
     // Allow Kyber to withdraw the amount of WETH we want to exchange
