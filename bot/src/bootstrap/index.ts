@@ -33,6 +33,20 @@ const server = http.createServer(function (req, res) {
     res.writeHead(200);
     res.end(`Last monitoring was ${secondsElapsedSinceLastMonitoring} seconds ago`);
   }
+
+  if (req.url === '/perf' && req.method === 'GET') {
+    if (!global.perfMonitoringRecords) {
+      res.writeHead(500);
+      res.end('Monitoring not started yet');
+      return;
+    }
+
+    const sum = global.perfMonitoringRecords.reduce((a, b) => (a += b));
+    const len = global.perfMonitoringRecords.length;
+
+    res.writeHead(200);
+    res.end(`Average monitoring speed: ${sum / len}ms`);
+  }
 });
 
 export const bootstrap = async () => {

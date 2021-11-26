@@ -6,6 +6,7 @@ import logger from './bootstrap/logger';
 import findBestPaths from './findBestPaths';
 import { WETH } from './tokens';
 import { Exchange, Strategy } from './types';
+import registerExecutionTime from './utils/registerExecutionTime';
 
 const executeStrategy = async ({
   blockNumber,
@@ -42,6 +43,9 @@ const executeStrategy = async ({
 const blockHandler =
   ({ multicall, exchanges }: { multicall: Multicall; exchanges: Exchange[] }) =>
   async (blockNumber: string) => {
+    // Record time for perf monitoring
+    global.botExecutionMonitoringTick = new Date().getTime();
+
     logger.log(`New block received. Block # ${blockNumber}`);
 
     if (global.isMonitoring) {
@@ -55,10 +59,6 @@ const blockHandler =
 
     global.isMonitoring = true;
 
-    if (config.isDev) {
-      console.time('monitorPrices');
-    }
-
     // Execute all strategies simultaneously
     await Promise.all(
       config.strategies.map((strategy) =>
@@ -71,13 +71,9 @@ const blockHandler =
       )
     );
 
-    if (config.isDev) {
-      console.timeEnd('monitorPrices');
-    }
-
     // Reset monitoring status so the script doesn't stop
     global.isMonitoring = false;
-    global.lastMonitoringDateTime = new Date().getTime();
+    registerExecutionTime();
   };
 
 export default blockHandler;
