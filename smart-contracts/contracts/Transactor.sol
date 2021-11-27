@@ -55,7 +55,7 @@ contract Transactor is Owner, IDyDxCallee {
     return IERC20(_fromToken).balanceOf(address(this));
   }
 
-  function withdraw(address _token, uint256 _tokenAmount) public owned {
+  function withdrawERC20(address _token, uint256 _tokenAmount) public owned {
     IERC20(_token).transfer(address(owner), _tokenAmount);
   }
 
@@ -63,9 +63,6 @@ contract Transactor is Owner, IDyDxCallee {
   // function withdrawETH(uint256 _amount) public owned {
   //   address(owner).transfer(_amount);
   // }
-
-  // We need our contract to be able to receive ETH to repay the flashloan
-  // fee of DyDx
 
   // Function to receive ethers. Note that msg.data must be empty
   receive() external payable {}
@@ -85,7 +82,7 @@ contract Transactor is Owner, IDyDxCallee {
     uint256 _deadline
   ) public owned {
     /*
-      The first step is to initiate a Flashloan with DyDx.
+      The first step is to initiate a flashloan with DyDx.
 
       The flash loan functionality in DyDx is predicated by their "operate" function,
       which takes a list of operations to execute, and defers validating the state of
