@@ -15,6 +15,47 @@ const setup = deployments.createFixture(async () => {
 });
 
 describe('Transactor', function () {
+  describe('receive/fallback', function () {
+    it('receives transferred ETH when msg.data is empty', async function () {
+      const { TransactorContract } = await setup();
+      const { deployerAddress } = await getNamedAccounts();
+      const deployer = await ethers.getSigner(deployerAddress);
+
+      const contractBalanceBeforeTransfer = await ethers.provider.getBalance(TransactorContract.address);
+      expect(contractBalanceBeforeTransfer.toString()).to.equal('0');
+
+      const transferredEthAmount = '1000000000000000000';
+
+      await deployer.sendTransaction({
+        to: TransactorContract.address,
+        value: BigNumber.from(transferredEthAmount), // 1 ether
+      });
+
+      const contractBalanceAfterTransfer = await ethers.provider.getBalance(TransactorContract.address);
+      expect(contractBalanceAfterTransfer.toString()).to.equal(transferredEthAmount);
+    });
+
+    it('receives transferred ETH when msg.data is not empty', async function () {
+      const { TransactorContract } = await setup();
+      const { deployerAddress } = await getNamedAccounts();
+      const deployer = await ethers.getSigner(deployerAddress);
+
+      const contractBalanceBeforeTransfer = await ethers.provider.getBalance(TransactorContract.address);
+      expect(contractBalanceBeforeTransfer.toString()).to.equal('0');
+
+      const transferredEthAmount = '1000000000000000000';
+
+      await deployer.sendTransaction({
+        to: TransactorContract.address,
+        value: BigNumber.from(transferredEthAmount), // 1 ether
+        data: [1, 0, 1],
+      });
+
+      const contractBalanceAfterTransfer = await ethers.provider.getBalance(TransactorContract.address);
+      expect(contractBalanceAfterTransfer.toString()).to.equal(transferredEthAmount);
+    });
+  });
+
   describe('getBalance', function () {
     it('reverts when being called by an account that is not the owner', async function () {
       const { TransactorContract } = await setup();
@@ -76,6 +117,8 @@ describe('Transactor', function () {
       const contractBalanceAfterTrade = await TransactorContract.getBalance(WETH_MAINNET_ADDRESS);
       expect(contractBalanceAfterTrade.toString()).to.equal('587029118114948954');
     });
+
+    // TODO: test buying and selling exchanges are correctly defined
   });
 
   describe('callFunction', function () {
