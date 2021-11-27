@@ -17,7 +17,6 @@
   "dependencies": {
     "@aws/web3-ws-provider": "^1.0.3",
     "@maxime.julian/ethereum-multicall": "^3.0.0",
-    "@openzeppelin/contracts": "^4.3.3",
     "aws-sdk": "^2.1016.0",
     "axios": "^0.24.0",
     "bignumber.js": "^9.0.1",
@@ -31,8 +30,6 @@
     "google-spreadsheet": "^3.2.0",
     "module-alias": "^2.2.2",
     "serialize-error": "^8.1.0",
-    "truffle-hdwallet-provider": "^1.0.17",
-    "typed-emitter": "^1.4.0",
     "websocket": "^1.0.34"
   },
   "devDependencies": {
@@ -55,6 +52,7 @@
     "lint-staged": "^11.2.6",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.4.1",
+    "typed-emitter": "^1.4.0",
     "typescript": "^4.4.4"
   },
   "lint-staged": {

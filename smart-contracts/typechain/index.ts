@@ -2,22 +2,16 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { IERC20 } from "./IERC20";
-export type { ICryptoComRouter } from "./ICryptoComRouter";
 export type { IDyDxCallee } from "./IDyDxCallee";
 export type { IDyDxSoloMargin } from "./IDyDxSoloMargin";
-export type { IKyberNetworkProxy } from "./IKyberNetworkProxy";
-export type { ISushiswapRouter } from "./ISushiswapRouter";
 export type { IUniswapV2Router } from "./IUniswapV2Router";
 export type { Migrator } from "./Migrator";
 export type { Owner } from "./Owner";
 export type { Transactor } from "./Transactor";
 
 export { IERC20__factory } from "./factories/IERC20__factory";
-export { ICryptoComRouter__factory } from "./factories/ICryptoComRouter__factory";
 export { IDyDxCallee__factory } from "./factories/IDyDxCallee__factory";
 export { IDyDxSoloMargin__factory } from "./factories/IDyDxSoloMargin__factory";
-export { IKyberNetworkProxy__factory } from "./factories/IKyberNetworkProxy__factory";
-export { ISushiswapRouter__factory } from "./factories/ISushiswapRouter__factory";
 export { IUniswapV2Router__factory } from "./factories/IUniswapV2Router__factory";
 export { Migrator__factory } from "./factories/Migrator__factory";
 export { Owner__factory } from "./factories/Owner__factory";

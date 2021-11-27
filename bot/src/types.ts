@@ -15,10 +15,11 @@ export interface Strategy {
   };
 }
 
+// These values need to correspond to the ones used in the Transactor contract
 export enum ExchangeName {
-  UniswapV2 = 'Uniswap V2',
+  UniswapV2 = 'UniswapV2',
   Sushiswap = 'Sushiswap',
-  CryptoCom = 'Crypto.com',
+  CryptoCom = 'CryptoCom',
 }
 
 export interface Deal {
