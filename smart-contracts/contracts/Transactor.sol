@@ -73,7 +73,7 @@ contract Transactor is Owner, IDyDxCallee {
   // Fallback function to receive ethers when msg.data is not empty
   fallback() external payable {}
 
-  function execute(
+  function trade(
     uint256 _wethAmountToBorrow,
     address _tradedTokenAddress,
     uint256 _minTradedTokenAmountOut,
@@ -96,7 +96,7 @@ contract Transactor is Owner, IDyDxCallee {
       repays the loan, plus the 2 wei fee), and pass them all to "operate".
 
       Note that the Deposit operation will invoke the transferFrom to pay the loan
-      (or whatever amount it was initialised with) back to itself, there is no need
+      (or whatever amount it was initialized with) back to itself, there is no need
       to pay it back explicitly.
 
       At the moment, we only make flashloans in WETH.
@@ -188,6 +188,9 @@ contract Transactor is Owner, IDyDxCallee {
     Account.Info memory accountInfo,
     bytes memory data
   ) external override {
+    // Make sure the call comes from DyDx' solo margin contract
+    require(msg.sender == address(dydxSoloMargin), 'DyDx contract only');
+
     // TODO: add require to verify sender is the owner of the contract (?)
 
     // Decode the passed variables from the data object
@@ -237,15 +240,13 @@ contract Transactor is Owner, IDyDxCallee {
     // Allow the buying exchange to withdraw the amount of tradedToken we just received
     IERC20(tradeData.tradedTokenAddress).approve(address(buyingExchange), tradedTokenAmountReceived);
 
-    uint256 wethAmountReceived = buyingExchange.swapExactTokensForTokens(
+    buyingExchange.swapExactTokensForTokens(
       tradedTokenAmountReceived, // tradedToken amount received from selling swap
       tradeData.minWethAmountOut, // Minimum WETH amount out for this deal to be profitable
       buyingPath,
       address(this),
       tradeData.deadline
-    )[1];
-
-    require(weth.balanceOf(address(this)) > tradeData.wethAmountToRepay, 'Cannot repay loan');
+    );
 
     // After that DyDx will withdraw the amount of WETH we borrowed from them (+ 2 wei fee) and the
     // profit (in WETH) will be left on the contract

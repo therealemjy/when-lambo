@@ -22,10 +22,10 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface TransactorInterface extends ethers.utils.Interface {
   functions: {
     "callFunction(address,(address,uint256),bytes)": FunctionFragment;
-    "execute(uint256,address,uint256,uint256,uint8,uint8,uint256)": FunctionFragment;
     "getBalance(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "setOwner(address)": FunctionFragment;
+    "trade(uint256,address,uint256,uint256,uint8,uint8,uint256)": FunctionFragment;
     "withdraw(address,uint256)": FunctionFragment;
   };
 
@@ -33,8 +33,11 @@ interface TransactorInterface extends ethers.utils.Interface {
     functionFragment: "callFunction",
     values: [string, { owner: string; number: BigNumberish }, BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "getBalance", values: [string]): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "setOwner", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "execute",
+    functionFragment: "trade",
     values: [
       BigNumberish,
       string,
@@ -45,9 +48,6 @@ interface TransactorInterface extends ethers.utils.Interface {
       BigNumberish
     ]
   ): string;
-  encodeFunctionData(functionFragment: "getBalance", values: [string]): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "setOwner", values: [string]): string;
   encodeFunctionData(
     functionFragment: "withdraw",
     values: [string, BigNumberish]
@@ -57,10 +57,10 @@ interface TransactorInterface extends ethers.utils.Interface {
     functionFragment: "callFunction",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getBalance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "setOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "trade", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {};
@@ -117,17 +117,6 @@ export class Transactor extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    execute(
-      _wethAmountToBorrow: BigNumberish,
-      _tradedTokenAddress: string,
-      _minTradedTokenAmountOut: BigNumberish,
-      _minWethAmountOut: BigNumberish,
-      _sellingExchangeIndex: BigNumberish,
-      _buyingExchangeIndex: BigNumberish,
-      _deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     getBalance(
       _fromToken: string,
       overrides?: CallOverrides
@@ -137,6 +126,17 @@ export class Transactor extends BaseContract {
 
     setOwner(
       _newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    trade(
+      _wethAmountToBorrow: BigNumberish,
+      _tradedTokenAddress: string,
+      _minTradedTokenAmountOut: BigNumberish,
+      _minWethAmountOut: BigNumberish,
+      _sellingExchangeIndex: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -154,7 +154,16 @@ export class Transactor extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  execute(
+  getBalance(_fromToken: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  owner(overrides?: CallOverrides): Promise<string>;
+
+  setOwner(
+    _newOwner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  trade(
     _wethAmountToBorrow: BigNumberish,
     _tradedTokenAddress: string,
     _minTradedTokenAmountOut: BigNumberish,
@@ -162,15 +171,6 @@ export class Transactor extends BaseContract {
     _sellingExchangeIndex: BigNumberish,
     _buyingExchangeIndex: BigNumberish,
     _deadline: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  getBalance(_fromToken: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  owner(overrides?: CallOverrides): Promise<string>;
-
-  setOwner(
-    _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -188,7 +188,16 @@ export class Transactor extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    execute(
+    getBalance(
+      _fromToken: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    owner(overrides?: CallOverrides): Promise<string>;
+
+    setOwner(_newOwner: string, overrides?: CallOverrides): Promise<void>;
+
+    trade(
       _wethAmountToBorrow: BigNumberish,
       _tradedTokenAddress: string,
       _minTradedTokenAmountOut: BigNumberish,
@@ -198,15 +207,6 @@ export class Transactor extends BaseContract {
       _deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    getBalance(
-      _fromToken: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    owner(overrides?: CallOverrides): Promise<string>;
-
-    setOwner(_newOwner: string, overrides?: CallOverrides): Promise<void>;
 
     withdraw(
       _token: string,
@@ -225,17 +225,6 @@ export class Transactor extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    execute(
-      _wethAmountToBorrow: BigNumberish,
-      _tradedTokenAddress: string,
-      _minTradedTokenAmountOut: BigNumberish,
-      _minWethAmountOut: BigNumberish,
-      _sellingExchangeIndex: BigNumberish,
-      _buyingExchangeIndex: BigNumberish,
-      _deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     getBalance(
       _fromToken: string,
       overrides?: CallOverrides
@@ -245,6 +234,17 @@ export class Transactor extends BaseContract {
 
     setOwner(
       _newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    trade(
+      _wethAmountToBorrow: BigNumberish,
+      _tradedTokenAddress: string,
+      _minTradedTokenAmountOut: BigNumberish,
+      _minWethAmountOut: BigNumberish,
+      _sellingExchangeIndex: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -263,17 +263,6 @@ export class Transactor extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    execute(
-      _wethAmountToBorrow: BigNumberish,
-      _tradedTokenAddress: string,
-      _minTradedTokenAmountOut: BigNumberish,
-      _minWethAmountOut: BigNumberish,
-      _sellingExchangeIndex: BigNumberish,
-      _buyingExchangeIndex: BigNumberish,
-      _deadline: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     getBalance(
       _fromToken: string,
       overrides?: CallOverrides
@@ -283,6 +272,17 @@ export class Transactor extends BaseContract {
 
     setOwner(
       _newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    trade(
+      _wethAmountToBorrow: BigNumberish,
+      _tradedTokenAddress: string,
+      _minTradedTokenAmountOut: BigNumberish,
+      _minWethAmountOut: BigNumberish,
+      _sellingExchangeIndex: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
