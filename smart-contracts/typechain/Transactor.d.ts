@@ -22,7 +22,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface TransactorInterface extends ethers.utils.Interface {
   functions: {
     "callFunction(address,(address,uint256),bytes)": FunctionFragment;
-    "execute(uint256)": FunctionFragment;
+    "execute(uint256,address,uint256,uint256,uint8,uint8,uint256)": FunctionFragment;
     "getBalance(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "setOwner(address)": FunctionFragment;
@@ -35,7 +35,15 @@ interface TransactorInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "execute",
-    values: [BigNumberish]
+    values: [
+      BigNumberish,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(functionFragment: "getBalance", values: [string]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -110,7 +118,13 @@ export class Transactor extends BaseContract {
     ): Promise<ContractTransaction>;
 
     execute(
-      _borrowedWethAmount: BigNumberish,
+      _wethAmountToBorrow: BigNumberish,
+      _tradedTokenAddress: string,
+      _minTradedTokenAmountOut: BigNumberish,
+      _minWethAmountOut: BigNumberish,
+      _sellingExchangeIndex: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -141,7 +155,13 @@ export class Transactor extends BaseContract {
   ): Promise<ContractTransaction>;
 
   execute(
-    _borrowedWethAmount: BigNumberish,
+    _wethAmountToBorrow: BigNumberish,
+    _tradedTokenAddress: string,
+    _minTradedTokenAmountOut: BigNumberish,
+    _minWethAmountOut: BigNumberish,
+    _sellingExchangeIndex: BigNumberish,
+    _buyingExchangeIndex: BigNumberish,
+    _deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -169,7 +189,13 @@ export class Transactor extends BaseContract {
     ): Promise<void>;
 
     execute(
-      _borrowedWethAmount: BigNumberish,
+      _wethAmountToBorrow: BigNumberish,
+      _tradedTokenAddress: string,
+      _minTradedTokenAmountOut: BigNumberish,
+      _minWethAmountOut: BigNumberish,
+      _sellingExchangeIndex: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -200,7 +226,13 @@ export class Transactor extends BaseContract {
     ): Promise<BigNumber>;
 
     execute(
-      _borrowedWethAmount: BigNumberish,
+      _wethAmountToBorrow: BigNumberish,
+      _tradedTokenAddress: string,
+      _minTradedTokenAmountOut: BigNumberish,
+      _minWethAmountOut: BigNumberish,
+      _sellingExchangeIndex: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -232,7 +264,13 @@ export class Transactor extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     execute(
-      _borrowedWethAmount: BigNumberish,
+      _wethAmountToBorrow: BigNumberish,
+      _tradedTokenAddress: string,
+      _minTradedTokenAmountOut: BigNumberish,
+      _minWethAmountOut: BigNumberish,
+      _sellingExchangeIndex: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

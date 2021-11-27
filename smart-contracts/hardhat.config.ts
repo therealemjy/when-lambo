@@ -8,6 +8,8 @@ import '@typechain/hardhat';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
 
+import { profitableTestTrade } from './test/constants';
+
 dotenv.config();
 
 const config: HardhatUserConfig = {
@@ -17,7 +19,7 @@ const config: HardhatUserConfig = {
       // TODO: check if we need to pass undefined once we'll deploy the contracts onto the mainnet
       forking: {
         url: process.env.MAINNET_FORKING_RPC_URL || '',
-        blockNumber: 13679843, // Juicy deal (see tests)
+        blockNumber: profitableTestTrade.blockNumber, // Juicy deal (see tests)
       },
     },
   },

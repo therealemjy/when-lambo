@@ -7,38 +7,48 @@ import './Owner.sol';
 import './interfaces/IDyDxCallee.sol';
 import './interfaces/IDyDxSoloMargin.sol';
 import './interfaces/IUniswapV2Router.sol';
-import './interfaces/ISushiswapRouter.sol';
-import './interfaces/ICryptoComRouter.sol';
-import './interfaces/IKyberNetworkProxy.sol';
 import './libraries/DyDx.sol';
 
-// TODO: remove in prod
-import 'hardhat/console.sol';
+enum Exchange {
+  UniswapV2,
+  Sushiswap,
+  CryptoCom
+}
 
 contract Transactor is Owner, IDyDxCallee {
   IERC20 private weth;
   IDyDxSoloMargin private dydxSoloMargin;
   IUniswapV2Router private uniswapV2Router;
-  ISushiswapRouter private sushiswapRouter;
-  ICryptoComRouter private cryptoComRouter;
-  IKyberNetworkProxy private kyberNetworkProxy;
+  IUniswapV2Router private sushiswapRouter;
+  IUniswapV2Router private cryptoComRouter;
+
+  struct CallFunctionData {
+    uint256 borrowedWethAmount;
+    uint256 wethAmountToRepay;
+    address tradedTokenAddress;
+    uint256 minTradedTokenAmountOut;
+    uint256 minWethAmountOut;
+    Exchange sellingExchangeIndex;
+    Exchange buyingExchangeIndex;
+    uint256 deadline;
+  }
 
   constructor(
     address _wethAddress,
     address _dydxSoloMarginAddress,
     address _uniswapV2RouterAddress,
     address _sushiswapRouterAddress,
-    address _cryptoComRouterAddress,
-    address _kyberNetworkProxyAddress
+    address _cryptoComRouterAddress
   ) {
     weth = IERC20(_wethAddress);
 
     // Initialize exchange contracts
     dydxSoloMargin = IDyDxSoloMargin(_dydxSoloMarginAddress);
     uniswapV2Router = IUniswapV2Router(_uniswapV2RouterAddress);
-    sushiswapRouter = ISushiswapRouter(_sushiswapRouterAddress);
-    cryptoComRouter = ICryptoComRouter(_cryptoComRouterAddress);
-    kyberNetworkProxy = IKyberNetworkProxy(_kyberNetworkProxyAddress);
+    // Note: we use the same interface for SushiswapRouter and CryptoComRouter, because
+    // they are both forks of UniswapV2Router
+    sushiswapRouter = IUniswapV2Router(_sushiswapRouterAddress);
+    cryptoComRouter = IUniswapV2Router(_cryptoComRouterAddress);
   }
 
   function getBalance(address _fromToken) public view owned returns (uint256 balance) {
@@ -63,9 +73,17 @@ contract Transactor is Owner, IDyDxCallee {
   // Fallback function to receive ethers when msg.data is not empty
   fallback() external payable {}
 
-  function execute(uint256 _borrowedWethAmount) public owned {
-    console.log('Contract balance: %s', weth.balanceOf(address(this)));
-
+  function execute(
+    uint256 _wethAmountToBorrow,
+    address _tradedTokenAddress,
+    uint256 _minTradedTokenAmountOut,
+    uint256 _minWethAmountOut,
+    Exchange _sellingExchangeIndex,
+    Exchange _buyingExchangeIndex,
+    // Although the deadline does not really apply in our case since our trade is
+    // only valid for one block, we still need to provide one to the exchanges
+    uint256 _deadline
+  ) public owned {
     /*
       The first step is to initiate a Flashloan with DyDx.
 
@@ -85,11 +103,11 @@ contract Transactor is Owner, IDyDxCallee {
     */
 
     // DyDx take a fee of 2 wei to execute the flashloan
-    uint256 repayAmount = _borrowedWethAmount + 2;
+    uint256 wethAmountToRepay = _wethAmountToBorrow + 2;
 
     // Give DyDx permission to withdraw amount to repay. This amount
     // will only be withdrawn after we've executed our trade.
-    weth.approve(address(dydxSoloMargin), repayAmount);
+    weth.approve(address(dydxSoloMargin), wethAmountToRepay);
 
     Actions.ActionArgs[] memory operations = new Actions.ActionArgs[](3);
 
@@ -101,7 +119,7 @@ contract Transactor is Owner, IDyDxCallee {
         sign: false,
         denomination: Types.AssetDenomination.Wei,
         ref: Types.AssetReference.Delta,
-        value: _borrowedWethAmount // Amount to borrow
+        value: _wethAmountToBorrow // Amount to borrow
       }),
       primaryMarketId: 0, // WETH
       secondaryMarketId: 0,
@@ -125,11 +143,17 @@ contract Transactor is Owner, IDyDxCallee {
       otherAddress: address(this),
       otherAccountId: 0,
       data: abi.encode(
-        // TODO: add any relevant data that needs to be sent to
-        // callFunction to execute the trade
-        // Replace or add any additional variables that you want
-        // to be available to the receiver function
-        _borrowedWethAmount
+        // These parameters will be passed to callFunction
+        CallFunctionData({
+          borrowedWethAmount: _wethAmountToBorrow,
+          wethAmountToRepay: wethAmountToRepay,
+          tradedTokenAddress: _tradedTokenAddress,
+          minTradedTokenAmountOut: _minTradedTokenAmountOut,
+          minWethAmountOut: _minWethAmountOut,
+          sellingExchangeIndex: _sellingExchangeIndex,
+          buyingExchangeIndex: _buyingExchangeIndex,
+          deadline: _deadline
+        })
       )
     });
 
@@ -141,9 +165,9 @@ contract Transactor is Owner, IDyDxCallee {
         sign: true,
         denomination: Types.AssetDenomination.Wei,
         ref: Types.AssetReference.Delta,
-        value: repayAmount // Amount to repay
+        value: wethAmountToRepay
       }),
-      primaryMarketId: 0, // market ID of the WETH
+      primaryMarketId: 0, // Market ID of the WETH
       secondaryMarketId: 0,
       otherAddress: address(this),
       otherAccountId: 0,
@@ -152,8 +176,6 @@ contract Transactor is Owner, IDyDxCallee {
 
     Account.Info[] memory accountInfos = new Account.Info[](1);
     accountInfos[0] = Account.Info({owner: address(this), number: 1});
-
-    console.log('Executing operations');
 
     dydxSoloMargin.operate(accountInfos, operations);
   }
@@ -166,86 +188,68 @@ contract Transactor is Owner, IDyDxCallee {
     Account.Info memory accountInfo,
     bytes memory data
   ) external override {
-    console.log('Callback called by DyDx');
+    // TODO: add require to verify sender is the owner of the contract (?)
 
     // Decode the passed variables from the data object
-    uint256 loanAmount = abi.decode(data, (uint256));
+    CallFunctionData memory tradeData = abi.decode(data, (CallFunctionData));
 
-    console.log('Expected amount of WETH received: %s', loanAmount);
-    console.log('Contract balance: %s', weth.balanceOf(address(this)));
+    // Define selling and buying exchanges based on passed sellingExchangeIndex and buyingExchangeIndex
+    // Note: we can use single variables that contain the selling and buying exchanges because
+    // currently all our exchanges share the same interface (UniswapV2Router). This logic will need to
+    // be updated once we support non-Uniswap like exchanges.
+    IUniswapV2Router sellingExchange = uniswapV2Router;
 
-    // TODO: remove
-    (uint256 expectedRate, uint256 worstRate) = kyberNetworkProxy.getExpectedRate(
-      weth,
-      IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F),
-      loanAmount
-    );
+    if (tradeData.sellingExchangeIndex == Exchange.Sushiswap) {
+      sellingExchange = sushiswapRouter;
+    } else if (tradeData.sellingExchangeIndex == Exchange.CryptoCom) {
+      sellingExchange = cryptoComRouter;
+    }
 
-    console.log('expectedRate %s', expectedRate);
-    console.log('worstRate %s', worstRate);
+    IUniswapV2Router buyingExchange = uniswapV2Router;
 
-    // Exchange tokens on Uniswap
+    if (tradeData.buyingExchangeIndex == Exchange.Sushiswap) {
+      buyingExchange = sushiswapRouter;
+    } else if (tradeData.buyingExchangeIndex == Exchange.CryptoCom) {
+      buyingExchange = cryptoComRouter;
+    }
 
-    // Allow Kyber to withdraw the amount of WETH we want to exchange
-    weth.approve(address(kyberNetworkProxy), loanAmount);
+    // Allow the selling exchange to withdraw the amount of WETH we want to exchange
+    weth.approve(address(sellingExchange), tradeData.borrowedWethAmount);
 
-    // TODO: define minConversionRate
-    uint256 minConversionRate = 1;
-    uint256 amountReceived = kyberNetworkProxy.swapTokenToToken(
-      weth,
-      loanAmount,
-      IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F), // DAI
-      minConversionRate
-    );
+    // Swap all the borrowed WETH to tradedToken
+    address[] memory sellingPath = new address[](2);
+    sellingPath[0] = address(weth);
+    sellingPath[1] = tradeData.tradedTokenAddress;
 
-    console.log('Amount received from selling: %s DAI decimals', amountReceived);
-
-    // Exchange tokens on Uniswap
-    address[] memory buyPath = new address[](2);
-    buyPath[0] = 0x6B175474E89094C44Da98b954EedeAC495271d0F; // DAI address
-    buyPath[1] = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address
-    uint256 deadline = block.timestamp + 1 days;
-
-    // Allow Uniswap to withdraw the amount of WETH we want to exchange
-    weth.approve(address(uniswapV2Router), amountReceived);
-
-    uint256 finalAmount = uniswapV2Router.swapExactTokensForTokens(
-      amountReceived,
-      40200508545589900000, // Arbitrary number (we'll need to set one based on the trade)
-      buyPath,
+    uint256 tradedTokenAmountReceived = sellingExchange.swapExactTokensForTokens(
+      tradeData.borrowedWethAmount, // WETH amount in
+      tradeData.minTradedTokenAmountOut, // Minimum tradedToken amount out for this deal to be profitable
+      sellingPath,
       address(this),
-      deadline
+      tradeData.deadline
     )[1];
 
-    // address[] memory buyPath = new address[](2);
-    // buyPath[0] = 0x6B175474E89094C44Da98b954EedeAC495271d0F; // DAI address
-    // buyPath[1] = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address
+    // Swap tradedToken amount received back to WETH
+    address[] memory buyingPath = new address[](2);
+    buyingPath[0] = tradeData.tradedTokenAddress;
+    buyingPath[1] = address(weth);
 
-    //   // Allow Sushiswap to withdraw the amount of MANA we want to exchange
-    //   IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F).approve(address(sushiswapRouter), amountReceived);
+    // Allow the buying exchange to withdraw the amount of tradedToken we just received
+    IERC20(tradeData.tradedTokenAddress).approve(address(buyingExchange), tradedTokenAmountReceived);
 
-    //   // Exchange amount received on Sushiswap
-    //   uint256 finalAmount = sushiswapRouter.swapExactTokensForTokens(
-    //     amountReceived,
-    //     6818466095429090000, // Arbitrary number (we'll need to set one based on the trade)
-    //     buyPath,
-    //     address(this),
-    //     deadline
-    //   )[1];
+    uint256 wethAmountReceived = buyingExchange.swapExactTokensForTokens(
+      tradedTokenAmountReceived, // tradedToken amount received from selling swap
+      tradeData.minWethAmountOut, // Minimum WETH amount out for this deal to be profitable
+      buyingPath,
+      address(this),
+      tradeData.deadline
+    )[1];
 
-    // IERC20(0x0F5D2fB29fb7d3CFeE444a200298f468908cC942).approve(address(cryptoComRouter), amountReceived);
+    require(weth.balanceOf(address(this)) > tradeData.wethAmountToRepay, 'Cannot repay loan');
 
-    // // Exchange amount received on Sushiswap
-    // uint256 finalAmount = cryptoComRouter.swapExactTokensForTokens(
-    //   amountReceived,
-    //   1, // Arbitrary number (we'll need to set one based on the trade)
-    //   buyPath,
-    //   address(this),
-    //   deadline
-    // )[1];
+    // After that DyDx will withdraw the amount of WETH we borrowed from them (+ 2 wei fee) and the
+    // profit (in WETH) will be left on the contract
 
-    // require(weth.balanceOf(address(this)) > repayAmount, 'Cannot repay loan');
-
-    console.log('Amount received from buying: %s WETH decimals', finalAmount);
+    // TODO: send event
   }
 }

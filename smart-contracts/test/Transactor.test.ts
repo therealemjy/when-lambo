@@ -1,9 +1,11 @@
 import { expect } from 'chai';
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
+import { BigNumber } from 'ethers';
 
 import { Transactor as ITransactorContract } from '../typechain';
 
-const WETH_CONTRACT_MAINNET_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
+import { WETH_MAINNET_ADDRESS } from '../constants';
+import { profitableTestTrade } from './constants';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);
@@ -18,27 +20,39 @@ describe('Transactor', function () {
       const { TransactorContract } = await setup();
       const { deployerAddress, externalUserAddress } = await getNamedAccounts();
 
-      await expect(
-        TransactorContract.connect(externalUserAddress).getBalance(WETH_CONTRACT_MAINNET_ADDRESS)
-      ).to.be.revertedWith('Owner only');
+      await expect(TransactorContract.connect(externalUserAddress).getBalance(WETH_MAINNET_ADDRESS)).to.be.revertedWith(
+        'Owner only'
+      );
       expect(await TransactorContract.owner()).to.equal(deployerAddress);
     });
 
     it('returns the current balance of the contract for the given token address, when called by the owner', async function () {
       const { TransactorContract } = await setup();
 
-      const contractBalance = await TransactorContract.getBalance(WETH_CONTRACT_MAINNET_ADDRESS);
+      const contractBalance = await TransactorContract.getBalance(WETH_MAINNET_ADDRESS);
       expect(contractBalance.toString()).to.equal('0');
     });
   });
 
-  it('should execute fake trade', async function () {
+  it('should execute trade and yield expected profit', async function () {
     const { TransactorContract } = await setup();
 
-    const contractBalanceBeforeTrade = await TransactorContract.provider.getBalance(TransactorContract.address);
-    console.log('Contract balance before trade: ', contractBalanceBeforeTrade.toString());
+    // Assert we start with an empty balance on the contract
+    const contractBalanceBeforeTrade = await TransactorContract.getBalance(WETH_MAINNET_ADDRESS);
+    expect(contractBalanceBeforeTrade.toString()).to.equal('0');
 
-    // Execute trade (borrow 1000 WETH)
-    await TransactorContract.execute(ethers.utils.parseEther('40'));
+    // Execute trade
+    await TransactorContract.execute(
+      profitableTestTrade.wethAmountToBorrow,
+      profitableTestTrade.tradedTokenAddress,
+      profitableTestTrade.minTradedTokenAmountOut,
+      profitableTestTrade.minWethAmountOut,
+      profitableTestTrade.sellingExchangeIndex,
+      profitableTestTrade.buyingExchangeIndex,
+      BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline 2 minutes fro now
+    );
+
+    const contractBalanceAfterTrade = await TransactorContract.getBalance(WETH_MAINNET_ADDRESS);
+    expect(contractBalanceAfterTrade.toString()).to.equal('587029118114948954');
   });
 });
