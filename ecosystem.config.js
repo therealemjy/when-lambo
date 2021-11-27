@@ -271,7 +271,7 @@ const strategy6 = [
 const baseEnvs = {
   NODE_ENV: "production",
   AWS_WSS_RPC_URL:
-    "wss://nd-omssuug64ravhkl6euczd7ixwq.wss.ethereum.managedblockchain.us-east-1.amazonaws.com",
+    "wss://nd-c3zx7bgowjbjtbax6euf4cl4fu.wss.ethereum.managedblockchain.us-east-1.amazonaws.com",
   AWS_ACCESS_KEY_ID: "AKIA2R3ZISIADD4WZMV7",
   AWS_SECRET_ACCESS_KEY: "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",
   SLACK_HOOK_URL_DEALS:
