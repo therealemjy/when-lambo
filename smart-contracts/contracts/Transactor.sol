@@ -74,6 +74,7 @@ contract Transactor is Owner, IDyDxCallee {
   }
 
   function transferETH(uint256 _amount, address payable _to) external owned {
+    // solhint-disable-next-line avoid-low-level-calls
     (bool success, ) = _to.call{value: _amount}('');
     require(success, 'Transfer failed');
   }
