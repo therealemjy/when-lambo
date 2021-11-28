@@ -22,6 +22,15 @@ contract Transactor is Owner, IDyDxCallee {
   IUniswapV2Router private sushiswapRouter;
   IUniswapV2Router private cryptoComRouter;
 
+  event SuccessfulTrade(
+    uint256 borrowedWethAmount,
+    Exchange sellingExchangeIndex,
+    uint256 tradedTokenAddress,
+    uint256 tradedTokenAmountOut,
+    Exchange buyingExchangeIndex,
+    uint256 wethAmountOut
+  );
+
   struct CallFunctionData {
     uint256 borrowedWethAmount;
     uint256 wethAmountToRepay;
@@ -196,7 +205,7 @@ contract Transactor is Owner, IDyDxCallee {
     bytes memory data
   ) external override {
     // Make sure the call comes from DyDx' solo margin contract
-    require(msg.sender == address(dydxSoloMargin), 'DyDx contract only');
+    assert(msg.sender == address(dydxSoloMargin));
 
     // TODO: add require to verify sender is an address we expect (?)
 

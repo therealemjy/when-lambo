@@ -283,7 +283,7 @@ describe('Transactor', function () {
 
       await expect(
         TransactorContract.callFunction(deployerAddress, { owner: deployerAddress, number: BigNumber.from('1') }, [])
-      ).to.be.revertedWith('DyDx contract only');
+      ).to.be.revertedWith('VM Exception while processing transaction: reverted with panic code 0x1 (Assertion error)');
     });
   });
 });
