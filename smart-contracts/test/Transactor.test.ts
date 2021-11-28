@@ -279,12 +279,6 @@ describe('Transactor', function () {
           profitableTestTrade.expectedExactWethAmountOut
         );
 
-      //     uint256 borrowedWethAmount,
-      // Exchange sellingExchangeIndex,
-      // uint256 tradedTokenAmountOut,
-      // Exchange buyingExchangeIndex,
-      // uint256 wethAmountOut
-
       // Check it sent a SuccessfulTrade event
 
       // Check the contract keeps the expected profit
