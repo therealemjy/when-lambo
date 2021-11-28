@@ -307,6 +307,7 @@ module.exports = {
       script: "./dist/index.js",
       wait_ready: false,
       watch: false,
+      node_args: "--max-old-space-size=1024",
       env_one: {
         ...baseEnvs,
         SERVER_ID: 1,
