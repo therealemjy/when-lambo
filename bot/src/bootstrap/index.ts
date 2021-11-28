@@ -1,6 +1,7 @@
 import http from 'http';
 
 import { registerEventListeners } from './eventEmitter/registerEvents';
+import fetchSecrets from './fetchSecrets';
 import gasPriceWatcher from './gasPriceWatcher';
 import logger from './logger';
 
@@ -54,6 +55,9 @@ const server = http.createServer(function (req, res) {
 export const bootstrap = async () => {
   server.listen(3000, async () => {
     logger.log('Server started running on port 3000');
+
+    // Get secrets
+    await fetchSecrets();
 
     // Register event listeners
     await registerEventListeners();
