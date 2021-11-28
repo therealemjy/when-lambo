@@ -9,6 +9,8 @@ import './interfaces/IDyDxSoloMargin.sol';
 import './interfaces/IUniswapV2Router.sol';
 import './libraries/DyDx.sol';
 
+import 'hardhat/console.sol';
+
 enum Exchange {
   UniswapV2,
   Sushiswap,
@@ -23,9 +25,9 @@ contract Transactor is Owner, IDyDxCallee {
   IUniswapV2Router private cryptoComRouter;
 
   event SuccessfulTrade(
+    address indexed tradedTokenAddress,
     uint256 borrowedWethAmount,
     Exchange sellingExchangeIndex,
-    uint256 tradedTokenAddress,
     uint256 tradedTokenAmountOut,
     Exchange buyingExchangeIndex,
     uint256 wethAmountOut
@@ -33,7 +35,6 @@ contract Transactor is Owner, IDyDxCallee {
 
   struct CallFunctionData {
     uint256 borrowedWethAmount;
-    uint256 wethAmountToRepay;
     address tradedTokenAddress;
     uint256 minTradedTokenAmountOut;
     uint256 minWethAmountOut;
@@ -161,7 +162,6 @@ contract Transactor is Owner, IDyDxCallee {
         // These parameters will be passed to callFunction
         CallFunctionData({
           borrowedWethAmount: _wethAmountToBorrow,
-          wethAmountToRepay: wethAmountToRepay,
           tradedTokenAddress: _tradedTokenAddress,
           minTradedTokenAmountOut: _minTradedTokenAmountOut,
           minWethAmountOut: _minWethAmountOut,
@@ -198,7 +198,7 @@ contract Transactor is Owner, IDyDxCallee {
   // Function called by DyDx after giving us the loan
   // Note: the type of this function comes from DyDx, do not update it
   // (even if a warning shows saying some of the parameters are unused)!
-  // Also, its name has to be callFunction.
+  // Also, its name has to be callFunction.g
   function callFunction(
     address sender,
     Account.Info memory accountInfo,
@@ -240,7 +240,7 @@ contract Transactor is Owner, IDyDxCallee {
     sellingPath[0] = address(weth);
     sellingPath[1] = tradeData.tradedTokenAddress;
 
-    uint256 tradedTokenAmountReceived = sellingExchange.swapExactTokensForTokens(
+    uint256 tradedTokenAmountOut = sellingExchange.swapExactTokensForTokens(
       tradeData.borrowedWethAmount, // WETH amount in
       tradeData.minTradedTokenAmountOut, // Minimum tradedToken amount out for this deal to be profitable
       sellingPath,
@@ -254,19 +254,26 @@ contract Transactor is Owner, IDyDxCallee {
     buyingPath[1] = address(weth);
 
     // Allow the buying exchange to withdraw the amount of tradedToken we just received
-    IERC20(tradeData.tradedTokenAddress).approve(address(buyingExchange), tradedTokenAmountReceived);
+    IERC20(tradeData.tradedTokenAddress).approve(address(buyingExchange), tradedTokenAmountOut);
 
-    buyingExchange.swapExactTokensForTokens(
-      tradedTokenAmountReceived, // tradedToken amount received from selling swap
+    uint256 wethAmountOut = buyingExchange.swapExactTokensForTokens(
+      tradedTokenAmountOut, // tradedToken amount received from selling swap
       tradeData.minWethAmountOut, // Minimum WETH amount out for this deal to be profitable
       buyingPath,
       address(this),
       tradeData.deadline
+    )[1];
+
+    emit SuccessfulTrade(
+      tradeData.tradedTokenAddress,
+      tradeData.borrowedWethAmount,
+      tradeData.sellingExchangeIndex,
+      tradedTokenAmountOut,
+      tradeData.buyingExchangeIndex,
+      wethAmountOut
     );
 
     // After that DyDx will withdraw the amount of WETH we borrowed from them (+ 2 wei fee) and the
     // profit (in WETH) will be left on the contract
-
-    // TODO: send event
   }
 }

@@ -247,7 +247,7 @@ describe('Transactor', function () {
       ).to.be.revertedWith('Owner only');
     });
 
-    it('should execute trade and keep profit on the contract', async function () {
+    it('should execute trade, keeping the profit on the contract and sending a SuccessfulTrade event', async function () {
       const { TransactorContract } = await setup();
       const { deployerAddress } = await getNamedAccounts();
       const deployer = await ethers.getSigner(deployerAddress);
@@ -258,15 +258,34 @@ describe('Transactor', function () {
       expect(transactorContractBalanceBeforeTransfer.toString()).to.equal('0');
 
       // Execute trade
-      await TransactorContract.trade(
-        profitableTestTrade.wethAmountToBorrow,
-        profitableTestTrade.sellingExchangeIndex,
-        profitableTestTrade.minWethAmountOut,
-        profitableTestTrade.buyingExchangeIndex,
-        profitableTestTrade.tradedTokenAddress,
-        profitableTestTrade.minTradedTokenAmountOut,
-        BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
-      );
+      await expect(
+        TransactorContract.trade(
+          profitableTestTrade.wethAmountToBorrow,
+          profitableTestTrade.sellingExchangeIndex,
+          profitableTestTrade.minWethAmountOut,
+          profitableTestTrade.buyingExchangeIndex,
+          profitableTestTrade.tradedTokenAddress,
+          profitableTestTrade.minTradedTokenAmountOut,
+          BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
+        )
+      )
+        .to.emit(TransactorContract, 'SuccessfulTrade')
+        .withArgs(
+          profitableTestTrade.tradedTokenAddress,
+          profitableTestTrade.wethAmountToBorrow,
+          profitableTestTrade.sellingExchangeIndex,
+          profitableTestTrade.expectedExactTradedTokenAmountOut,
+          profitableTestTrade.buyingExchangeIndex,
+          profitableTestTrade.expectedExactWethAmountOut
+        );
+
+      //     uint256 borrowedWethAmount,
+      // Exchange sellingExchangeIndex,
+      // uint256 tradedTokenAmountOut,
+      // Exchange buyingExchangeIndex,
+      // uint256 wethAmountOut
+
+      // Check it sent a SuccessfulTrade event
 
       // Check the contract keeps the expected profit
       const transactorContractBalanceAfterTrade = await wethContract.balanceOf(TransactorContract.address);
