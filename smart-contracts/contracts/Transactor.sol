@@ -51,11 +51,7 @@ contract Transactor is Owner, IDyDxCallee {
     cryptoComRouter = IUniswapV2Router(_cryptoComRouterAddress);
   }
 
-  function getERC20Balance(address _token) external view owned returns (uint256 balance) {
-    return IERC20(_token).balanceOf(address(this));
-  }
-
-  function withdrawERC20(
+  function transferERC20(
     address _token,
     uint256 _amount,
     address _to
@@ -63,7 +59,7 @@ contract Transactor is Owner, IDyDxCallee {
     IERC20(_token).transfer(_to, _amount);
   }
 
-  function withdrawETH(uint256 _amount, address payable _to) external owned {
+  function transferETH(uint256 _amount, address payable _to) external owned {
     (bool success, ) = _to.call{value: _amount}('');
     require(success, 'Withdrawal failed');
   }
@@ -75,6 +71,7 @@ contract Transactor is Owner, IDyDxCallee {
   fallback() external payable {}
 
   function trade(
+    // TODO: re-order list
     uint256 _wethAmountToBorrow,
     address _tradedTokenAddress,
     uint256 _minTradedTokenAmountOut,

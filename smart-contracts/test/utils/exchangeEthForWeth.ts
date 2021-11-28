@@ -1,12 +1,10 @@
-import { ethers } from 'hardhat';
 import { Signer, BigNumber } from 'ethers';
 
-import wethAbi from './wethAbi.json';
-import { WETH_MAINNET_ADDRESS } from '../../../constants';
+import getWethContract from './getWethContract';
 
 const exchangeEthForWeth = async (signer: Signer, ethAmount: BigNumber, toAddress: string) => {
   // Get contract
-  const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, signer);
+  const wethContract = getWethContract(signer);
 
   // Wrap ETH and receive the WETH on the signer account
   const { value } = await wethContract.deposit({ value: ethAmount });
