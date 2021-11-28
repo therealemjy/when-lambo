@@ -51,6 +51,20 @@ contract Transactor is Owner, IDyDxCallee {
     cryptoComRouter = IUniswapV2Router(_cryptoComRouterAddress);
   }
 
+  function destruct(address payable _to) external owned {
+    // Transfer WETH left on the contract to the provided address
+    uint256 wethBalance = weth.balanceOf(address(this));
+    weth.transfer(_to, wethBalance);
+
+    selfdestruct(_to);
+  }
+
+  // Function to receive ethers when msg.data is empty
+  receive() external payable {}
+
+  // Fallback function to receive ethers when msg.data is not empty
+  fallback() external payable {}
+
   function transferERC20(
     address _token,
     uint256 _amount,
@@ -64,20 +78,13 @@ contract Transactor is Owner, IDyDxCallee {
     require(success, 'Transfer failed');
   }
 
-  // Function to receive ethers. Note that msg.data must be empty
-  receive() external payable {}
-
-  // Fallback function to receive ethers when msg.data is not empty
-  fallback() external payable {}
-
   function trade(
-    // TODO: re-order list
     uint256 _wethAmountToBorrow,
+    Exchange _sellingExchangeIndex,
+    uint256 _minWethAmountOut,
+    Exchange _buyingExchangeIndex,
     address _tradedTokenAddress,
     uint256 _minTradedTokenAmountOut,
-    uint256 _minWethAmountOut,
-    Exchange _sellingExchangeIndex,
-    Exchange _buyingExchangeIndex,
     // Although the deadline does not really apply in our case since our trade is
     // only valid for one block, we still need to provide one to the exchanges
     uint256 _deadline
@@ -190,7 +197,7 @@ contract Transactor is Owner, IDyDxCallee {
     // Make sure the call comes from DyDx' solo margin contract
     require(msg.sender == address(dydxSoloMargin), 'DyDx contract only');
 
-    // TODO: add require to verify sender is the owner of the contract (?)
+    // TODO: add require to verify sender is an address we expect (?)
 
     // Decode the passed variables from the data object
     CallFunctionData memory tradeData = abi.decode(data, (CallFunctionData));
