@@ -298,7 +298,7 @@ const baseOptions = {
 };
 
 const getHookDeployCommand = (envName) =>
-  `cd bot && if [ -d node_modules ]; then rm -rf node_modules; fi && npm install && if [ -d dist ]; then rm -rf dist; fi && npm run tsc && pm2 start ../ecosystem.config.js --env ${envName}`;
+  `cd bot && if [ -d node_modules ]; then rm -rf node_modules; fi && npm install && pm2 start ../ecosystem.config.js --env ${envName}`;
 
 module.exports = {
   apps: [
@@ -307,7 +307,6 @@ module.exports = {
       script: "./dist/index.js",
       wait_ready: false,
       watch: false,
-      node_args: "--max-old-space-size=1024",
       env_one: {
         ...baseEnvs,
         SERVER_ID: 1,
