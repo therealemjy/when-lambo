@@ -51,18 +51,22 @@ contract Transactor is Owner, IDyDxCallee {
     cryptoComRouter = IUniswapV2Router(_cryptoComRouterAddress);
   }
 
-  function getBalance(address _fromToken) public view owned returns (uint256 balance) {
-    return IERC20(_fromToken).balanceOf(address(this));
+  function getERC20Balance(address _token) external view owned returns (uint256 balance) {
+    return IERC20(_token).balanceOf(address(this));
   }
 
-  function withdrawERC20(address _token, uint256 _tokenAmount) public owned {
-    IERC20(_token).transfer(address(owner), _tokenAmount);
+  function withdrawERC20(
+    address _token,
+    uint256 _amount,
+    address _to
+  ) external owned {
+    IERC20(_token).transfer(_to, _amount);
   }
 
-  // TODO: update
-  // function withdrawETH(uint256 _amount) public owned {
-  //   address(owner).transfer(_amount);
-  // }
+  function withdrawETH(uint256 _amount, address payable _to) external owned {
+    (bool success, ) = _to.call{value: _amount}('');
+    require(success, 'Withdrawal failed');
+  }
 
   // Function to receive ethers. Note that msg.data must be empty
   receive() external payable {}
@@ -80,7 +84,7 @@ contract Transactor is Owner, IDyDxCallee {
     // Although the deadline does not really apply in our case since our trade is
     // only valid for one block, we still need to provide one to the exchanges
     uint256 _deadline
-  ) public owned {
+  ) external owned {
     /*
       The first step is to initiate a flashloan with DyDx.
 

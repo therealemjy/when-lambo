@@ -6,6 +6,7 @@ import { Transactor as ITransactorContract } from '../typechain';
 
 import { WETH_MAINNET_ADDRESS } from '../constants';
 import { profitableTestTrade } from './constants';
+import exchangeEthForWeth from './utils/exchangeEthForWeth';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);
@@ -56,13 +57,13 @@ describe('Transactor', function () {
     });
   });
 
-  describe('getBalance', function () {
+  describe('getERC20Balance', function () {
     it('reverts when being called by an account that is not the owner', async function () {
       const { TransactorContract } = await setup();
       const { deployerAddress, externalUserAddress } = await getNamedAccounts();
       const externalUser = await ethers.getSigner(externalUserAddress);
 
-      await expect(TransactorContract.connect(externalUser).getBalance(WETH_MAINNET_ADDRESS)).to.be.revertedWith(
+      await expect(TransactorContract.connect(externalUser).getERC20Balance(WETH_MAINNET_ADDRESS)).to.be.revertedWith(
         'Owner only'
       );
       expect(await TransactorContract.owner()).to.equal(deployerAddress);
@@ -70,9 +71,18 @@ describe('Transactor', function () {
 
     it('returns the current balance of the contract for the given token address, when called by the owner', async function () {
       const { TransactorContract } = await setup();
+      const { deployerAddress } = await getNamedAccounts();
+      const deployer = await ethers.getSigner(deployerAddress);
 
-      const contractBalance = await TransactorContract.getBalance(WETH_MAINNET_ADDRESS);
-      expect(contractBalance.toString()).to.equal('0');
+      const contractBalanceBeforeTransfer = await TransactorContract.getERC20Balance(WETH_MAINNET_ADDRESS);
+      expect(contractBalanceBeforeTransfer.toString()).to.equal('0');
+
+      // Transfer WETH to the contract
+      const ethTransferred = '10000000000000000000'; // 10 ether
+      await exchangeEthForWeth(deployer, ethers.BigNumber.from(ethTransferred), TransactorContract.address);
+
+      const contractBalanceAfterTransfer = await TransactorContract.getERC20Balance(WETH_MAINNET_ADDRESS);
+      expect(contractBalanceAfterTransfer.toString()).to.equal(ethTransferred);
     });
   });
 
@@ -99,7 +109,7 @@ describe('Transactor', function () {
       const { TransactorContract } = await setup();
 
       // Assert we start with an empty balance on the contract
-      const contractBalanceBeforeTrade = await TransactorContract.getBalance(WETH_MAINNET_ADDRESS);
+      const contractBalanceBeforeTrade = await TransactorContract.getERC20Balance(WETH_MAINNET_ADDRESS);
       expect(contractBalanceBeforeTrade.toString()).to.equal('0');
 
       // Execute trade
@@ -114,7 +124,7 @@ describe('Transactor', function () {
       );
 
       // Assert the contract keeps the expected profit
-      const contractBalanceAfterTrade = await TransactorContract.getBalance(WETH_MAINNET_ADDRESS);
+      const contractBalanceAfterTrade = await TransactorContract.getERC20Balance(WETH_MAINNET_ADDRESS);
       expect(contractBalanceAfterTrade.toString()).to.equal('587029118114948954');
     });
 
