@@ -78,10 +78,8 @@ describe('Transactor', function () {
       const { deployerAddress, externalUserAddress } = await getNamedAccounts();
       const deployer = await ethers.getSigner(deployerAddress);
 
-      // Assert external user's WETH balance is 0
       const wethContract = getWethContract(deployer);
       const externalUserBalanceBeforeTransfer = await wethContract.balanceOf(deployerAddress);
-      expect(externalUserBalanceBeforeTransfer.toString()).to.equal('0');
 
       // Assert contract's WETH balance is 0
       const transactorContractBalanceBeforeTransfer = await wethContract.balanceOf(TransactorContract.address);
@@ -91,11 +89,74 @@ describe('Transactor', function () {
       const wethTransferred = ONE_WETH;
       await exchangeEthForWeth(deployer, ethers.BigNumber.from(wethTransferred), TransactorContract.address);
 
-      // Transfer 1 WETH from the contract to external user
+      // Assert contract received the WETH
+      const transactorContractBalance = await wethContract.balanceOf(TransactorContract.address);
+      expect(transactorContractBalance.toString()).to.equal(wethTransferred);
+
+      // Transfer 1 WETH from the contract to a user who's not the owner of the contract
       await TransactorContract.transferERC20(WETH_MAINNET_ADDRESS, ONE_WETH, externalUserAddress);
 
+      // Assert user received the WETH
       const externalUserBalanceAfterTransfer = await wethContract.balanceOf(externalUserAddress);
-      expect(externalUserBalanceAfterTransfer.toString()).to.equal(wethTransferred);
+      expect(externalUserBalanceAfterTransfer.sub(externalUserBalanceBeforeTransfer).toString()).to.equal(
+        wethTransferred
+      );
+
+      // Assert contract WETH balance is back to 0
+      const transactorContractBalanceAfterTransfer = await wethContract.balanceOf(TransactorContract.address);
+      expect(transactorContractBalanceAfterTransfer.toString()).to.equal('0');
+    });
+  });
+
+  describe('transferETH', function () {
+    it('reverts when being called by an account that is not the owner', async function () {
+      const { TransactorContract } = await setup();
+      const { deployerAddress, externalUserAddress } = await getNamedAccounts();
+      const externalUser = await ethers.getSigner(externalUserAddress);
+
+      await expect(
+        TransactorContract.connect(externalUser).transferETH(ONE_ETH, externalUserAddress)
+      ).to.be.revertedWith('Owner only');
+      expect(await TransactorContract.owner()).to.equal(deployerAddress);
+    });
+
+    it('transfers the amount of tokens specified from the contract to the provided address', async function () {
+      const { TransactorContract } = await setup();
+      const { deployerAddress, externalUserAddress } = await getNamedAccounts();
+      const deployer = await ethers.getSigner(deployerAddress);
+      const externalUser = await ethers.getSigner(externalUserAddress);
+
+      const externalUserBalanceBeforeTransfer = await externalUser.getBalance();
+
+      // Assert contract's ETH balance is 0
+      const transactorContractBalanceBeforeTransfer = await TransactorContract.provider.getBalance(
+        TransactorContract.address
+      );
+      expect(transactorContractBalanceBeforeTransfer.toString()).to.equal('0');
+
+      // Transfer 1 ETH to the contract
+      // Note: we send the ETH from the deployer signer so the external user balance isn't affected
+      const ethTransferred = BigNumber.from(ONE_ETH);
+      await deployer.sendTransaction({ to: TransactorContract.address, value: ethTransferred });
+
+      // Assert contract received the ETH
+      const transactorContractBalance = await TransactorContract.provider.getBalance(TransactorContract.address);
+      expect(transactorContractBalance.toString()).to.equal(ethTransferred);
+
+      // Transfer 1 ETH from the contract to a user who's not the owner of the contract
+      await TransactorContract.transferETH(ONE_ETH, externalUserAddress);
+
+      // Assert user received the ETH
+      const externalUserBalanceAfterTransfer = await externalUser.getBalance();
+      expect(externalUserBalanceAfterTransfer.sub(externalUserBalanceBeforeTransfer).toString()).to.equal(
+        ethTransferred
+      );
+
+      // Assert contract's ETH balance is back to 0
+      const transactorContractBalanceAfterTransfer = await TransactorContract.provider.getBalance(
+        TransactorContract.address
+      );
+      expect(transactorContractBalanceAfterTransfer.toString()).to.equal('0');
     });
   });
 
