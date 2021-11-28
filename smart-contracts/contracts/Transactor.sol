@@ -45,7 +45,7 @@ contract Transactor is Owner, IDyDxCallee {
     // Initialize exchange contracts
     dydxSoloMargin = IDyDxSoloMargin(_dydxSoloMarginAddress);
     uniswapV2Router = IUniswapV2Router(_uniswapV2RouterAddress);
-    // Note: we use the same interface for SushiswapRouter and CryptoComRouter, because
+    // Note: we use the same interface for SushiswapRouter and CryptoComRouter because
     // they are both forks of UniswapV2Router
     sushiswapRouter = IUniswapV2Router(_sushiswapRouterAddress);
     cryptoComRouter = IUniswapV2Router(_cryptoComRouterAddress);
@@ -61,7 +61,7 @@ contract Transactor is Owner, IDyDxCallee {
 
   function transferETH(uint256 _amount, address payable _to) external owned {
     (bool success, ) = _to.call{value: _amount}('');
-    require(success, 'Withdrawal failed');
+    require(success, 'Transfer failed');
   }
 
   // Function to receive ethers. Note that msg.data must be empty
@@ -181,6 +181,7 @@ contract Transactor is Owner, IDyDxCallee {
   // Function called by DyDx after giving us the loan
   // Note: the type of this function comes from DyDx, do not update it
   // (even if a warning shows saying some of the parameters are unused)!
+  // Also, its name has to be callFunction.
   function callFunction(
     address sender,
     Account.Info memory accountInfo,

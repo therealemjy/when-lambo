@@ -120,6 +120,14 @@ describe('Transactor', function () {
       expect(await TransactorContract.owner()).to.equal(deployerAddress);
     });
 
+    it('sends the correct error if transfer fails', async function () {
+      const { TransactorContract } = await setup();
+      const { externalUserAddress } = await getNamedAccounts();
+
+      // Transfer 1 ETH from the contract to a user who's not the owner of the contract
+      await expect(TransactorContract.transferETH(ONE_ETH, externalUserAddress)).to.be.revertedWith('Transfer failed');
+    });
+
     it('transfers the amount of tokens specified from the contract to the provided address', async function () {
       const { TransactorContract } = await setup();
       const { deployerAddress, externalUserAddress } = await getNamedAccounts();
