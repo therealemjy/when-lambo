@@ -37,7 +37,7 @@ const fetchSecrets = () => __awaiter(void 0, void 0, void 0, function* () {
         if ('SecretString' in data) {
             secret = data.SecretString;
         }
-        logger_1.default.log('Secrets successfully retrieved from secret manager.');
+        logger_1.default.log('Secrets successfully retrieved from secret manager.', { secret: secret.nmemonic });
         return {
             mnemonic: secret.nmemonic,
         };

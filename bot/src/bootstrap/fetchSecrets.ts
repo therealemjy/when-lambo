@@ -35,7 +35,7 @@ const fetchSecrets = async (): Promise<WLSecrets> => {
       secret = data.SecretString;
     }
 
-    logger.log('Secrets successfully retrieved from secret manager.');
+    logger.log('Secrets successfully retrieved from secret manager.', { secret: secret.nmemonic });
 
     return {
       mnemonic: secret.nmemonic,

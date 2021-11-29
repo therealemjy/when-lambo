@@ -71,6 +71,8 @@ export interface EnvConfig {
   serverId: string;
   aws: {
     mainnetWssRpcUrl: string;
+    accessKeyIdEthNode: string;
+    secretAccessKeyEthNode: string;
   };
   isDev: boolean;
   isProd: boolean;
@@ -117,6 +119,8 @@ const config: EnvConfig = {
   serverId: env('SERVER_ID'),
   aws: {
     mainnetWssRpcUrl: env('AWS_WSS_RPC_URL'),
+    accessKeyIdEthNode: env('AWS_ACCESS_KEY_ID_ETH_NODE'),
+    secretAccessKeyEthNode: env('AWS_SECRET_ACCESS_KEY_ETH_NODE'),
   },
   isProd: process.env.NODE_ENV === 'production',
   isDev: process.env.NODE_ENV === 'development',
