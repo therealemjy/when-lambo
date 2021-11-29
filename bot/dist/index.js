@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const web3_ws_provider_1 = __importDefault(require("@aws/web3-ws-provider"));
 const ethereum_multicall_1 = require("@maxime.julian/ethereum-multicall");
-const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const ethers_1 = require("ethers");
 require("./@moduleAliases");
 const blockHandler_1 = __importDefault(require("./src/blockHandler"));
@@ -35,14 +34,19 @@ process.on('uncaughtException', (error) => {
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     const start = () => {
         const provider = new ethers_1.ethers.providers.Web3Provider(new web3_ws_provider_1.default(config_1.default.aws.mainnetWssRpcUrl, {
-            clientConfig: Object.assign(Object.assign({ maxReceivedFrameSize: 100000000, maxReceivedMessageSize: 100000000 }, (config_1.default.isProd && { credentials: new aws_sdk_1.default.EC2MetadataCredentials() })), { keepalive: true, keepaliveInterval: 60000, 
+            clientConfig: {
+                maxReceivedFrameSize: 100000000,
+                maxReceivedMessageSize: 100000000,
+                keepalive: true,
+                keepaliveInterval: 60000,
                 // Enable auto reconnection
                 reconnect: {
                     auto: true,
                     delay: 5000,
                     maxAttempts: 5,
                     onTimeout: false,
-                } }),
+                },
+            },
         }));
         const multicall = new ethereum_multicall_1.Multicall({ ethersProvider: provider, tryAggregate: true });
         // Instantiate exchange services
