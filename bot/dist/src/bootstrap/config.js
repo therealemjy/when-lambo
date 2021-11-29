@@ -57,6 +57,14 @@ const env = (name) => {
     }
     return value;
 };
+// Throws an error only in test environment
+const envTestOnly = (name) => {
+    const value = process.env[`${name}`];
+    if (!value && env('NODE_ENV') === 'development') {
+        throw new Error(`Missing: process.env['${name}'].`);
+    }
+    return value;
+};
 const parsedStrategies = process.env.NODE_ENV === 'development' ? testingCoins : JSON.parse(env('STRINGIFIED_STRATEGIES'));
 const strategyToWeiAmounts = (baseWei, incrementPercent, incrementAmount) => {
     const strategy = Array.from(Array(incrementAmount).keys());
@@ -80,8 +88,9 @@ const config = {
         accessKeyIdEthNode: env('AWS_ACCESS_KEY_ID_ETH_NODE'),
         secretAccessKeyEthNode: env('AWS_SECRET_ACCESS_KEY_ETH_NODE'),
     },
-    isProd: process.env.NODE_ENV === 'production',
-    isDev: process.env.NODE_ENV === 'development',
+    isProd: env('NODE_ENV') === 'production',
+    isDev: env('NODE_ENV') === 'development',
+    testMnemonic: envTestOnly('TEST_MNEMONIC'),
     slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
     gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
     gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),

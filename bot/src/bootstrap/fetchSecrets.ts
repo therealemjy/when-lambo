@@ -9,9 +9,9 @@ type WLSecrets = {
 };
 
 const fetchSecrets = async (): Promise<WLSecrets> => {
-  if (config.isDev) {
+  if (config.isDev && config.testMnemonic) {
     return {
-      mnemonic: 'add test mnemonic',
+      mnemonic: config.testMnemonic,
     };
   }
 
@@ -22,7 +22,7 @@ const fetchSecrets = async (): Promise<WLSecrets> => {
   // Create a Secrets Manager client
   const client = new AWS.SecretsManager({
     region: region,
-    credentials: new AWS.EC2MetadataCredentials(), // Get credentials from IAM role
+    credentials: new AWS.EC2MetadataCredentials(),
   });
 
   try {
@@ -31,14 +31,12 @@ const fetchSecrets = async (): Promise<WLSecrets> => {
 
     // Decrypts secret using the associated KMS CMK.
     // Depending on whether the secret is a string or binary, one of these fields will be populated.
-    if ('SecretString' in data) {
-      secret = data.SecretString;
+    if (data.SecretString) {
+      secret = JSON.parse(data.SecretString);
     }
 
-    logger.log('Secrets successfully retrieved from secret manager.', { secret: secret.nmemonic });
-
     return {
-      mnemonic: secret.nmemonic,
+      mnemonic: secret.mnemonic,
     };
   } catch (err: any) {
     logger.error('Error while decoding secrets', err);

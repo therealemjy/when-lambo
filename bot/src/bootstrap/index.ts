@@ -52,19 +52,24 @@ const server = http.createServer(function (req, res) {
   }
 });
 
-export const bootstrap = async () => {
-  server.listen(3000, async () => {
-    logger.log('Server started running on port 3000');
+export const bootstrap = async (): Promise<void> =>
+  new Promise((resolve) => {
+    server.listen(3000, async () => {
+      logger.log('Server started running on port 3000');
 
-    // Get secrets
-    await fetchSecrets();
+      setupGlobalStateVariables();
 
-    // Register event listeners
-    await registerEventListeners();
+      // Get secrets
+      const secret = await fetchSecrets();
 
-    // Pull gas prices every 5 seconds
-    gasPriceWatcher.start(5000);
+      console.log('Secret is:', secret);
 
-    setupGlobalStateVariables();
+      // Register event listeners
+      await registerEventListeners();
+
+      // Pull gas prices every 5 seconds
+      gasPriceWatcher.start(5000);
+
+      resolve();
+    });
   });
-};

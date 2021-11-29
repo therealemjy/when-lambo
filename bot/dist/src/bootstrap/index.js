@@ -58,16 +58,20 @@ const server = http_1.default.createServer(function (req, res) {
     }
 });
 const bootstrap = () => __awaiter(void 0, void 0, void 0, function* () {
-    server.listen(3000, () => __awaiter(void 0, void 0, void 0, function* () {
-        logger_1.default.log('Server started running on port 3000');
-        // Get secrets
-        yield (0, fetchSecrets_1.default)();
-        // Register event listeners
-        yield (0, registerEvents_1.registerEventListeners)();
-        // Pull gas prices every 5 seconds
-        gasPriceWatcher_1.default.start(5000);
-        setupGlobalStateVariables();
-    }));
+    return new Promise((resolve) => {
+        server.listen(3000, () => __awaiter(void 0, void 0, void 0, function* () {
+            logger_1.default.log('Server started running on port 3000');
+            setupGlobalStateVariables();
+            // Get secrets
+            const secret = yield (0, fetchSecrets_1.default)();
+            console.log('Secret is:', secret);
+            // Register event listeners
+            yield (0, registerEvents_1.registerEventListeners)();
+            // Pull gas prices every 5 seconds
+            gasPriceWatcher_1.default.start(5000);
+            resolve();
+        }));
+    });
 });
 exports.bootstrap = bootstrap;
 //# sourceMappingURL=index.js.map

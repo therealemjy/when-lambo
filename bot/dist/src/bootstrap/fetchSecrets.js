@@ -16,9 +16,9 @@ const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const config_1 = __importDefault(require("@src/bootstrap/config"));
 const logger_1 = __importDefault(require("./logger"));
 const fetchSecrets = () => __awaiter(void 0, void 0, void 0, function* () {
-    if (config_1.default.isDev) {
+    if (config_1.default.isDev && config_1.default.testMnemonic) {
         return {
-            mnemonic: 'add test mnemonic',
+            mnemonic: config_1.default.testMnemonic,
         };
     }
     // Load the AWS SDK
@@ -27,19 +27,18 @@ const fetchSecrets = () => __awaiter(void 0, void 0, void 0, function* () {
     // Create a Secrets Manager client
     const client = new aws_sdk_1.default.SecretsManager({
         region: region,
-        credentials: new aws_sdk_1.default.EC2MetadataCredentials(), // Get credentials from IAM role
+        credentials: new aws_sdk_1.default.EC2MetadataCredentials(),
     });
     try {
         let secret;
         const data = yield client.getSecretValue({ SecretId: secretName }).promise();
         // Decrypts secret using the associated KMS CMK.
         // Depending on whether the secret is a string or binary, one of these fields will be populated.
-        if ('SecretString' in data) {
-            secret = data.SecretString;
+        if (data.SecretString) {
+            secret = JSON.parse(data.SecretString);
         }
-        logger_1.default.log('Secrets successfully retrieved from secret manager.', { secret: secret.nmemonic });
         return {
-            mnemonic: secret.nmemonic,
+            mnemonic: secret.mnemonic,
         };
     }
     catch (err) {
