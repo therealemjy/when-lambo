@@ -207,8 +207,6 @@ contract Transactor is Owner, IDyDxCallee {
     // Make sure the call comes from DyDx' solo margin contract
     assert(msg.sender == address(dydxSoloMargin));
 
-    // TODO: add require to verify sender is an address we expect (?)
-
     // Decode the passed variables from the data object
     CallFunctionData memory tradeData = abi.decode(data, (CallFunctionData));
 
