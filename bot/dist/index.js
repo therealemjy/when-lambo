@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const web3_ws_provider_1 = __importDefault(require("@aws/web3-ws-provider"));
 const ethereum_multicall_1 = require("@maxime.julian/ethereum-multicall");
 const ethers_1 = require("ethers");
+const when_lambo_web3_ws_provider_1 = __importDefault(require("when-lambo-web3-ws-provider"));
 require("./@moduleAliases");
 const blockHandler_1 = __importDefault(require("./src/blockHandler"));
 const bootstrap_1 = require("./src/bootstrap");
@@ -33,7 +33,7 @@ process.on('uncaughtException', (error) => {
 });
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     const start = () => {
-        const provider = new ethers_1.ethers.providers.Web3Provider(new web3_ws_provider_1.default(config_1.default.aws.mainnetWssRpcUrl, {
+        const provider = new ethers_1.ethers.providers.Web3Provider(new when_lambo_web3_ws_provider_1.default(config_1.default.aws.mainnetWssRpcUrl, {
             clientConfig: {
                 maxReceivedFrameSize: 100000000,
                 maxReceivedMessageSize: 100000000,
