@@ -33,9 +33,9 @@ contract Transactor is Owner, IDyDxCallee {
 
   struct CallFunctionData {
     uint256 borrowedWethAmount;
-    address tradedTokenAddress;
-    uint256 minTradedTokenAmountOut;
-    uint256 minWethAmountOut;
+    address tradedToken;
+    uint256 tradedTokenAmountOutMin;
+    uint256 wethAmountOutMin;
     Exchange sellingExchangeIndex;
     Exchange buyingExchangeIndex;
     uint256 deadline;
@@ -43,20 +43,20 @@ contract Transactor is Owner, IDyDxCallee {
 
   constructor(
     address _wethAddress,
-    address _dydxSoloMarginAddress,
-    address _uniswapV2RouterAddress,
-    address _sushiswapRouterAddress,
-    address _cryptoComRouterAddress
+    address _dydxSoloMargin,
+    address _uniswapV2Router,
+    address _sushiswapRouter,
+    address _cryptoComRouter
   ) {
     weth = IERC20(_wethAddress);
 
     // Initialize exchange contracts
-    dydxSoloMargin = IDyDxSoloMargin(_dydxSoloMarginAddress);
-    uniswapV2Router = IUniswapV2Router(_uniswapV2RouterAddress);
+    dydxSoloMargin = IDyDxSoloMargin(_dydxSoloMargin);
+    uniswapV2Router = IUniswapV2Router(_uniswapV2Router);
     // Note: we use the same interface for SushiswapRouter and CryptoComRouter because
     // they are both forks of UniswapV2Router
-    sushiswapRouter = IUniswapV2Router(_sushiswapRouterAddress);
-    cryptoComRouter = IUniswapV2Router(_cryptoComRouterAddress);
+    sushiswapRouter = IUniswapV2Router(_sushiswapRouter);
+    cryptoComRouter = IUniswapV2Router(_cryptoComRouter);
   }
 
   function destruct(address payable _to) external owned {
@@ -89,6 +89,10 @@ contract Transactor is Owner, IDyDxCallee {
   }
 
   function getExchange(Exchange exchangeIndex) public view returns (IUniswapV2Router) {
+    // Define selling and buying exchanges based on passed sellingExchangeIndex and buyingExchangeIndex
+    // Note: we can use single variables that contain the selling and buying exchanges because
+    // currently all our exchanges share the same interface (UniswapV2Router). This logic will need to
+    // be updated once we support non-Uniswap like exchanges.
     IUniswapV2Router exchange = uniswapV2Router;
 
     if (exchangeIndex == Exchange.Sushiswap) {
@@ -100,13 +104,42 @@ contract Transactor is Owner, IDyDxCallee {
     return exchange;
   }
 
+  function swap(
+    address fromToken,
+    uint256 fromTokenAmountIn,
+    Exchange exchangeIndex,
+    address toToken,
+    uint256 toTokenAmountOutMin,
+    uint256 deadline
+  ) internal returns (uint256 toTokenAmountOut) {
+    IUniswapV2Router exchange = getExchange(exchangeIndex);
+
+    // Allow the exchange to withdraw the amount of fromToken we want to exchange
+    IERC20(fromToken).approve(address(exchange), fromTokenAmountIn);
+
+    // Swap all the fromTokens to toTokens
+    address[] memory path = new address[](2);
+    path[0] = fromToken;
+    path[1] = toToken;
+
+    uint256 toTokenAmountReceived = exchange.swapExactTokensForTokens(
+      fromTokenAmountIn,
+      toTokenAmountOutMin,
+      path,
+      address(this),
+      deadline
+    )[1];
+
+    return toTokenAmountReceived;
+  }
+
   function trade(
     uint256 _wethAmountToBorrow,
     Exchange _sellingExchangeIndex,
-    uint256 _minWethAmountOut,
+    uint256 _wethAmountOutMin,
     Exchange _buyingExchangeIndex,
-    address _tradedTokenAddress,
-    uint256 _minTradedTokenAmountOut,
+    address _tradedToken,
+    uint256 _tradedTokenAmountOutMin,
     // Although the deadline does not really apply in our case since our trade is
     // only valid for one block, we still need to provide one to the exchanges
     uint256 _deadline
@@ -173,9 +206,9 @@ contract Transactor is Owner, IDyDxCallee {
         // These parameters will be passed to callFunction
         CallFunctionData({
           borrowedWethAmount: _wethAmountToBorrow,
-          tradedTokenAddress: _tradedTokenAddress,
-          minTradedTokenAmountOut: _minTradedTokenAmountOut,
-          minWethAmountOut: _minWethAmountOut,
+          tradedToken: _tradedToken,
+          tradedTokenAmountOutMin: _tradedTokenAmountOutMin,
+          wethAmountOutMin: _wethAmountOutMin,
           sellingExchangeIndex: _sellingExchangeIndex,
           buyingExchangeIndex: _buyingExchangeIndex,
           deadline: _deadline
@@ -221,47 +254,28 @@ contract Transactor is Owner, IDyDxCallee {
     // Decode the passed variables from the data object
     CallFunctionData memory tradeData = abi.decode(data, (CallFunctionData));
 
-    // Define selling and buying exchanges based on passed sellingExchangeIndex and buyingExchangeIndex
-    // Note: we can use single variables that contain the selling and buying exchanges because
-    // currently all our exchanges share the same interface (UniswapV2Router). This logic will need to
-    // be updated once we support non-Uniswap like exchanges.
-    IUniswapV2Router sellingExchange = getExchange(tradeData.sellingExchangeIndex);
-    IUniswapV2Router buyingExchange = getExchange(tradeData.buyingExchangeIndex);
-
-    // Allow the selling exchange to withdraw the amount of WETH we want to exchange
-    weth.approve(address(sellingExchange), tradeData.borrowedWethAmount);
-
-    // Swap all the borrowed WETH to tradedToken
-    address[] memory sellingPath = new address[](2);
-    sellingPath[0] = address(weth);
-    sellingPath[1] = tradeData.tradedTokenAddress;
-
-    uint256 tradedTokenAmountOut = sellingExchange.swapExactTokensForTokens(
-      tradeData.borrowedWethAmount, // WETH amount in
-      tradeData.minTradedTokenAmountOut, // Minimum tradedToken amount out for this deal to be profitable
-      sellingPath,
-      address(this),
+    // Sell all the borrowed WETH for as much tradedToken as possible
+    uint256 tradedTokenAmountOut = swap(
+      address(weth), // fromToken
+      tradeData.borrowedWethAmount, // fromTokenAmountIn
+      tradeData.sellingExchangeIndex,
+      tradeData.tradedToken, // toToken
+      tradeData.tradedTokenAmountOutMin, // Minimum tradedToken amount out for this deal to be profitable
       tradeData.deadline
-    )[1];
+    );
 
-    // Swap tradedToken amount received back to WETH
-    address[] memory buyingPath = new address[](2);
-    buyingPath[0] = tradeData.tradedTokenAddress;
-    buyingPath[1] = address(weth);
-
-    // Allow the buying exchange to withdraw the amount of tradedToken we just received
-    IERC20(tradeData.tradedTokenAddress).approve(address(buyingExchange), tradedTokenAmountOut);
-
-    uint256 wethAmountOut = buyingExchange.swapExactTokensForTokens(
-      tradedTokenAmountOut, // tradedToken amount received from selling swap
-      tradeData.minWethAmountOut, // Minimum WETH amount out for this deal to be profitable
-      buyingPath,
-      address(this),
+    // Sell all the tradedToken obtained for as much WETH as possible
+    uint256 wethAmountOut = swap(
+      tradeData.tradedToken,
+      tradedTokenAmountOut, // tradedToken amount received from selling the borrowed WETH
+      tradeData.buyingExchangeIndex,
+      address(weth),
+      tradeData.wethAmountOutMin, // Minimum WETH amount out for this deal to be profitable
       tradeData.deadline
-    )[1];
+    );
 
     emit SuccessfulTrade(
-      tradeData.tradedTokenAddress,
+      tradeData.tradedToken,
       tradeData.borrowedWethAmount,
       tradeData.sellingExchangeIndex,
       tradedTokenAmountOut,

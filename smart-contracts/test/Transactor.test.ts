@@ -257,10 +257,10 @@ describe('Transactor', function () {
         TransactorContract.connect(externalUser).trade(
           profitableTestTrade.wethAmountToBorrow,
           profitableTestTrade.sellingExchangeIndex,
-          profitableTestTrade.minWethAmountOut,
+          profitableTestTrade.wethAmountOutMin,
           profitableTestTrade.buyingExchangeIndex,
           profitableTestTrade.tradedTokenAddress,
-          profitableTestTrade.minTradedTokenAmountOut,
+          profitableTestTrade.tradedTokenAmountOutMin,
           BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
         )
       ).to.be.revertedWith('Owner only');
@@ -281,10 +281,10 @@ describe('Transactor', function () {
         TransactorContract.trade(
           profitableTestTrade.wethAmountToBorrow,
           profitableTestTrade.sellingExchangeIndex,
-          profitableTestTrade.minWethAmountOut,
+          profitableTestTrade.wethAmountOutMin,
           profitableTestTrade.buyingExchangeIndex,
           profitableTestTrade.tradedTokenAddress,
-          profitableTestTrade.minTradedTokenAmountOut,
+          profitableTestTrade.tradedTokenAmountOutMin,
           BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
         )
       )
