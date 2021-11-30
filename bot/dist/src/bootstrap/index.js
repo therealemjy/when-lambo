@@ -63,8 +63,9 @@ const bootstrap = () => __awaiter(void 0, void 0, void 0, function* () {
             logger_1.default.log('Server started running on port 3000');
             setupGlobalStateVariables();
             // Get secrets
-            const secret = yield (0, fetchSecrets_1.default)();
-            console.log('Secret is:', secret);
+            const secrets = yield (0, fetchSecrets_1.default)();
+            // Register secrets in global variable
+            global.secrets = secrets;
             // Register event listeners
             yield (0, registerEvents_1.registerEventListeners)();
             // Pull gas prices every 5 seconds
