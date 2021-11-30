@@ -6,7 +6,8 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "bot:test": "hardhat node --fork https://eth-mainnet.alchemyapi.io/v2/riG17C292D4AAxmWW0cSzqqIIgR7TYhu --fork-block-number 13680260"
   },
   "license": "ISC",
   "devDependencies": {
