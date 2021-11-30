@@ -294,9 +294,9 @@ describe('Transactor', function () {
           profitableTestTrade.tradedTokenAddress,
           profitableTestTrade.wethAmountToBorrow,
           profitableTestTrade.sellingExchangeIndex,
-          profitableTestTrade.expectedExactTradedTokenAmountOut,
+          profitableTestTrade.tradedTokenAmountOutExpected,
           profitableTestTrade.buyingExchangeIndex,
-          profitableTestTrade.expectedExactWethAmountOut
+          profitableTestTrade.wethAmountOutExpected
         );
 
       // Check the contract keeps the expected profit

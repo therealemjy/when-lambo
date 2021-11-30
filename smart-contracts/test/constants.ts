@@ -4,11 +4,11 @@ import { BigNumber } from 'ethers';
 export const profitableTestTrade = {
   blockNumber: 13680260,
   wethAmountToBorrow: BigNumber.from('6300000000000000000'),
+  sellingExchangeIndex: 0, // Uniswap V2
   tradedTokenAddress: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942', // MANA (https://etherscan.io/token/0x0f5d2fb29fb7d3cfee444a200298f468908cc942))
   tradedTokenAmountOutMin: BigNumber.from('6014317813922740000000'),
-  wethAmountOutMin: BigNumber.from('6818466095429090000'),
-  sellingExchangeIndex: 0, // Uniswap V2
+  tradedTokenAmountOutExpected: BigNumber.from('6044540516505264580775'),
   buyingExchangeIndex: 1, // Sushiswap
-  expectedExactTradedTokenAmountOut: BigNumber.from('6044540516505264580775'),
-  expectedExactWethAmountOut: BigNumber.from('6887029118114948956'),
+  wethAmountOutMin: BigNumber.from('6818466095429090000'),
+  wethAmountOutExpected: BigNumber.from('6887029118114948956'),
 };
