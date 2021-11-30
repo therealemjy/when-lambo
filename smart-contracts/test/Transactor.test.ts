@@ -4,7 +4,12 @@ import { BigNumber } from 'ethers';
 
 import { Transactor as ITransactorContract } from '../typechain';
 
-import { WETH_MAINNET_ADDRESS } from '../constants';
+import {
+  WETH_MAINNET_ADDRESS,
+  UNISWAP_V2_ROUTER_MAINNET_ADDRESS,
+  SUSHISWAP_ROUTER_MAINNET_ADDRESS,
+  CRYPTO_COM_ROUTER_MAINNET_ADDRESS,
+} from '../constants';
 import { profitableTestTrade } from './constants';
 import exchangeEthForWeth from './utils/exchangeEthForWeth';
 import getWethContract from './utils/getWethContract';
@@ -228,6 +233,20 @@ describe('Transactor', function () {
     });
   });
 
+  describe('getExchange', function () {
+    it('returns the correct contract based on the passed exchangeIndex', async function () {
+      const { TransactorContract } = await setup();
+
+      const expectedUniswapV2RouterAddress = await TransactorContract.getExchange(0);
+      const expectedSushiswapRouterAddress = await TransactorContract.getExchange(1);
+      const expectedCryptoComRouterAddress = await TransactorContract.getExchange(2);
+
+      expect(expectedUniswapV2RouterAddress).to.equal(UNISWAP_V2_ROUTER_MAINNET_ADDRESS);
+      expect(expectedSushiswapRouterAddress).to.equal(SUSHISWAP_ROUTER_MAINNET_ADDRESS);
+      expect(expectedCryptoComRouterAddress).to.equal(CRYPTO_COM_ROUTER_MAINNET_ADDRESS);
+    });
+  });
+
   describe('trade', function () {
     it('reverts when being called by an account that is not the owner', async function () {
       const { TransactorContract } = await setup();
@@ -269,6 +288,7 @@ describe('Transactor', function () {
           BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
         )
       )
+        // Check a SuccessfulTrade event was emitted
         .to.emit(TransactorContract, 'SuccessfulTrade')
         .withArgs(
           profitableTestTrade.tradedTokenAddress,
@@ -279,14 +299,10 @@ describe('Transactor', function () {
           profitableTestTrade.expectedExactWethAmountOut
         );
 
-      // Check it sent a SuccessfulTrade event
-
       // Check the contract keeps the expected profit
       const transactorContractBalanceAfterTrade = await wethContract.balanceOf(TransactorContract.address);
       expect(transactorContractBalanceAfterTrade.toString()).to.equal('587029118114948954');
     });
-
-    // TODO: test buying and selling exchanges are correctly defined
   });
 
   describe('callFunction', function () {
