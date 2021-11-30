@@ -250,11 +250,13 @@ describe('Transactor', function () {
   describe('trade', function () {
     it('reverts when being called by an account that is not the owner', async function () {
       const { TransactorContract } = await setup();
+      const currentBlockNumber = await ethers.provider.getBlockNumber();
       const { externalUserAddress } = await getNamedAccounts();
       const externalUser = await ethers.getSigner(externalUserAddress);
 
       await expect(
         TransactorContract.connect(externalUser).trade(
+          currentBlockNumber + 1,
           profitableTestTrade.wethAmountToBorrow,
           profitableTestTrade.sellingExchangeIndex,
           profitableTestTrade.wethAmountOutMin,
@@ -266,8 +268,29 @@ describe('Transactor', function () {
       ).to.be.revertedWith('Owner only');
     });
 
+    it('reverts when expectedBlockNumber does not correspond to the block number the transaction is being mined for', async function () {
+      const { TransactorContract } = await setup();
+      const currentBlockNumber = await ethers.provider.getBlockNumber();
+
+      await expect(
+        TransactorContract.trade(
+          // This transaction should be mined at currentBlockNumber + 1, so passing currentBlockNumber should
+          // trigger a revert
+          currentBlockNumber,
+          profitableTestTrade.wethAmountToBorrow,
+          profitableTestTrade.sellingExchangeIndex,
+          profitableTestTrade.wethAmountOutMin,
+          profitableTestTrade.buyingExchangeIndex,
+          profitableTestTrade.tradedTokenAddress,
+          profitableTestTrade.tradedTokenAmountOutMin,
+          BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
+        )
+      ).to.be.revertedWith('Trade expired');
+    });
+
     it('should execute trade, keeping the profit on the contract and sending a SuccessfulTrade event', async function () {
       const { TransactorContract } = await setup();
+      const currentBlockNumber = await ethers.provider.getBlockNumber();
       const { deployerAddress } = await getNamedAccounts();
       const deployer = await ethers.getSigner(deployerAddress);
       const wethContract = getWethContract(deployer);
@@ -279,6 +302,7 @@ describe('Transactor', function () {
       // Execute trade
       await expect(
         TransactorContract.trade(
+          currentBlockNumber + 1,
           profitableTestTrade.wethAmountToBorrow,
           profitableTestTrade.sellingExchangeIndex,
           profitableTestTrade.wethAmountOutMin,

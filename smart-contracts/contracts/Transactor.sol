@@ -134,6 +134,7 @@ contract Transactor is Owner, IDyDxCallee {
   }
 
   function trade(
+    uint256 expectedBlockNumber,
     uint256 _wethAmountToBorrow,
     Exchange _sellingExchangeIndex,
     uint256 _wethAmountOutMin,
@@ -144,6 +145,9 @@ contract Transactor is Owner, IDyDxCallee {
     // only valid for one block, we still need to provide one to the exchanges
     uint256 _deadline
   ) external owned {
+    // Make sure trade does not execute if a new block was mined since the transaction has been sent
+    require(expectedBlockNumber == block.number, 'Trade expired');
+
     /*
       The first step is to initiate a flashloan with DyDx.
 
