@@ -242,7 +242,7 @@ contract Transactor is Owner, IDyDxCallee {
   // Function called by DyDx after giving us the loan
   // Note: the type of this function comes from DyDx, do not update it
   // (even if a warning shows saying some of the parameters are unused)!
-  // Also, its name has to be callFunction.g
+  // Also, its name has to be callFunction.
   function callFunction(
     address sender,
     Account.Info memory accountInfo,
