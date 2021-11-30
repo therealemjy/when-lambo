@@ -28,12 +28,12 @@ const init = async () => {
         clientConfig: {
           maxReceivedFrameSize: 100000000, // bytes - default: 1MiB
           maxReceivedMessageSize: 100000000, // bytes - default: 8MiB
-          credentials: {
-            accessKeyId: config.aws.accessKeyId,
-            secretAccessKey: config.aws.secretAccessKey,
-          },
           keepalive: true,
           keepaliveInterval: 60000, // ms
+          credentials: {
+            accessKeyId: config.aws.accessKeyIdEthNode,
+            secretAccessKey: config.aws.secretAccessKeyEthNode,
+          },
           // Enable auto reconnection
           reconnect: {
             auto: true,
@@ -80,6 +80,7 @@ const init = async () => {
 (async () => {
   try {
     await bootstrap();
+
     await init();
   } catch (err) {
     eventEmitter.emit('error', err);

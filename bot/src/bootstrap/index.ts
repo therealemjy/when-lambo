@@ -1,6 +1,7 @@
 import http from 'http';
 
 import { registerEventListeners } from './eventEmitter/registerEvents';
+import fetchSecrets from './fetchSecrets';
 import gasPriceWatcher from './gasPriceWatcher';
 import logger from './logger';
 
@@ -51,16 +52,25 @@ const server = http.createServer(function (req, res) {
   }
 });
 
-export const bootstrap = async () => {
-  server.listen(3000, async () => {
-    logger.log('Server started running on port 3000');
+export const bootstrap = async (): Promise<void> =>
+  new Promise((resolve) => {
+    server.listen(3000, async () => {
+      logger.log('Server started running on port 3000');
 
-    // Register event listeners
-    await registerEventListeners();
+      setupGlobalStateVariables();
 
-    // Pull gas prices every 5 seconds
-    gasPriceWatcher.start(5000);
+      // Get secrets
+      const secrets = await fetchSecrets();
 
-    setupGlobalStateVariables();
+      // Register secrets in global variable
+      global.secrets = secrets;
+
+      // Register event listeners
+      await registerEventListeners();
+
+      // Pull gas prices every 5 seconds
+      gasPriceWatcher.start(5000);
+
+      resolve();
+    });
   });
-};

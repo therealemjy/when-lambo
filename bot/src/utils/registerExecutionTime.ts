@@ -16,7 +16,7 @@ const registerExecutionTime = (): void => {
   // Used for health check "When was the last execution"
   global.lastMonitoringDateTime = currentDateTime;
 
-  if (global.perfMonitoringRecords.length === 11) {
+  if (global.perfMonitoringRecords.length === 21) {
     global.perfMonitoringRecords.shift();
   }
 };

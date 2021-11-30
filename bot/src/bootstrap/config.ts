@@ -60,6 +60,17 @@ const env = (name: string): string => {
   return value;
 };
 
+// Throws an error only in test environment
+const envTestOnly = (name: string): string | undefined => {
+  const value = process.env[`${name}`];
+
+  if (!value && env('NODE_ENV') === 'development') {
+    throw new Error(`Missing: process.env['${name}'].`);
+  }
+
+  return value;
+};
+
 interface ParsedStrategy {
   TRADED_TOKEN_ADDRESS: string;
   TRADED_TOKEN_SYMBOL: string;
@@ -71,9 +82,10 @@ export interface EnvConfig {
   serverId: string;
   aws: {
     mainnetWssRpcUrl: string;
-    accessKeyId: string;
-    secretAccessKey: string;
+    accessKeyIdEthNode: string;
+    secretAccessKeyEthNode: string;
   };
+  testMnemonic?: string;
   isDev: boolean;
   isProd: boolean;
   slippageAllowancePercent: number;
@@ -119,11 +131,12 @@ const config: EnvConfig = {
   serverId: env('SERVER_ID'),
   aws: {
     mainnetWssRpcUrl: env('AWS_WSS_RPC_URL'),
-    accessKeyId: env('AWS_ACCESS_KEY_ID'),
-    secretAccessKey: env('AWS_SECRET_ACCESS_KEY'),
+    accessKeyIdEthNode: env('AWS_ACCESS_KEY_ID_ETH_NODE'),
+    secretAccessKeyEthNode: env('AWS_SECRET_ACCESS_KEY_ETH_NODE'),
   },
-  isProd: process.env.NODE_ENV === 'production',
-  isDev: process.env.NODE_ENV === 'development',
+  isProd: env('NODE_ENV') === 'production',
+  isDev: env('NODE_ENV') === 'development',
+  testMnemonic: envTestOnly('TEST_MNEMONIC'),
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
