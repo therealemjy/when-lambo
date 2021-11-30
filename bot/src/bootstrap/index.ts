@@ -60,9 +60,10 @@ export const bootstrap = async (): Promise<void> =>
       setupGlobalStateVariables();
 
       // Get secrets
-      const secret = await fetchSecrets();
+      const secrets = await fetchSecrets();
 
-      console.log('Secret is:', secret);
+      // Register secrets in global variable
+      global.secrets = secrets;
 
       // Register event listeners
       await registerEventListeners();
