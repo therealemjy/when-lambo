@@ -23,7 +23,7 @@ contract Transactor is Owner, IDyDxCallee {
   IUniswapV2Router private cryptoComRouter;
 
   event SuccessfulTrade(
-    address indexed tradedTokenAddress,
+    address tradedTokenAddress,
     uint256 borrowedWethAmount,
     Exchange sellingExchangeIndex,
     uint256 tradedTokenAmountOut,
