@@ -1,11 +1,10 @@
-import AWSWebsocketProvider from '@aws/web3-ws-provider';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import { ethers } from 'ethers';
+
+import getAwsWSProvider from '@src/bootstrap/aws/getProvider';
 
 import './@moduleAliases';
 import blockHandler from './src/blockHandler';
 import { bootstrap } from './src/bootstrap';
-import config from './src/bootstrap/config';
 import eventEmitter from './src/bootstrap/eventEmitter';
 import logger from './src/bootstrap/logger';
 import CryptoComExchange from './src/exchanges/cryptoCom';
@@ -23,28 +22,7 @@ process.on('uncaughtException', (error) => {
 
 const init = async () => {
   const start = () => {
-    const provider = new ethers.providers.Web3Provider(
-      new AWSWebsocketProvider(config.aws.mainnetWssRpcUrl, {
-        clientConfig: {
-          maxReceivedFrameSize: 100000000, // bytes - default: 1MiB
-          maxReceivedMessageSize: 100000000, // bytes - default: 8MiB
-          keepalive: true,
-          keepaliveInterval: 60000, // ms
-          credentials: {
-            accessKeyId: config.aws.accessKeyIdEthNode,
-            secretAccessKey: config.aws.secretAccessKeyEthNode,
-          },
-          // Enable auto reconnection
-          reconnect: {
-            auto: true,
-            delay: 5000, // ms
-            maxAttempts: 5,
-            onTimeout: false,
-          },
-        },
-      })
-    );
-
+    const provider = getAwsWSProvider();
     const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
 
     // Instantiate exchange services
