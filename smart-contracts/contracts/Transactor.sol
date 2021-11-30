@@ -9,8 +9,6 @@ import './interfaces/IDyDxSoloMargin.sol';
 import './interfaces/IUniswapV2Router.sol';
 import './libraries/DyDx.sol';
 
-import 'hardhat/console.sol';
-
 enum Exchange {
   UniswapV2,
   Sushiswap,
