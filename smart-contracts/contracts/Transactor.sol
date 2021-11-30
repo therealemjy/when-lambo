@@ -68,6 +68,7 @@ contract Transactor is Owner, IDyDxCallee {
   }
 
   // Function to receive ethers when msg.data is empty
+  // solhint-disable-next-line no-empty-blocks
   receive() external payable {}
 
   // Fallback function to receive ethers when msg.data is not empty
