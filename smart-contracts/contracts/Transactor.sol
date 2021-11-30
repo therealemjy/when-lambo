@@ -89,6 +89,18 @@ contract Transactor is Owner, IDyDxCallee {
     require(success, 'Transfer failed');
   }
 
+  function getExchange(Exchange exchangeIndex) public view returns (IUniswapV2Router) {
+    IUniswapV2Router exchange = uniswapV2Router;
+
+    if (exchangeIndex == Exchange.Sushiswap) {
+      exchange = sushiswapRouter;
+    } else if (exchangeIndex == Exchange.CryptoCom) {
+      exchange = cryptoComRouter;
+    }
+
+    return exchange;
+  }
+
   function trade(
     uint256 _wethAmountToBorrow,
     Exchange _sellingExchangeIndex,
@@ -214,21 +226,8 @@ contract Transactor is Owner, IDyDxCallee {
     // Note: we can use single variables that contain the selling and buying exchanges because
     // currently all our exchanges share the same interface (UniswapV2Router). This logic will need to
     // be updated once we support non-Uniswap like exchanges.
-    IUniswapV2Router sellingExchange = uniswapV2Router;
-
-    if (tradeData.sellingExchangeIndex == Exchange.Sushiswap) {
-      sellingExchange = sushiswapRouter;
-    } else if (tradeData.sellingExchangeIndex == Exchange.CryptoCom) {
-      sellingExchange = cryptoComRouter;
-    }
-
-    IUniswapV2Router buyingExchange = uniswapV2Router;
-
-    if (tradeData.buyingExchangeIndex == Exchange.Sushiswap) {
-      buyingExchange = sushiswapRouter;
-    } else if (tradeData.buyingExchangeIndex == Exchange.CryptoCom) {
-      buyingExchange = cryptoComRouter;
-    }
+    IUniswapV2Router sellingExchange = getExchange(tradeData.sellingExchangeIndex);
+    IUniswapV2Router buyingExchange = getExchange(tradeData.buyingExchangeIndex);
 
     // Allow the selling exchange to withdraw the amount of WETH we want to exchange
     weth.approve(address(sellingExchange), tradeData.borrowedWethAmount);

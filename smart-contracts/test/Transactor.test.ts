@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ethers, deployments, getNamedAccounts, waffle } from 'hardhat';
+import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import { BigNumber } from 'ethers';
 
 import { Transactor as ITransactorContract } from '../typechain';
@@ -13,10 +13,6 @@ import {
 import { profitableTestTrade } from './constants';
 import exchangeEthForWeth from './utils/exchangeEthForWeth';
 import getWethContract from './utils/getWethContract';
-// TODO: import from artifacts (?)
-import uniswapV2RouterAbi from './abis/uniswapV2Router.json';
-import sushiswapRouterAbi from './abis/sushiswapRouter.json';
-import cryptoComRouterAbi from './abis/cryptoComRouter.json';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);
@@ -237,6 +233,20 @@ describe('Transactor', function () {
     });
   });
 
+  describe('getExchange', function () {
+    it('returns the correct contract based on the passed exchangeIndex', async function () {
+      const { TransactorContract } = await setup();
+
+      const expectedUniswapV2RouterAddress = await TransactorContract.getExchange(0);
+      const expectedSushiswapRouterAddress = await TransactorContract.getExchange(1);
+      const expectedCryptoComRouterAddress = await TransactorContract.getExchange(2);
+
+      expect(expectedUniswapV2RouterAddress).to.equal(UNISWAP_V2_ROUTER_MAINNET_ADDRESS);
+      expect(expectedSushiswapRouterAddress).to.equal(SUSHISWAP_ROUTER_MAINNET_ADDRESS);
+      expect(expectedCryptoComRouterAddress).to.equal(CRYPTO_COM_ROUTER_MAINNET_ADDRESS);
+    });
+  });
+
   describe('trade', function () {
     it('reverts when being called by an account that is not the owner', async function () {
       const { TransactorContract } = await setup();
@@ -293,64 +303,6 @@ describe('Transactor', function () {
       const transactorContractBalanceAfterTrade = await wethContract.balanceOf(TransactorContract.address);
       expect(transactorContractBalanceAfterTrade.toString()).to.equal('587029118114948954');
     });
-
-    // Note: these need to be in the same order as in the Transactor contract (see Exchange enum)
-    // const exchanges = [
-    //   {
-    //     name: 'UniswapV2',
-    //     address: UNISWAP_V2_ROUTER_MAINNET_ADDRESS,
-    //     abi: uniswapV2RouterAbi,
-    //   },
-    //   {
-    //     name: 'Sushiswap',
-    //     address: SUSHISWAP_ROUTER_MAINNET_ADDRESS,
-    //     abi: sushiswapRouterAbi,
-    //   },
-    //   {
-    //     name: 'CryptoCom',
-    //     address: CRYPTO_COM_ROUTER_MAINNET_ADDRESS,
-    //     abi: cryptoComRouterAbi,
-    //   },
-    // ];
-
-    // exchanges.forEach((exchange, sellingExchangeIndex) => {
-    //   it(`uses ${exchange.name} as buying exchange when the sellingExchangeIndex passed is ${sellingExchangeIndex}`, async function () {
-    //     const { TransactorContract } = await setup();
-    //     const { deployerAddress } = await getNamedAccounts();
-    //     const deployer = await ethers.getSigner(deployerAddress);
-
-    //     const buyingExchangeIndex = sellingExchangeIndex === 1 ? 0 : 1;
-
-    //     // Mock the selling exchange contract
-    //     const mockedSellingExchangeContract = await waffle.deployMockContract(
-    //       deployer,
-    //       exchanges[sellingExchangeIndex].abi
-    //     );
-
-    //     // Mock the buying exchange contract
-
-    //     const fakeTrade = {
-    //       wethAmountToBorrow: BigNumber.from('1000000000000000000'),
-    //       tradedTokenAddress: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942', // MANA (https://etherscan.io/token/0x0f5d2fb29fb7d3cfee444a200298f468908cc942))
-    //       minTradedTokenAmountOut: BigNumber.from('1000000000000000000'),
-    //       minWethAmountOut: BigNumber.from('1000000000000000000'),
-    //       sellingExchangeIndex,
-    //       buyingExchangeIndex,
-    //     };
-
-    //     await TransactorContract.trade(
-    //       fakeTrade.wethAmountToBorrow,
-    //       fakeTrade.sellingExchangeIndex,
-    //       fakeTrade.minWethAmountOut,
-    //       fakeTrade.buyingExchangeIndex,
-    //       fakeTrade.tradedTokenAddress,
-    //       fakeTrade.minTradedTokenAmountOut,
-    //       BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
-    //     );
-
-    //     // Check mocked contract has been called
-    //   });
-    // });
   });
 
   describe('callFunction', function () {
