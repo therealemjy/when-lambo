@@ -8,7 +8,7 @@ import 'solidity-coverage';
 import * as dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 
-import './hardhatTasks';
+import './tasks';
 import { profitableTestTrade } from './constants';
 
 dotenv.config();
@@ -44,9 +44,6 @@ const config: HardhatUserConfig = {
     externalUserAddress: {
       default: 2, // assign another account as external user (used in tests only)
     },
-  },
-  paths: {
-    tests: './contracts/__tests__',
   },
 };
 

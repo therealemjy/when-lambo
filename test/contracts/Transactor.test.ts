@@ -24,7 +24,7 @@ const setup = deployments.createFixture(async () => {
 const ONE_ETH = '1000000000000000000';
 const ONE_WETH = ONE_ETH;
 
-describe('Transactor', function () {
+describe('contracts/Transactor', function () {
   describe('destruct', function () {
     it('reverts when being called by an account that is not the owner', async function () {
       const { TransactorContract } = await setup();

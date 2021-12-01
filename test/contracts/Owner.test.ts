@@ -1,9 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 
-// TODO: remove
-
-describe('Owner', function () {
+describe('contracts/Owner', function () {
   it('should set sender as the owner when deploying', async function () {
     const [sender] = await ethers.getSigners();
 

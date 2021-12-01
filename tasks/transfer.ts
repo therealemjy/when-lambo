@@ -12,6 +12,9 @@ import swapEthForWeth from '../utils/swapEthForWeth';
 import formatNestedBN from '../utils/formatNestedBN';
 
 const COUNTDOWN_SECONDS = 60;
+
+// TODO: add tests
+
 const transfer = async (
   { tokenSymbol, amount }: { tokenSymbol: 'ETH' | 'WETH'; amount: BigNumber },
   { ethers, getNamedAccounts }: HardhatRuntimeEnvironment
