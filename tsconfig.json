@@ -9,7 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
   },
-  "include": ["./hardhat.config.ts", "./scripts", "./deploy", "./test", "typechain/**/*"],
+  "include": ["./hardhat.config.ts", "./scripts", "./deploy", "./test", "typechain/**/*", "utils/**/*"],
   "exclude": ["./bot"],
   "files": ["./hardhat.config.ts"]
 }

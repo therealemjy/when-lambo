@@ -8,8 +8,8 @@ import 'solidity-coverage';
 import * as dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 
-import './hardhat.tasks';
-import { profitableTestTrade } from './test/constants';
+import './hardhatTasks';
+import { profitableTestTrade } from './constants';
 
 dotenv.config();
 

@@ -10,9 +10,9 @@ import {
   SUSHISWAP_ROUTER_MAINNET_ADDRESS,
   CRYPTO_COM_ROUTER_MAINNET_ADDRESS,
 } from '../constants';
-import { profitableTestTrade } from './constants';
-import exchangeEthForWeth from './utils/exchangeEthForWeth';
-import getWethContract from './utils/getWethContract';
+import wethAbi from '../utils/wethAbi.json';
+import { profitableTestTrade } from '../constants';
+import swapEthForWeth from '../utils/swapEthForWeth';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);
@@ -46,7 +46,7 @@ describe('Transactor', function () {
 
       const owner = await ethers.getSigner(ownerAddress);
       const externalUser = await ethers.getSigner(externalUserAddress);
-      const wethContract = getWethContract(owner);
+      const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, owner);
 
       // Send 1 ETH to the contract
       const transferredEthAmount = ONE_ETH;
@@ -61,7 +61,7 @@ describe('Transactor', function () {
 
       // Send 1 WETH to the contract
       const transferredWethAmount = ONE_WETH;
-      await exchangeEthForWeth(owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
+      await swapEthForWeth(ethers, owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
 
       // Check contract received the WETH
       const contractWethBalanceBeforeDestruct = await wethContract.balanceOf(TransactorContract.address);
@@ -149,7 +149,7 @@ describe('Transactor', function () {
       const { ownerAddress, externalUserAddress } = await getNamedAccounts();
       const owner = await ethers.getSigner(ownerAddress);
 
-      const wethContract = getWethContract(owner);
+      const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, owner);
       const externalUserBalanceBeforeTransfer = await wethContract.balanceOf(ownerAddress);
 
       // Check contract's WETH balance is 0
@@ -158,7 +158,7 @@ describe('Transactor', function () {
 
       // Transfer 1 WETH to the contract
       const transferredWethAmount = ONE_WETH;
-      await exchangeEthForWeth(owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
+      await swapEthForWeth(ethers, owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
 
       // Check contract received the WETH
       const transactorContractBalance = await wethContract.balanceOf(TransactorContract.address);
@@ -294,7 +294,7 @@ describe('Transactor', function () {
       const currentBlockNumber = await ethers.provider.getBlockNumber();
       const { ownerAddress } = await getNamedAccounts();
       const owner = await ethers.getSigner(ownerAddress);
-      const wethContract = getWethContract(owner);
+      const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, owner);
 
       // Check we start with an empty balance on the contract
       const transactorContractBalanceBeforeTransfer = await wethContract.balanceOf(TransactorContract.address);
