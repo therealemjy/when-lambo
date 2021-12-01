@@ -7,10 +7,13 @@ import 'hardhat-gas-reporter';
 import 'solidity-coverage';
 import * as dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 
 import './tasks';
 import { OWNER_ACCOUNT_MAINNET_ADDRESS, profitableTestTrade } from './constants';
 
+chai.use(chaiAsPromised);
 dotenv.config();
 
 const config: HardhatUserConfig = {

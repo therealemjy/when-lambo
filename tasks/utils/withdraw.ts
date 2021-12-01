@@ -1,6 +1,5 @@
-import { BigNumber, ContractTransaction } from 'ethers';
+import { BigNumber, ContractTransaction, Signer } from 'ethers';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { LedgerSigner } from '@ethersproject/hardware-wallets';
 
 // TODO: import mainnet info once contract has been deployed on it
 import transactorContractInfo from '../../deployments/localhost/Transactor.json';
@@ -9,42 +8,39 @@ import { Transactor as ITransactorContract } from '../../typechain';
 import { WETH_MAINNET_ADDRESS, LEDGER_OWNER_ACCOUNT_PATH } from '../../constants';
 import wethAbi from '../../utils/wethAbi.json';
 import formatNestedBN from '../../utils/formatNestedBN';
+
 // import swapEthForWeth from '../../utils/swapEthForWeth';
+
+// DEV ONLY: remove once this task is connected to the contract on the mainnet
+// Transfer funds to contract (in tests its funds will always be 0 since it just got deployed)
+// if (tokenSymbol === 'ETH') {
+//   await owner.sendTransaction({ to: TransactorContract.address, value: amount });
+// } else {
+//   await swapEthForWeth(ethers, owner, amount, TransactorContract.address);
+// }
+// END DEV ONLY
 
 const COUNTDOWN_SECONDS = 60;
 
-// TODO: add tests
-
 const withdraw = async (
-  { tokenSymbol, amount }: { tokenSymbol: 'ETH' | 'WETH'; amount: BigNumber },
+  { signer, tokenSymbol, amount }: { signer: Signer; tokenSymbol: 'ETH' | 'WETH'; amount: BigNumber },
   { ethers, getNamedAccounts }: HardhatRuntimeEnvironment
 ) => {
-  // Connect to ledger to retrieve owner signer
-  const owner = new LedgerSigner(ethers.provider, 'hid', LEDGER_OWNER_ACCOUNT_PATH);
-  const ownerAddressLedger = await owner.getAddress();
+  const signerAddress = await signer.getAddress();
   const { ownerAddress, vaultAddress } = await getNamedAccounts();
 
   // Check ownerAddress corresponds to address of owner retrieved from ledger
-  if (ownerAddressLedger !== ownerAddress) {
+  if (signerAddress !== ownerAddress) {
     throw new Error(
-      `Wrong signer. The signer address needed is ${ownerAddress}, but the one detected was ${ownerAddressLedger}`
+      `Wrong signer. The signer address needed is ${ownerAddress}, but the one provided was ${signerAddress}`
     );
   }
 
   const TransactorContract = new ethers.Contract(
     transactorContractInfo.address,
     transactorContractInfo.abi,
-    owner
+    signer
   ) as ITransactorContract;
-
-  // DEV ONLY: remove once this task is connected to the contract on the mainnet
-  // Transfer funds to contract (in tests its funds will always be 0 since it just got deployed)
-  // if (tokenSymbol === 'ETH') {
-  //   await owner.sendTransaction({ to: TransactorContract.address, value: amount });
-  // } else {
-  //   await swapEthForWeth(ethers, owner, amount, TransactorContract.address);
-  // }
-  // END DEV ONLY
 
   // Check we have enough funds on the contract
   let contractBalance: BigNumber;
@@ -52,7 +48,7 @@ const withdraw = async (
   if (tokenSymbol === 'ETH') {
     contractBalance = await ethers.provider.getBalance(transactorContractInfo.address);
   } else {
-    const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, owner);
+    const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, signer);
     contractBalance = await wethContract.balanceOf(transactorContractInfo.address);
   }
 

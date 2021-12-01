@@ -21,7 +21,7 @@ const setup = deployments.createFixture(async () => {
   return { TransactorContract };
 });
 
-const ONE_ETH = '1000000000000000000';
+const ONE_ETH = ethers.utils.parseEther('1');
 const ONE_WETH = ONE_ETH;
 
 describe('contracts/Transactor', function () {
