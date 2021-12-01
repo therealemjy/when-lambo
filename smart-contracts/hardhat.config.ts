@@ -1,13 +1,14 @@
 import 'hardhat-deploy';
 import '@nomiclabs/hardhat-ethers';
-import * as dotenv from 'dotenv';
-import { HardhatUserConfig } from 'hardhat/config';
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
+import * as dotenv from 'dotenv';
+import { HardhatUserConfig } from 'hardhat/config';
 
+import './hardhat.tasks';
 import { profitableTestTrade } from './test/constants';
 
 dotenv.config();
@@ -37,7 +38,7 @@ const config: HardhatUserConfig = {
     ownerAddress: {
       default: 0, // assign the first user as owner
     },
-    bank: {
+    bankAddress: {
       default: 1,
     },
     externalUserAddress: {
