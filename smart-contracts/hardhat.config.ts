@@ -35,11 +35,14 @@ const config: HardhatUserConfig = {
     currency: 'ETH',
   },
   namedAccounts: {
-    deployerAddress: {
-      default: 0, // assign the first user as deployer
+    ownerAddress: {
+      default: 0, // assign the first user as owner
+    },
+    bank: {
+      default: 1,
     },
     externalUserAddress: {
-      default: 1, // assign another account as external user (used in tests only)
+      default: 2, // assign another account as external user (used in tests only)
     },
   },
 };

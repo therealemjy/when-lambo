@@ -42,14 +42,15 @@ describe('Transactor', function () {
 
     it('destructs the contract and sends the remaining ETH and WETH to the provided account', async function () {
       const { TransactorContract } = await setup();
-      const { deployerAddress, externalUserAddress } = await getNamedAccounts();
-      const deployer = await ethers.getSigner(deployerAddress);
+      const { ownerAddress, externalUserAddress } = await getNamedAccounts();
+
+      const owner = await ethers.getSigner(ownerAddress);
       const externalUser = await ethers.getSigner(externalUserAddress);
-      const wethContract = getWethContract(deployer);
+      const wethContract = getWethContract(owner);
 
       // Send 1 ETH to the contract
       const transferredEthAmount = ONE_ETH;
-      await deployer.sendTransaction({
+      await owner.sendTransaction({
         to: TransactorContract.address,
         value: BigNumber.from(transferredEthAmount),
       });
@@ -60,7 +61,7 @@ describe('Transactor', function () {
 
       // Send 1 WETH to the contract
       const transferredWethAmount = ONE_WETH;
-      await exchangeEthForWeth(deployer, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
+      await exchangeEthForWeth(owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
 
       // Check contract received the WETH
       const contractWethBalanceBeforeDestruct = await wethContract.balanceOf(TransactorContract.address);
@@ -94,15 +95,15 @@ describe('Transactor', function () {
   describe('receive/fallback', function () {
     it('receives transferred ETH when msg.data is empty', async function () {
       const { TransactorContract } = await setup();
-      const { deployerAddress } = await getNamedAccounts();
-      const deployer = await ethers.getSigner(deployerAddress);
+      const { ownerAddress } = await getNamedAccounts();
+      const owner = await ethers.getSigner(ownerAddress);
 
       const contractBalanceBeforeTransfer = await ethers.provider.getBalance(TransactorContract.address);
       expect(contractBalanceBeforeTransfer.toString()).to.equal('0');
 
       const transferredEthAmount = ONE_ETH;
 
-      await deployer.sendTransaction({
+      await owner.sendTransaction({
         to: TransactorContract.address,
         value: BigNumber.from(transferredEthAmount),
       });
@@ -113,15 +114,15 @@ describe('Transactor', function () {
 
     it('receives transferred ETH when msg.data is not empty', async function () {
       const { TransactorContract } = await setup();
-      const { deployerAddress } = await getNamedAccounts();
-      const deployer = await ethers.getSigner(deployerAddress);
+      const { ownerAddress } = await getNamedAccounts();
+      const owner = await ethers.getSigner(ownerAddress);
 
       const contractBalanceBeforeTransfer = await ethers.provider.getBalance(TransactorContract.address);
       expect(contractBalanceBeforeTransfer.toString()).to.equal('0');
 
       const transferredEthAmount = ONE_ETH;
 
-      await deployer.sendTransaction({
+      await owner.sendTransaction({
         to: TransactorContract.address,
         value: BigNumber.from(transferredEthAmount),
         data: [1, 0, 1],
@@ -145,11 +146,11 @@ describe('Transactor', function () {
 
     it('transfers the amount of tokens specified from the contract to the provided address', async function () {
       const { TransactorContract } = await setup();
-      const { deployerAddress, externalUserAddress } = await getNamedAccounts();
-      const deployer = await ethers.getSigner(deployerAddress);
+      const { ownerAddress, externalUserAddress } = await getNamedAccounts();
+      const owner = await ethers.getSigner(ownerAddress);
 
-      const wethContract = getWethContract(deployer);
-      const externalUserBalanceBeforeTransfer = await wethContract.balanceOf(deployerAddress);
+      const wethContract = getWethContract(owner);
+      const externalUserBalanceBeforeTransfer = await wethContract.balanceOf(ownerAddress);
 
       // Check contract's WETH balance is 0
       const transactorContractBalanceBeforeTransfer = await wethContract.balanceOf(TransactorContract.address);
@@ -157,7 +158,7 @@ describe('Transactor', function () {
 
       // Transfer 1 WETH to the contract
       const transferredWethAmount = ONE_WETH;
-      await exchangeEthForWeth(deployer, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
+      await exchangeEthForWeth(owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
 
       // Check contract received the WETH
       const transactorContractBalance = await wethContract.balanceOf(TransactorContract.address);
@@ -199,8 +200,8 @@ describe('Transactor', function () {
 
     it('transfers the amount of tokens specified from the contract to the provided address', async function () {
       const { TransactorContract } = await setup();
-      const { deployerAddress, externalUserAddress } = await getNamedAccounts();
-      const deployer = await ethers.getSigner(deployerAddress);
+      const { ownerAddress, externalUserAddress } = await getNamedAccounts();
+      const owner = await ethers.getSigner(ownerAddress);
       const externalUser = await ethers.getSigner(externalUserAddress);
 
       const externalUserBalanceBeforeTransfer = await externalUser.getBalance();
@@ -210,9 +211,9 @@ describe('Transactor', function () {
       expect(transactorContractBalanceBeforeTransfer.toString()).to.equal('0');
 
       // Transfer 1 ETH to the contract
-      // Note: we send the ETH from the deployer signer so the external user balance isn't affected
+      // Note: we send the ETH from the owner signer so the external user balance isn't affected
       const transferredEthAmount = BigNumber.from(ONE_ETH);
-      await deployer.sendTransaction({ to: TransactorContract.address, value: transferredEthAmount });
+      await owner.sendTransaction({ to: TransactorContract.address, value: transferredEthAmount });
 
       // Check contract received the ETH
       const transactorContractBalance = await ethers.provider.getBalance(TransactorContract.address);
@@ -291,9 +292,9 @@ describe('Transactor', function () {
     it('should execute trade, keeping the profit on the contract and sending a SuccessfulTrade event', async function () {
       const { TransactorContract } = await setup();
       const currentBlockNumber = await ethers.provider.getBlockNumber();
-      const { deployerAddress } = await getNamedAccounts();
-      const deployer = await ethers.getSigner(deployerAddress);
-      const wethContract = getWethContract(deployer);
+      const { ownerAddress } = await getNamedAccounts();
+      const owner = await ethers.getSigner(ownerAddress);
+      const wethContract = getWethContract(owner);
 
       // Check we start with an empty balance on the contract
       const transactorContractBalanceBeforeTransfer = await wethContract.balanceOf(TransactorContract.address);
@@ -332,10 +333,10 @@ describe('Transactor', function () {
   describe('callFunction', function () {
     it('reverts when being called by an account that is not DyDx solo margin contract', async function () {
       const { TransactorContract } = await setup();
-      const { deployerAddress } = await getNamedAccounts();
+      const { ownerAddress } = await getNamedAccounts();
 
       await expect(
-        TransactorContract.callFunction(deployerAddress, { owner: deployerAddress, number: BigNumber.from('1') }, [])
+        TransactorContract.callFunction(ownerAddress, { owner: ownerAddress, number: BigNumber.from('1') }, [])
       ).to.be.revertedWith('VM Exception while processing transaction: reverted with panic code 0x1 (Assertion error)');
     });
   });

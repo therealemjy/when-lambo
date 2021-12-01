@@ -13,10 +13,10 @@ const deployFunc: DeployFunction = async function (hre: HardhatRuntimeEnvironmen
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
 
-  const { deployerAddress } = await getNamedAccounts();
+  const { ownerAddress } = await getNamedAccounts();
 
   await deploy('Transactor', {
-    from: deployerAddress,
+    from: ownerAddress,
     log: true,
     autoMine: true, // speed up deployment on local network (ganache, hardhat), no effect on live networks
     args: [
