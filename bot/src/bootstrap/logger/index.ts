@@ -66,7 +66,7 @@ const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: Googl
       expenseDec: path[0].fromTokenDecimalAmount.plus(gasCost),
     });
 
-    const profitTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
+    const profitInTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
 
     // Only log profitable paths in production
     if (config.isProd && profitDec.isGreaterThan(0)) {
@@ -104,7 +104,7 @@ const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: Googl
             },
             {
               type: 'mrkdwn',
-              text: `*Profit (in ${path[0].fromToken.symbol}):*\n${profitTokens}`,
+              text: `*Profit (in ${path[0].fromToken.symbol}):*\n${profitInTokens}`,
             },
             {
               type: 'mrkdwn',
@@ -128,7 +128,7 @@ const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: Googl
         bestBuyingExchangeName,
         +revenues,
         +gasCostWETH,
-        +profitTokens,
+        +profitInTokens,
         `${profitPercent}%`,
       ]);
     }
@@ -142,7 +142,7 @@ const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: Googl
         'Best buying exchange': bestBuyingExchangeName,
         [`${path[0].fromToken.symbol} bought back`]: revenues,
         'Gas cost (in WETH)': gasCostWETH,
-        [`Profit (in ${path[0].fromToken.symbol})`]: profitTokens,
+        [`Profit (in ${path[0].fromToken.symbol})`]: profitInTokens,
         'Profit (%)': profitPercent + '%',
       });
     }
