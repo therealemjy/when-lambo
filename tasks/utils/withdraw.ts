@@ -1,21 +1,21 @@
 import { BigNumber, ContractTransaction } from 'ethers';
 
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import delay from '../utils/delay';
+import delay from '../../utils/delay';
 
 // TODO: import mainnet info once contract has been deployed on it
-import transactorContractInfo from '../deployments/localhost/Transactor.json';
-import { Transactor as ITransactorContract } from '../typechain';
-import { WETH_MAINNET_ADDRESS } from '../constants';
-import wethAbi from '../utils/wethAbi.json';
-import swapEthForWeth from '../utils/swapEthForWeth';
-import formatNestedBN from '../utils/formatNestedBN';
+import transactorContractInfo from '../../deployments/localhost/Transactor.json';
+import { Transactor as ITransactorContract } from '../../typechain';
+import { WETH_MAINNET_ADDRESS } from '../../constants';
+import wethAbi from '../../utils/wethAbi.json';
+import swapEthForWeth from '../../utils/swapEthForWeth';
+import formatNestedBN from '../../utils/formatNestedBN';
 
 const COUNTDOWN_SECONDS = 60;
 
 // TODO: add tests
 
-const transfer = async (
+const withdraw = async (
   { tokenSymbol, amount }: { tokenSymbol: 'ETH' | 'WETH'; amount: BigNumber },
   { ethers, getNamedAccounts }: HardhatRuntimeEnvironment
 ) => {
@@ -96,4 +96,4 @@ const transfer = async (
   console.log(JSON.stringify(receipt));
 };
 
-export default transfer;
+export default withdraw;

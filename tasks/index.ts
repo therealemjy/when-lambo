@@ -1,13 +1,13 @@
 import { task, types } from 'hardhat/config';
 
-import transfer from './transfer';
+import withdraw from './utils/withdraw';
 
-task('transferETH', 'Transfers ETH from Transactor contract to vault account')
-  .addParam('eth', 'The amount of ethers to transfer', undefined, types.int)
+task('withdrawETH', 'Withdraw ETH from Transactor contract to vault account')
+  .addParam('eth', 'The amount of ethers to withdraw', undefined, types.int)
   .setAction(async ({ eth }, hre) => {
     const weiAmount = hre.ethers.utils.parseEther(eth.toString());
 
-    return transfer(
+    return withdraw(
       {
         tokenSymbol: 'ETH',
         amount: weiAmount,
@@ -16,12 +16,12 @@ task('transferETH', 'Transfers ETH from Transactor contract to vault account')
     );
   });
 
-task('transferWETH', 'Transfers WETH from Transactor contract to vault account')
-  .addParam('weth', 'The amount of WETH to transfer', undefined, types.int)
+task('withdrawWETH', 'Withdraw WETH from Transactor contract to vault account')
+  .addParam('weth', 'The amount of WETH to withdraw', undefined, types.int)
   .setAction(async ({ weth }, hre) => {
     const wethDecimalAmount = hre.ethers.utils.parseEther(weth.toString());
 
-    return transfer(
+    return withdraw(
       {
         tokenSymbol: 'WETH',
         amount: wethDecimalAmount,
