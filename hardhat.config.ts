@@ -9,7 +9,7 @@ import * as dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 
 import './tasks';
-import { profitableTestTrade } from './constants';
+import { OWNER_ACCOUNT_MAINNET_ADDRESS, profitableTestTrade } from './constants';
 
 dotenv.config();
 
@@ -36,13 +36,18 @@ const config: HardhatUserConfig = {
   },
   namedAccounts: {
     ownerAddress: {
-      default: 0, // assign the first user as owner
+      // hardhat: 0, // assign the first user as owner
+      // DEV ONLY
+      hardhat: 0, // assign the first user as owner
+      // END DEV ONLY
+      mainnet: OWNER_ACCOUNT_MAINNET_ADDRESS,
     },
     vaultAddress: {
-      default: 1,
+      hardhat: 1,
+      // TODO: add mainnet address
     },
     externalUserAddress: {
-      default: 2, // assign another account as external user (used in tests only)
+      hardhat: 2, // assign another account as external user (used in tests only)
     },
   },
 };
