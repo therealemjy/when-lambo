@@ -2,28 +2,24 @@ import { BigNumber, ContractTransaction, Signer } from 'ethers';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 // TODO: import mainnet info once contract has been deployed on it
-import transactorContractInfo from '../../deployments/localhost/Transactor.json';
-import delay from '../../utils/delay';
+import { abi as transactorContractAbi } from '../../deployments/localhost/Transactor.json';
 import { Transactor as ITransactorContract } from '../../typechain';
-import { WETH_MAINNET_ADDRESS, LEDGER_OWNER_ACCOUNT_PATH } from '../../constants';
+import { WETH_MAINNET_ADDRESS } from '../../constants';
 import wethAbi from '../../utils/wethAbi.json';
 import formatNestedBN from '../../utils/formatNestedBN';
 
-// import swapEthForWeth from '../../utils/swapEthForWeth';
-
-// DEV ONLY: remove once this task is connected to the contract on the mainnet
-// Transfer funds to contract (in tests its funds will always be 0 since it just got deployed)
-// if (tokenSymbol === 'ETH') {
-//   await owner.sendTransaction({ to: TransactorContract.address, value: amount });
-// } else {
-//   await swapEthForWeth(ethers, owner, amount, TransactorContract.address);
-// }
-// END DEV ONLY
-
-const COUNTDOWN_SECONDS = 60;
-
-const withdraw = async (
-  { signer, tokenSymbol, amount }: { signer: Signer; tokenSymbol: 'ETH' | 'WETH'; amount: BigNumber },
+const withdrawFromTransactorContract = async (
+  {
+    signer,
+    tokenSymbol,
+    amount,
+    transactorContractAddress,
+  }: {
+    signer: Signer;
+    tokenSymbol: 'ETH' | 'WETH';
+    amount: BigNumber;
+    transactorContractAddress: string;
+  },
   { ethers, getNamedAccounts }: HardhatRuntimeEnvironment
 ) => {
   const signerAddress = await signer.getAddress();
@@ -37,8 +33,8 @@ const withdraw = async (
   }
 
   const TransactorContract = new ethers.Contract(
-    transactorContractInfo.address,
-    transactorContractInfo.abi,
+    transactorContractAddress,
+    transactorContractAbi,
     signer
   ) as ITransactorContract;
 
@@ -46,10 +42,10 @@ const withdraw = async (
   let contractBalance: BigNumber;
 
   if (tokenSymbol === 'ETH') {
-    contractBalance = await ethers.provider.getBalance(transactorContractInfo.address);
+    contractBalance = await ethers.provider.getBalance(transactorContractAddress);
   } else {
     const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, signer);
-    contractBalance = await wethContract.balanceOf(transactorContractInfo.address);
+    contractBalance = await wethContract.balanceOf(transactorContractAddress);
   }
 
   if (contractBalance.lt(amount)) {
@@ -59,26 +55,6 @@ const withdraw = async (
       )} ${tokenSymbol}`
     );
   }
-
-  // Display transaction information and add a countdown
-  console.log('Review and confirm the next transaction. Press on ctrl + c to cancel.\n');
-  console.log(`Amount: ${ethers.utils.formatEther(amount.toString())} ${tokenSymbol}`);
-  console.log(`From: Transactor contract (${transactorContractInfo.address})`);
-  console.log(`To: vault account (${vaultAddress})\n`);
-
-  for (let t = 0; t < COUNTDOWN_SECONDS; t++) {
-    if (t > 0) {
-      process.stdout.clearLine(-1);
-      process.stdout.cursorTo(0);
-    }
-    process.stdout.write(`Seconds before execution: ${COUNTDOWN_SECONDS - t}`);
-
-    await delay(1000);
-  }
-
-  // Remove timer line
-  process.stdout.clearLine(-1);
-  process.stdout.cursorTo(0);
 
   // Execute trade
   console.log('Executing transaction...');
@@ -99,4 +75,4 @@ const withdraw = async (
   console.log(JSON.stringify(receipt));
 };
 
-export default withdraw;
+export default withdrawFromTransactorContract;

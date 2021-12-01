@@ -1,39 +1,65 @@
 import { LedgerSigner } from '@ethersproject/hardware-wallets';
 import { task, types } from 'hardhat/config';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
-import { LEDGER_OWNER_ACCOUNT_PATH } from '../constants';
-import withdraw from './utils/withdraw';
+// TODO: import mainnet info once contract has been deployed on it
+import { address as transactorContractAddress } from '../deployments/localhost/Transactor.json';
+import { LEDGER_OWNER_ACCOUNT_PATH, VAULT_ACCOUNT_MAINNET_ADDRESS } from '../constants';
+import withdrawFromTransactorContract from './utils/withdrawFromTransactorContract';
+
+const withdraw = async (
+  {
+    tokenSymbol,
+    tokenAmount,
+  }: {
+    tokenSymbol: 'ETH' | 'WETH';
+    tokenAmount: string;
+  },
+  hre: HardhatRuntimeEnvironment
+) => {
+  // Display transaction information
+  console.log('Review and confirm the next transaction. Press ctrl + c to cancel.\n');
+  console.log(`Amount: ${tokenAmount} ${tokenSymbol}`);
+  console.log(`From: Transactor contract (${transactorContractAddress})`);
+  console.log(`To: vault account (${VAULT_ACCOUNT_MAINNET_ADDRESS})\n`);
+
+  // Connect to ledger to retrieve signer
+  const signer = new LedgerSigner(hre.ethers.provider, 'hid', LEDGER_OWNER_ACCOUNT_PATH);
+
+  // Convert amount to wei
+  const weiAmount = hre.ethers.utils.parseEther(tokenAmount.toString());
+
+  return withdrawFromTransactorContract(
+    {
+      signer,
+      tokenSymbol,
+      amount: weiAmount,
+      transactorContractAddress,
+    },
+    hre
+  );
+};
 
 task('withdrawETH', 'Withdraw ETH from Transactor contract to vault account')
   .addParam('eth', 'The amount of ethers to withdraw', undefined, types.int)
-  .setAction(async ({ eth }, hre) => {
-    // Connect to ledger to retrieve signer
-    const signer = new LedgerSigner(hre.ethers.provider, 'hid', LEDGER_OWNER_ACCOUNT_PATH);
-    const weiAmount = hre.ethers.utils.parseEther(eth.toString());
-
-    return withdraw(
+  .setAction(async ({ eth }, hre) =>
+    withdraw(
       {
-        signer,
         tokenSymbol: 'ETH',
-        amount: weiAmount,
+        tokenAmount: eth,
       },
       hre
-    );
-  });
+    )
+  );
 
 task('withdrawWETH', 'Withdraw WETH from Transactor contract to vault account')
   .addParam('weth', 'The amount of WETH to withdraw', undefined, types.int)
-  .setAction(async ({ weth }, hre) => {
-    // Connect to ledger to retrieve signer
-    const signer = new LedgerSigner(hre.ethers.provider, 'hid', LEDGER_OWNER_ACCOUNT_PATH);
-    const wethDecimalAmount = hre.ethers.utils.parseEther(weth.toString());
-
-    return withdraw(
+  .setAction(async ({ weth }, hre) =>
+    withdraw(
       {
-        signer,
         tokenSymbol: 'WETH',
-        amount: wethDecimalAmount,
+        tokenAmount: weth,
       },
       hre
-    );
-  });
+    )
+  );

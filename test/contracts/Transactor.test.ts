@@ -21,8 +21,7 @@ const setup = deployments.createFixture(async () => {
   return { TransactorContract };
 });
 
-const ONE_ETH = ethers.utils.parseEther('1');
-const ONE_WETH = ONE_ETH;
+const ONE_ETHER = ethers.utils.parseEther('1');
 
 describe('contracts/Transactor', function () {
   describe('destruct', function () {
@@ -49,7 +48,7 @@ describe('contracts/Transactor', function () {
       const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, owner);
 
       // Send 1 ETH to the contract
-      const transferredEthAmount = ONE_ETH;
+      const transferredEthAmount = ONE_ETHER;
       await owner.sendTransaction({
         to: TransactorContract.address,
         value: BigNumber.from(transferredEthAmount),
@@ -60,7 +59,7 @@ describe('contracts/Transactor', function () {
       expect(contractEthBalanceBeforeDestruct.toString()).to.equal(transferredEthAmount);
 
       // Send 1 WETH to the contract
-      const transferredWethAmount = ONE_WETH;
+      const transferredWethAmount = ONE_ETHER;
       await swapEthForWeth(ethers, owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
 
       // Check contract received the WETH
@@ -101,7 +100,7 @@ describe('contracts/Transactor', function () {
       const contractBalanceBeforeTransfer = await ethers.provider.getBalance(TransactorContract.address);
       expect(contractBalanceBeforeTransfer.toString()).to.equal('0');
 
-      const transferredEthAmount = ONE_ETH;
+      const transferredEthAmount = ONE_ETHER;
 
       await owner.sendTransaction({
         to: TransactorContract.address,
@@ -120,7 +119,7 @@ describe('contracts/Transactor', function () {
       const contractBalanceBeforeTransfer = await ethers.provider.getBalance(TransactorContract.address);
       expect(contractBalanceBeforeTransfer.toString()).to.equal('0');
 
-      const transferredEthAmount = ONE_ETH;
+      const transferredEthAmount = ONE_ETHER;
 
       await owner.sendTransaction({
         to: TransactorContract.address,
@@ -140,7 +139,7 @@ describe('contracts/Transactor', function () {
       const externalUser = await ethers.getSigner(externalUserAddress);
 
       await expect(
-        TransactorContract.connect(externalUser).transferERC20(WETH_MAINNET_ADDRESS, ONE_WETH, externalUserAddress)
+        TransactorContract.connect(externalUser).transferERC20(WETH_MAINNET_ADDRESS, ONE_ETHER, externalUserAddress)
       ).to.be.revertedWith('Owner only');
     });
 
@@ -157,7 +156,7 @@ describe('contracts/Transactor', function () {
       expect(transactorContractBalanceBeforeTransfer.toString()).to.equal('0');
 
       // Transfer 1 WETH to the contract
-      const transferredWethAmount = ONE_WETH;
+      const transferredWethAmount = ONE_ETHER;
       await swapEthForWeth(ethers, owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
 
       // Check contract received the WETH
@@ -165,7 +164,7 @@ describe('contracts/Transactor', function () {
       expect(transactorContractBalance.toString()).to.equal(transferredWethAmount);
 
       // Transfer 1 WETH from the contract to a user who's not the owner of the contract
-      await TransactorContract.transferERC20(WETH_MAINNET_ADDRESS, ONE_WETH, externalUserAddress);
+      await TransactorContract.transferERC20(WETH_MAINNET_ADDRESS, ONE_ETHER, externalUserAddress);
 
       // Check user received the WETH
       const externalUserBalanceAfterTransfer = await wethContract.balanceOf(externalUserAddress);
@@ -186,7 +185,7 @@ describe('contracts/Transactor', function () {
       const externalUser = await ethers.getSigner(externalUserAddress);
 
       await expect(
-        TransactorContract.connect(externalUser).transferETH(ONE_ETH, externalUserAddress)
+        TransactorContract.connect(externalUser).transferETH(ONE_ETHER, externalUserAddress)
       ).to.be.revertedWith('Owner only');
     });
 
@@ -195,7 +194,9 @@ describe('contracts/Transactor', function () {
       const { externalUserAddress } = await getNamedAccounts();
 
       // Transfer 1 ETH from the contract to a user who's not the owner of the contract
-      await expect(TransactorContract.transferETH(ONE_ETH, externalUserAddress)).to.be.revertedWith('Transfer failed');
+      await expect(TransactorContract.transferETH(ONE_ETHER, externalUserAddress)).to.be.revertedWith(
+        'Transfer failed'
+      );
     });
 
     it('transfers the amount of tokens specified from the contract to the provided address', async function () {
@@ -212,7 +213,7 @@ describe('contracts/Transactor', function () {
 
       // Transfer 1 ETH to the contract
       // Note: we send the ETH from the owner signer so the external user balance isn't affected
-      const transferredEthAmount = BigNumber.from(ONE_ETH);
+      const transferredEthAmount = BigNumber.from(ONE_ETHER);
       await owner.sendTransaction({ to: TransactorContract.address, value: transferredEthAmount });
 
       // Check contract received the ETH
@@ -220,7 +221,7 @@ describe('contracts/Transactor', function () {
       expect(transactorContractBalance.toString()).to.equal(transferredEthAmount);
 
       // Transfer 1 ETH from the contract to a user who's not the owner of the contract
-      await TransactorContract.transferETH(ONE_ETH, externalUserAddress);
+      await TransactorContract.transferETH(ONE_ETHER, externalUserAddress);
 
       // Check user received the ETH
       const externalUserBalanceAfterTransfer = await externalUser.getBalance();
