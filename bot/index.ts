@@ -1,10 +1,9 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 
-import getAwsWSProvider from '@src/bootstrap/aws/getProvider';
-
 import './@moduleAliases';
 import blockHandler from './src/blockHandler';
 import { bootstrap } from './src/bootstrap';
+import getAwsWSProvider from './src/bootstrap/aws/getProvider';
 import eventEmitter from './src/bootstrap/eventEmitter';
 import logger from './src/bootstrap/logger';
 import CryptoComExchange from './src/exchanges/cryptoCom';
