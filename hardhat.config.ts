@@ -45,6 +45,9 @@ const config: HardhatUserConfig = {
       default: 2, // assign another account as external user (used in tests only)
     },
   },
+  paths: {
+    tests: './contracts/__tests__',
+  },
 };
 
 export default config;
