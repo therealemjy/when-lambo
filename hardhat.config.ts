@@ -38,7 +38,7 @@ const config: HardhatUserConfig = {
     ownerAddress: {
       default: 0, // assign the first user as owner
     },
-    bankAddress: {
+    vaultAddress: {
       default: 1,
     },
     externalUserAddress: {
