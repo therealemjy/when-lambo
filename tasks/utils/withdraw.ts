@@ -6,7 +6,7 @@ import { LedgerSigner } from '@ethersproject/hardware-wallets';
 import transactorContractInfo from '../../deployments/localhost/Transactor.json';
 import delay from '../../utils/delay';
 import { Transactor as ITransactorContract } from '../../typechain';
-import { WETH_MAINNET_ADDRESS } from '../../constants';
+import { WETH_MAINNET_ADDRESS, LEDGER_OWNER_ACCOUNT_PATH } from '../../constants';
 import wethAbi from '../../utils/wethAbi.json';
 import formatNestedBN from '../../utils/formatNestedBN';
 // import swapEthForWeth from '../../utils/swapEthForWeth';
@@ -20,7 +20,7 @@ const withdraw = async (
   { ethers, getNamedAccounts }: HardhatRuntimeEnvironment
 ) => {
   // Connect to ledger to retrieve owner signer
-  const owner = new LedgerSigner(ethers.provider, 'hid', process.env.LEDGER_PATH);
+  const owner = new LedgerSigner(ethers.provider, 'hid', LEDGER_OWNER_ACCOUNT_PATH);
   const ownerAddressLedger = await owner.getAddress();
   const { ownerAddress, vaultAddress } = await getNamedAccounts();
 
