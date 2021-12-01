@@ -10,5 +10,6 @@
     "resolveJsonModule": true
   },
   "include": ["./hardhat.config.ts", "./scripts", "./deploy", "./test", "typechain/**/*"],
+  "exclude": ["./bot"],
   "files": ["./hardhat.config.ts"]
 }

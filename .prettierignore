@@ -3,3 +3,8 @@ node_modules
 package.json
 dist
 build
+
+artifacts
+cache
+coverage*
+gasReporterOutput.json
