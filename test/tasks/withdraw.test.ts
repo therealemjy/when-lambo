@@ -32,4 +32,29 @@ describe('tasks/withdraw', function () {
       `Wrong signer. The signer address needed is ${ownerAddress}, but the one provided was ${externalUserAddress}`
     );
   });
+
+  describe('throws an error when contract does not have sufficient funds', async function () {
+    const tokenSymbols: ['ETH', 'WETH'] = ['ETH', 'WETH'];
+
+    for (let t = 0; t < tokenSymbols.length; t++) {
+      const tokenSymbol = tokenSymbols[t];
+
+      it(`when withdrawing ${tokenSymbol}`, async () => {
+        await setup();
+        const { ownerAddress } = await getNamedAccounts();
+        const owner = await ethers.getSigner(ownerAddress);
+
+        await expect(
+          withdraw(
+            {
+              signer: owner,
+              tokenSymbol,
+              amount: ONE_ETH,
+            },
+            HRE
+          )
+        ).to.be.rejectedWith(`Insufficient funds on contract. Current balance: 0.0 ${tokenSymbol}`);
+      });
+    }
+  });
 });
