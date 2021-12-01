@@ -1,17 +1,17 @@
-import 'hardhat-deploy';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
-import 'hardhat-gas-reporter';
-import 'solidity-coverage';
-import * as dotenv from 'dotenv';
-import { HardhatUserConfig } from 'hardhat/config';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import * as dotenv from 'dotenv';
+import 'hardhat-deploy';
+import 'hardhat-gas-reporter';
+import { HardhatUserConfig } from 'hardhat/config';
+import 'solidity-coverage';
 
-import './tasks';
 import { OWNER_ACCOUNT_MAINNET_ADDRESS, profitableTestTrade } from './constants';
+import './tasks';
 
 chai.use(chaiAsPromised);
 dotenv.config();

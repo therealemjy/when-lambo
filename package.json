@@ -8,7 +8,9 @@
   "scripts": {
     "tsc": "tsc --noEmit",
     "test": "hardhat test",
-    "bot:test": "hardhat node --fork https://eth-mainnet.alchemyapi.io/v2/riG17C292D4AAxmWW0cSzqqIIgR7TYhu --fork-block-number 13680260",
+    "format": "npm-run-all format:*",
+    "format:json": "prettier --write \"**/*.json\"",
+    "format:ts": "prettier --write \"**/*.ts\"",
     "bot:predeploy": "cd bot && rm -rf ./dist && npm run tsc && cd ../ && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
     "bot:deploy": "npx pm2 deploy one update --force && npx pm2 deploy two update --force && npx pm2 deploy three update --force && npx pm2 deploy four update --force && npx pm2 deploy five update --force && npx pm2 deploy six update --force"
   },
@@ -19,6 +21,7 @@
     "@nomiclabs/hardhat-etherscan": "^2.1.7",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "^4.3.3",
+    "@trivago/prettier-plugin-sort-imports": "^3.1.1",
     "@typechain/ethers-v5": "^7.2.0",
     "@typechain/hardhat": "^2.3.1",
     "@types/chai": "^4.2.22",
@@ -43,6 +46,7 @@
     "hardhat-deploy": "^0.9.10",
     "hardhat-gas-reporter": "^1.0.4",
     "module-alias": "^2.2.2",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.4.1",
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "sinon": "^12.0.1",
