@@ -23,7 +23,6 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
-      // TODO: check if we need to pass undefined once we'll deploy the contracts onto the mainnet
       forking: {
         url: process.env.MAINNET_FORKING_RPC_URL || '',
         blockNumber: profitableTestTrade.blockNumber, // Juicy deal (see tests)
