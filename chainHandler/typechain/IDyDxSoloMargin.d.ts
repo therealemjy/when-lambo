@@ -3,10 +3,9 @@
 /* tslint:disable */
 
 /* eslint-disable */
-import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
 import {
   ethers,
   EventFilter,
@@ -18,15 +17,17 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
+} from 'ethers';
+
+import type { TypedEventFilter, TypedEvent, TypedListener } from './common';
 
 interface IDyDxSoloMarginInterface extends ethers.utils.Interface {
   functions: {
-    "operate(tuple[],tuple[])": FunctionFragment;
+    'operate(tuple[],tuple[])': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "operate",
+    functionFragment: 'operate',
     values: [
       { owner: string; number: BigNumberish }[],
       {
@@ -47,7 +48,7 @@ interface IDyDxSoloMarginInterface extends ethers.utils.Interface {
     ]
   ): string;
 
-  decodeFunctionResult(functionFragment: "operate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'operate', data: BytesLike): Result;
 
   events: {};
 }

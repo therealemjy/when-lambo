@@ -14,6 +14,7 @@ module.exports = {
     'no-shadow': 'off',
     'no-undef-init': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/ban-ts-comment': 'warn',
     '@typescript-eslint/no-shadow': ['error', { ignoreTypeValueShadow: true }],
     'import/no-anonymous-default-export': [

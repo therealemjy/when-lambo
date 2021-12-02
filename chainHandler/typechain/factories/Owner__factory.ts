@@ -3,51 +3,50 @@
 /* tslint:disable */
 
 /* eslint-disable */
-import type { Owner, OwnerInterface } from "../Owner";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
-import { Signer, utils, Contract, ContractFactory, Overrides } from "ethers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { Signer, utils, Contract, ContractFactory, Overrides } from 'ethers';
+
+import type { Owner, OwnerInterface } from '../Owner';
 
 const _abi = [
   {
     inputs: [],
-    stateMutability: "nonpayable",
-    type: "constructor",
+    stateMutability: 'nonpayable',
+    type: 'constructor',
   },
   {
     inputs: [],
-    name: "owner",
+    name: 'owner',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "_newOwner",
-        type: "address",
+        internalType: 'address',
+        name: '_newOwner',
+        type: 'address',
       },
     ],
-    name: "setOwner",
+    name: 'setOwner',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
 ];
 
 const _bytecode =
-  "0x608060405234801561001057600080fd5b50600080546001600160a01b03191633179055610150806100326000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c806313af40351461003b5780638da5cb5b14610050575b600080fd5b61004e6100493660046100ec565b61007f565b005b600054610063906001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f35b6000546001600160a01b031633146100ca5760405162461bcd60e51b815260206004820152600a6024820152694f776e6572206f6e6c7960b01b604482015260640160405180910390fd5b600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000602082840312156100fd578081fd5b81356001600160a01b0381168114610113578182fd5b939250505056fea2646970667358221220a4aaef16aaf24124a36c1198a146064ce9af355c18985aeae482231edeb89dc364736f6c63430008040033";
+  '0x608060405234801561001057600080fd5b50600080546001600160a01b03191633179055610150806100326000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c806313af40351461003b5780638da5cb5b14610050575b600080fd5b61004e6100493660046100ec565b61007f565b005b600054610063906001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f35b6000546001600160a01b031633146100ca5760405162461bcd60e51b815260206004820152600a6024820152694f776e6572206f6e6c7960b01b604482015260640160405180910390fd5b600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000602082840312156100fd578081fd5b81356001600160a01b0381168114610113578182fd5b939250505056fea2646970667358221220a4aaef16aaf24124a36c1198a146064ce9af355c18985aeae482231edeb89dc364736f6c63430008040033';
 
 export class Owner__factory extends ContractFactory {
-  constructor(
-    ...args: [signer: Signer] | ConstructorParameters<typeof ContractFactory>
-  ) {
+  constructor(...args: [signer: Signer] | ConstructorParameters<typeof ContractFactory>) {
     if (args.length === 1) {
       super(_abi, _bytecode, args[0]);
     } else {
@@ -55,14 +54,10 @@ export class Owner__factory extends ContractFactory {
     }
   }
 
-  deploy(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<Owner> {
+  deploy(overrides?: Overrides & { from?: string | Promise<string> }): Promise<Owner> {
     return super.deploy(overrides || {}) as Promise<Owner>;
   }
-  getDeployTransaction(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): TransactionRequest {
+  getDeployTransaction(overrides?: Overrides & { from?: string | Promise<string> }): TransactionRequest {
     return super.getDeployTransaction(overrides || {});
   }
   attach(address: string): Owner {

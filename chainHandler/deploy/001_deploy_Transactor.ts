@@ -7,7 +7,7 @@ import {
   UNISWAP_V2_ROUTER_MAINNET_ADDRESS,
   SUSHISWAP_ROUTER_MAINNET_ADDRESS,
   CRYPTO_COM_ROUTER_MAINNET_ADDRESS,
-} from '../../constants';
+} from '@constants';
 
 const deployFunc: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;

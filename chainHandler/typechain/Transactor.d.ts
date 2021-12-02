@@ -3,10 +3,9 @@
 /* tslint:disable */
 
 /* eslint-disable */
-import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
 import {
   ethers,
   EventFilter,
@@ -18,79 +17,51 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
+} from 'ethers';
+
+import type { TypedEventFilter, TypedEvent, TypedListener } from './common';
 
 interface TransactorInterface extends ethers.utils.Interface {
   functions: {
-    "callFunction(address,(address,uint256),bytes)": FunctionFragment;
-    "destruct(address)": FunctionFragment;
-    "getExchange(uint8)": FunctionFragment;
-    "owner()": FunctionFragment;
-    "setOwner(address)": FunctionFragment;
-    "trade(uint256,uint256,uint8,uint256,uint8,address,uint256,uint256)": FunctionFragment;
-    "transferERC20(address,uint256,address)": FunctionFragment;
-    "transferETH(uint256,address)": FunctionFragment;
+    'callFunction(address,(address,uint256),bytes)': FunctionFragment;
+    'destruct(address)': FunctionFragment;
+    'getExchange(uint8)': FunctionFragment;
+    'owner()': FunctionFragment;
+    'setOwner(address)': FunctionFragment;
+    'trade(uint256,uint256,uint8,uint256,uint8,address,uint256,uint256)': FunctionFragment;
+    'transferERC20(address,uint256,address)': FunctionFragment;
+    'transferETH(uint256,address)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "callFunction",
+    functionFragment: 'callFunction',
     values: [string, { owner: string; number: BigNumberish }, BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "destruct", values: [string]): string;
+  encodeFunctionData(functionFragment: 'destruct', values: [string]): string;
+  encodeFunctionData(functionFragment: 'getExchange', values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'setOwner', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "getExchange",
-    values: [BigNumberish]
+    functionFragment: 'trade',
+    values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish, BigNumberish, string, BigNumberish, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "setOwner", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "trade",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      BigNumberish,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferERC20",
-    values: [string, BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferETH",
-    values: [BigNumberish, string]
-  ): string;
+  encodeFunctionData(functionFragment: 'transferERC20', values: [string, BigNumberish, string]): string;
+  encodeFunctionData(functionFragment: 'transferETH', values: [BigNumberish, string]): string;
 
-  decodeFunctionResult(
-    functionFragment: "callFunction",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "destruct", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getExchange",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "setOwner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "trade", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "transferERC20",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferETH",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: 'callFunction', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'destruct', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getExchange', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'setOwner', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'trade', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'transferERC20', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'transferETH', data: BytesLike): Result;
 
   events: {
-    "SuccessfulTrade(address,uint256,uint8,uint256,uint8,uint256)": EventFragment;
+    'SuccessfulTrade(address,uint256,uint8,uint256,uint8,uint256)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "SuccessfulTrade"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'SuccessfulTrade'): EventFragment;
 }
 
 export type SuccessfulTradeEvent = TypedEvent<
@@ -155,15 +126,9 @@ export class Transactor extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    destruct(
-      _to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    destruct(_to: string, overrides?: Overrides & { from?: string | Promise<string> }): Promise<ContractTransaction>;
 
-    getExchange(
-      exchangeIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+    getExchange(exchangeIndex: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -205,15 +170,9 @@ export class Transactor extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  destruct(
-    _to: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  destruct(_to: string, overrides?: Overrides & { from?: string | Promise<string> }): Promise<ContractTransaction>;
 
-  getExchange(
-    exchangeIndex: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
+  getExchange(exchangeIndex: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -257,10 +216,7 @@ export class Transactor extends BaseContract {
 
     destruct(_to: string, overrides?: CallOverrides): Promise<void>;
 
-    getExchange(
-      exchangeIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
+    getExchange(exchangeIndex: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -278,22 +234,13 @@ export class Transactor extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    transferERC20(
-      _token: string,
-      _amount: BigNumberish,
-      _to: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    transferERC20(_token: string, _amount: BigNumberish, _to: string, overrides?: CallOverrides): Promise<void>;
 
-    transferETH(
-      _amount: BigNumberish,
-      _to: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    transferETH(_amount: BigNumberish, _to: string, overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
-    "SuccessfulTrade(address,uint256,uint8,uint256,uint8,uint256)"(
+    'SuccessfulTrade(address,uint256,uint8,uint256,uint8,uint256)'(
       tradedTokenAddress?: null,
       borrowedWethAmount?: null,
       sellingExchangeIndex?: null,
@@ -340,22 +287,13 @@ export class Transactor extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    destruct(
-      _to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    destruct(_to: string, overrides?: Overrides & { from?: string | Promise<string> }): Promise<BigNumber>;
 
-    getExchange(
-      exchangeIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    getExchange(exchangeIndex: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setOwner(
-      _newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    setOwner(_newOwner: string, overrides?: Overrides & { from?: string | Promise<string> }): Promise<BigNumber>;
 
     trade(
       expectedBlockNumber: BigNumberish,
@@ -391,15 +329,9 @@ export class Transactor extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    destruct(
-      _to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    destruct(_to: string, overrides?: Overrides & { from?: string | Promise<string> }): Promise<PopulatedTransaction>;
 
-    getExchange(
-      exchangeIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getExchange(exchangeIndex: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

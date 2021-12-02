@@ -3,10 +3,9 @@
 /* tslint:disable */
 
 /* eslint-disable */
-import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
 import {
   ethers,
   EventFilter,
@@ -18,19 +17,21 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
+} from 'ethers';
+
+import type { TypedEventFilter, TypedEvent, TypedListener } from './common';
 
 interface OwnerInterface extends ethers.utils.Interface {
   functions: {
-    "owner()": FunctionFragment;
-    "setOwner(address)": FunctionFragment;
+    'owner()': FunctionFragment;
+    'setOwner(address)': FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "setOwner", values: [string]): string;
+  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'setOwner', values: [string]): string;
 
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "setOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'setOwner', data: BytesLike): Result;
 
   events: {};
 }
@@ -105,10 +106,7 @@ export class Owner extends BaseContract {
   estimateGas: {
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setOwner(
-      _newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    setOwner(_newOwner: string, overrides?: Overrides & { from?: string | Promise<string> }): Promise<BigNumber>;
   };
 
   populateTransaction: {

@@ -3,10 +3,9 @@
 /* tslint:disable */
 
 /* eslint-disable */
-import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
 import {
   ethers,
   EventFilter,
@@ -18,22 +17,21 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
+} from 'ethers';
+
+import type { TypedEventFilter, TypedEvent, TypedListener } from './common';
 
 interface IUniswapV2RouterInterface extends ethers.utils.Interface {
   functions: {
-    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)": FunctionFragment;
+    'swapExactTokensForTokens(uint256,uint256,address[],address,uint256)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "swapExactTokensForTokens",
+    functionFragment: 'swapExactTokensForTokens',
     values: [BigNumberish, BigNumberish, string[], string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "swapExactTokensForTokens",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: 'swapExactTokensForTokens', data: BytesLike): Result;
 
   events: {};
 }

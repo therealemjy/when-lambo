@@ -8,7 +8,15 @@
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "rootDirs": ["./"],
+    "baseUrl": "./",
+    "paths": {
+      "@chainHandler/*": ["./chainHandler/*"],
+      "@bot/*": ["./bot/*"],
+      "@deployments/*": ["./deployments/*"],
+      "@constants": ["./constants"]
+    }
   },
   "include": [
     "./hardhat.config.ts",
