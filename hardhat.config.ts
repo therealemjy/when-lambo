@@ -16,7 +16,7 @@ import moduleAlias from 'module-alias';
 import 'module-alias/register';
 import 'solidity-coverage';
 
-import { OWNER_ACCOUNT_MAINNET_ADDRESS, profitableTestTrade } from './constants';
+import { OWNER_ACCOUNT_MAINNET_ADDRESS } from './constants';
 import './hardhatTasks';
 
 chai.use(chaiAsPromised);
@@ -35,7 +35,9 @@ const config: HardhatUserConfig = {
     hardhat: {
       forking: {
         url: process.env.MAINNET_FORKING_RPC_URL || '',
-        blockNumber: profitableTestTrade.blockNumber, // Juicy deal (see tests)
+        blockNumber: process.env.TEST_PROFITABLE_TRADE_BLOCK_NUMBER
+          ? +process.env.TEST_PROFITABLE_TRADE_BLOCK_NUMBER
+          : undefined,
       },
     },
   },
