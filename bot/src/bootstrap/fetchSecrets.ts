@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 
-import config from '@src/bootstrap/config';
+import config from '@src/config';
 
 import logger from './logger';
 

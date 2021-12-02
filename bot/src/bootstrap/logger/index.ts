@@ -4,7 +4,7 @@ import RotatingFileStream from 'bunyan-rotating-file-stream';
 import 'console.table';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
-import config from '@src/bootstrap/config';
+import config from '@src/config';
 import eventEmitter from '@src/bootstrap/eventEmitter';
 import { WETH } from '@src/tokens';
 import { Path } from '@src/types';
