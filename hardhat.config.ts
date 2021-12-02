@@ -10,8 +10,8 @@ import 'hardhat-gas-reporter';
 import { HardhatUserConfig } from 'hardhat/config';
 import 'solidity-coverage';
 
-import './chainHandler/tasks';
 import { OWNER_ACCOUNT_MAINNET_ADDRESS, profitableTestTrade } from './constants';
+import './hardhatTasks';
 
 chai.use(chaiAsPromised);
 dotenv.config();

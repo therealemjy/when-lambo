@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ExchangeName } from '@src/types';
+import sushiswapRouterContract from '@resources/thirdPartyContracts/mainnet/sushiswapRouter.json';
 
-import sushiswapRouterContract from './contracts/sushiswapRouter.json';
+import { Exchange, ExchangeName } from '@src/types';
 
 class Sushiswap implements Exchange {
   name: ExchangeName;

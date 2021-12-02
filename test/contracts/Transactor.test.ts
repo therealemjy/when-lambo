@@ -2,17 +2,15 @@ import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
 
-import {
-  WETH_MAINNET_ADDRESS,
-  UNISWAP_V2_ROUTER_MAINNET_ADDRESS,
-  SUSHISWAP_ROUTER_MAINNET_ADDRESS,
-  CRYPTO_COM_ROUTER_MAINNET_ADDRESS,
-  profitableTestTrade,
-} from '@constants';
+import { profitableTestTrade } from '@constants';
+
+import { address as CRYPTO_COM_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/cryptoComRouter.json';
+import { address as SUSHISWAP_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/sushiswapRouter.json';
+import { address as UNISWAP_V2_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
+import wethMainnetContractInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import swapEthForWeth from '@chainHandler/utils/swapEthForWeth';
-import wethAbi from '@chainHandler/utils/wethAbi.json';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);
@@ -45,7 +43,7 @@ describe('contracts/Transactor', function () {
 
       const owner = await ethers.getSigner(ownerAddress);
       const externalUser = await ethers.getSigner(externalUserAddress);
-      const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, owner);
+      const wethContract = new ethers.Contract(wethMainnetContractInfo.address, wethMainnetContractInfo.abi, owner);
 
       // Send 1 ETH to the contract
       const transferredEthAmount = ONE_ETHER;
@@ -139,7 +137,11 @@ describe('contracts/Transactor', function () {
       const externalUser = await ethers.getSigner(externalUserAddress);
 
       await expect(
-        TransactorContract.connect(externalUser).transferERC20(WETH_MAINNET_ADDRESS, ONE_ETHER, externalUserAddress)
+        TransactorContract.connect(externalUser).transferERC20(
+          wethMainnetContractInfo.address,
+          ONE_ETHER,
+          externalUserAddress
+        )
       ).to.be.revertedWith('Owner only');
     });
 
@@ -148,7 +150,7 @@ describe('contracts/Transactor', function () {
       const { ownerAddress, externalUserAddress } = await getNamedAccounts();
       const owner = await ethers.getSigner(ownerAddress);
 
-      const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, owner);
+      const wethContract = new ethers.Contract(wethMainnetContractInfo.address, wethMainnetContractInfo.abi, owner);
       const externalUserBalanceBeforeTransfer = await wethContract.balanceOf(ownerAddress);
 
       // Check contract's WETH balance is 0
@@ -164,7 +166,7 @@ describe('contracts/Transactor', function () {
       expect(transactorContractBalance.toString()).to.equal(transferredWethAmount);
 
       // Transfer 1 WETH from the contract to a user who's not the owner of the contract
-      await TransactorContract.transferERC20(WETH_MAINNET_ADDRESS, ONE_ETHER, externalUserAddress);
+      await TransactorContract.transferERC20(wethMainnetContractInfo.address, ONE_ETHER, externalUserAddress);
 
       // Check user received the WETH
       const externalUserBalanceAfterTransfer = await wethContract.balanceOf(externalUserAddress);
@@ -295,7 +297,7 @@ describe('contracts/Transactor', function () {
       const currentBlockNumber = await ethers.provider.getBlockNumber();
       const { ownerAddress } = await getNamedAccounts();
       const owner = await ethers.getSigner(ownerAddress);
-      const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, owner);
+      const wethContract = new ethers.Contract(wethMainnetContractInfo.address, wethMainnetContractInfo.abi, owner);
 
       // Check we start with an empty balance on the contract
       const transactorContractBalanceBeforeTransfer = await wethContract.balanceOf(TransactorContract.address);

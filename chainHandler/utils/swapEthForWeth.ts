@@ -1,8 +1,6 @@
 import { ethers, Signer, BigNumber } from 'ethers';
 
-import { WETH_MAINNET_ADDRESS } from '@constants';
-
-import wethAbi from './wethAbi.json';
+import wethMainnetContractInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 const swapEthForWeth = async (
   ethersInstance: typeof ethers,
@@ -11,7 +9,11 @@ const swapEthForWeth = async (
   toAddress: string
 ) => {
   // Get contract
-  const wethContract = new ethersInstance.Contract(WETH_MAINNET_ADDRESS, wethAbi, signer);
+  const wethContract = new ethersInstance.Contract(
+    wethMainnetContractInfo.address,
+    wethMainnetContractInfo.abi,
+    signer
+  );
 
   // Wrap ETH and receive the WETH on the signer account
   const { value } = await wethContract.deposit({ value: ethAmount });

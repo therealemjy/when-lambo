@@ -2,7 +2,16 @@
   "singleQuote": true,
   "printWidth": 120,
   "tabWidth": 2,
-  "importOrder": ["^@constants", "^@deployments/(.*)$", "^@chainHandler/(.*)$", "^@bot/(.*)$", "^@src/(.*)$", "^[./]"],
+  "importOrder": [
+    "^@constants",
+    "^@resources/(.*)$",
+    "^@hardhatTasks/(.*)$",
+    "^@deployments/(.*)$",
+    "^@chainHandler/(.*)$",
+    "^@bot/(.*)$",
+    "^@src/(.*)$",
+    "^[./]"
+  ],
   "importOrderSeparation": true,
   "importOrderParserPlugins": ["classProperties", "typescript"]
 }

@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ExchangeName } from '@src/types';
+import cryptoComRouterContract from '@resources/thirdPartyContracts/mainnet/cryptoComRouter.json';
 
-import cryptoComRouterContract from './contracts/cryptoComRouter.json';
+import { Exchange, ExchangeName } from '@src/types';
 
 class CryptoCom implements Exchange {
   name: ExchangeName;

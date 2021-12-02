@@ -12,19 +12,22 @@
     "rootDirs": ["./"],
     "baseUrl": "./",
     "paths": {
-      "@chainHandler/*": ["./chainHandler/*"],
-      "@bot/*": ["./bot/*"],
+      "@constants": ["./constants"],
+      "@resources/*": ["./resources/*"],
+      "@hardhatTasks/*": ["./hardhatTasks/*"],
       "@deployments/*": ["./deployments/*"],
-      "@constants": ["./constants"]
+      "@chainHandler/*": ["./chainHandler/*"],
+      "@bot/*": ["./bot/*"]
     }
   },
   "include": [
     "./hardhat.config.ts",
     "./scripts",
     "./test",
-    "./chainHandler/typechain/",
+    "./chainHandler/typechain",
     "./chainHandler/deploy",
-    "./chainHandler/utils/**/*"
+    "./chainHandler/utils",
+    "./hardhatTasks"
   ],
   "exclude": ["./bot", "./node_modules", "./dist"],
   "files": ["./hardhat.config.ts"]

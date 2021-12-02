@@ -23,7 +23,12 @@
     "sourceMap": true,
     "outDir": "dist",
     "paths": {
-      "@src/*": ["./src/*"]
+      "@src/*": ["./src/*"],
+      "@constants": ["../constants"],
+      "@resources/*": ["../resources/*"],
+      "@deployments/*": ["../deployments/*"],
+      "@chainHandler/*": ["../chainHandler/*"],
+      "@bot/*": ["../bot/*"]
     },
     "lib": ["es2020"]
   },

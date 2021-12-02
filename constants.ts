@@ -3,11 +3,6 @@ import { BigNumber } from 'ethers';
 export const LEDGER_OWNER_ACCOUNT_PATH = "44'/60'/0'/0/0";
 export const OWNER_ACCOUNT_MAINNET_ADDRESS = '0x56bE12a70ef5d5E974b4716281356199564F23c3';
 export const VAULT_ACCOUNT_MAINNET_ADDRESS = 'TO BE DEFINED';
-export const WETH_MAINNET_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-export const DYDX_SOLO_MAINNET_ADDRESS = '0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e';
-export const UNISWAP_V2_ROUTER_MAINNET_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
-export const SUSHISWAP_ROUTER_MAINNET_ADDRESS = '0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F';
-export const CRYPTO_COM_ROUTER_MAINNET_ADDRESS = '0xCeB90E4C17d626BE0fACd78b79c9c87d7ca181b3';
 
 // TODO: move to env variables
 // Juicy deal (see line 68 of spreadsheet: https://docs.google.com/spreadsheets/d/1zHMFP3oMbB8opRr4A4uG6nQrsaSyrw1bNcRy4trkhQw/edit#gid=0)
