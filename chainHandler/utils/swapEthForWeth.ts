@@ -1,6 +1,6 @@
 import { ethers, Signer, BigNumber } from 'ethers';
 
-import { WETH_MAINNET_ADDRESS } from '../constants';
+import { WETH_MAINNET_ADDRESS } from '../../constants';
 import wethAbi from './wethAbi.json';
 
 const swapEthForWeth = async (

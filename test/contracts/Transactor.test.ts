@@ -2,6 +2,9 @@ import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
 
+import { Transactor as ITransactorContract } from '../../chainHandler/typechain';
+import swapEthForWeth from '../../chainHandler/utils/swapEthForWeth';
+import wethAbi from '../../chainHandler/utils/wethAbi.json';
 import {
   WETH_MAINNET_ADDRESS,
   UNISWAP_V2_ROUTER_MAINNET_ADDRESS,
@@ -9,9 +12,6 @@ import {
   CRYPTO_COM_ROUTER_MAINNET_ADDRESS,
 } from '../../constants';
 import { profitableTestTrade } from '../../constants';
-import { Transactor as ITransactorContract } from '../../typechain';
-import swapEthForWeth from '../../utils/swapEthForWeth';
-import wethAbi from '../../utils/wethAbi.json';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);

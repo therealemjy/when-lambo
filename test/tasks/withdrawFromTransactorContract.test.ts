@@ -3,11 +3,11 @@ import { Signer } from 'ethers';
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
+import withdraw from '../../chainHandler/tasks/utils/withdrawFromTransactorContract';
+import { Transactor as ITransactorContract } from '../../chainHandler/typechain';
+import swapEthForWeth from '../../chainHandler/utils/swapEthForWeth';
+import wethAbi from '../../chainHandler/utils/wethAbi.json';
 import { WETH_MAINNET_ADDRESS } from '../../constants';
-import withdraw from '../../tasks/utils/withdrawFromTransactorContract';
-import { Transactor as ITransactorContract } from '../../typechain';
-import swapEthForWeth from '../../utils/swapEthForWeth';
-import wethAbi from '../../utils/wethAbi.json';
 
 const HRE = { ethers, getNamedAccounts } as HardhatRuntimeEnvironment;
 const ONE_ETHER = ethers.utils.parseEther('1');

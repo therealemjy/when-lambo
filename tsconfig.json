@@ -10,7 +10,14 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["./hardhat.config.ts", "./scripts", "./deploy", "./test", "typechain/**/*", "utils/**/*"],
-  "exclude": ["./bot", "./node_modules"],
+  "include": [
+    "./hardhat.config.ts",
+    "./scripts",
+    "./test",
+    "typechain/**/*",
+    "chainHandler/deploy",
+    "./chainHandler/utils/**/*"
+  ],
+  "exclude": ["./bot", "./node_modules", "./dist"],
   "files": ["./hardhat.config.ts"]
 }
