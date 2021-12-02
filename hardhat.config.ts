@@ -8,6 +8,12 @@ import * as dotenv from 'dotenv';
 import 'hardhat-deploy';
 import 'hardhat-gas-reporter';
 import { HardhatUserConfig } from 'hardhat/config';
+import moduleAlias from 'module-alias';
+// TS paths don't seem to be working with Hardhat, although the version of
+// Hardhat we use just implemented that feature
+// (https://github.com/nomiclabs/hardhat/pull/1992), so we use module-alias to
+// map the paths when using Hardhat commands.
+import 'module-alias/register';
 import 'solidity-coverage';
 
 import { OWNER_ACCOUNT_MAINNET_ADDRESS, profitableTestTrade } from './constants';

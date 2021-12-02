@@ -22,13 +22,12 @@
   },
   "include": [
     "./hardhat.config.ts",
-    "./scripts",
     "./test",
     "./chainHandler/typechain",
     "./chainHandler/deploy",
     "./chainHandler/utils",
     "./hardhatTasks"
   ],
-  "exclude": ["./bot", "./node_modules", "./dist"],
+  "exclude": ["./bot", "./node_modules"],
   "files": ["./hardhat.config.ts"]
 }
