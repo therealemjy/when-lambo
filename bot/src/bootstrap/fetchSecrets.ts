@@ -11,6 +11,10 @@ type WLSecrets = {
 const fetchSecrets = async (): Promise<WLSecrets> => {
   if (config.isDev) {
     return {
+      // WARNING: this private key corresponds to a REAL account on the mainnet,
+      // but this private key is well known since it's one of the accounts
+      // Hardhat uses for tests. DO NOT ever send any funds to this address and
+      // do not use it for anything else than obtaining transaction estimates.
       ownerAccountPrivateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
     };
   }
