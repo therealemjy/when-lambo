@@ -50,21 +50,10 @@ const testingCoins = [
   },
 ];
 
-const env = (name: string): string => {
+export const env = (name: string): string => {
   const value = process.env[`${name}`];
 
   if (!value) {
-    throw new Error(`Missing: process.env['${name}'].`);
-  }
-
-  return value;
-};
-
-// Throws an error only in test environment
-const envTestOnly = (name: string): string | undefined => {
-  const value = process.env[`${name}`];
-
-  if (!value && env('NODE_ENV') === 'development') {
     throw new Error(`Missing: process.env['${name}'].`);
   }
 
@@ -85,7 +74,6 @@ export interface EnvConfig {
     accessKeyIdEthNode: string;
     secretAccessKeyEthNode: string;
   };
-  testMnemonic?: string;
   isDev: boolean;
   isProd: boolean;
   slippageAllowancePercent: number;
@@ -136,7 +124,6 @@ const config: EnvConfig = {
   },
   isProd: env('NODE_ENV') === 'production',
   isDev: env('NODE_ENV') === 'development',
-  testMnemonic: envTestOnly('TEST_MNEMONIC'),
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),

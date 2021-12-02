@@ -5,7 +5,7 @@ declare global {
   var lastMonitoringDateTime: number | null;
   var secrets:
     | {
-        mnemonic: string;
+        ownerAccountPrivateKey: string;
       }
     | undefined;
   var botExecutionMonitoringTick: number;

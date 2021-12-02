@@ -1,17 +1,17 @@
 import AWS from 'aws-sdk';
 
-import config from '@src/config';
+import config, { env } from '@src/config';
 
 import logger from './logger';
 
 type WLSecrets = {
-  mnemonic: string;
+  ownerAccountPrivateKey: string;
 };
 
 const fetchSecrets = async (): Promise<WLSecrets> => {
-  if (config.isDev && config.testMnemonic) {
+  if (config.isDev) {
     return {
-      mnemonic: config.testMnemonic,
+      ownerAccountPrivateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
     };
   }
 
@@ -26,19 +26,19 @@ const fetchSecrets = async (): Promise<WLSecrets> => {
   });
 
   try {
-    let secret: any;
     const data = await client.getSecretValue({ SecretId: secretName }).promise();
+    const secret = data.SecretString ? (JSON.parse(data.SecretString) as WLSecrets) : undefined;
 
     // Decrypts secret using the associated KMS CMK.
     // Depending on whether the secret is a string or binary, one of these fields will be populated.
-    if (data.SecretString) {
-      secret = JSON.parse(data.SecretString);
+    if (!secret) {
+      throw new Error('Could not fetch secrets');
     }
 
     return {
-      mnemonic: secret.mnemonic,
+      ownerAccountPrivateKey: secret.ownerAccountPrivateKey,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     logger.error('Error while decoding secrets', err);
     throw err;
   }
