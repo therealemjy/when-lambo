@@ -8,5 +8,4 @@ artifacts
 cache
 coverage*
 gasReporterOutput.json
-bot
 deployments
