@@ -23,9 +23,9 @@
     "sourceMap": true,
     "outDir": "dist",
     "paths": {
-      "@src/*": ["./src/*"],
+      "@src/*": ["./src/*"]
     },
     "lib": ["es2020"]
   },
-  "exclude": ["node_modules"]
+  "exclude": ["./dist"]
 }
