@@ -15,13 +15,13 @@ const getAwsWSProvider = () => {
           accessKeyId: config.aws.accessKeyIdEthNode,
           secretAccessKey: config.aws.secretAccessKeyEthNode,
         },
-        // Enable auto reconnection
-        reconnect: {
-          auto: true,
-          delay: 5000, // ms
-          maxAttempts: 5,
-          onTimeout: false,
-        },
+      },
+      // Enable auto reconnection
+      reconnect: {
+        auto: true,
+        delay: 5000, // ms
+        maxAttempts: 5,
+        onTimeout: false,
       },
     })
   );

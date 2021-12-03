@@ -36,8 +36,10 @@ const executeStrategy = async ({
     });
 
     eventEmitter.emit('paths', blockNumber, paths);
+    return paths;
   } catch (error: unknown) {
     eventEmitter.emit('error', error);
+    return [];
   }
 };
 
@@ -61,8 +63,8 @@ const blockHandler =
     global.isMonitoring = true;
 
     // Execute all strategies simultaneously
-    await Promise.all(
-      strategies.map((strategy) =>
+    const paths = await Promise.all(
+      config.strategies.map((strategy) =>
         executeStrategy({
           blockNumber,
           multicall,
@@ -75,6 +77,8 @@ const blockHandler =
     // Reset monitoring status so the script doesn't stop
     global.isMonitoring = false;
     registerExecutionTime();
+
+    return paths.flat();
   };
 
 export default blockHandler;

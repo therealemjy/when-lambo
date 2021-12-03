@@ -14,7 +14,7 @@ import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
 import handleError from './src/utils/handleError';
 
-const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
+// const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
 
 // Catch unhandled exceptions
 process.on('uncaughtException', (error) => {
@@ -72,15 +72,15 @@ const init = async (secrets: WLSecrets) => {
 
     logger.log('Price monitoring bot started.');
 
-    // Regularly restart the bot so the websocket connection doesn't idle
-    setTimeout(() => {
-      logger.log('Restarting bot...');
+    // // Regularly restart the bot so the websocket connection doesn't idle
+    // setTimeout(() => {
+    //   logger.log('Restarting bot...');
 
-      // Shut down bot
-      provider.removeAllListeners();
+    //   // Shut down bot
+    //   provider.removeAllListeners();
 
-      start();
-    }, THIRTY_MINUTES_IN_MILLISECONDS);
+    //   start();
+    // }, THIRTY_MINUTES_IN_MILLISECONDS);
   };
 
   // Start bot
