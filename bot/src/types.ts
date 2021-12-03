@@ -13,6 +13,12 @@ export enum ExchangeName {
   CryptoCom = 'CryptoCom',
 }
 
+export enum ExchangeIndex {
+  UniswapV2 = 0,
+  Sushiswap = 1,
+  CryptoCom = 2,
+}
+
 export interface Deal {
   timestamp: Date;
   exchangeName: ExchangeName;

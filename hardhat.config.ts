@@ -4,11 +4,9 @@ import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import * as dotenv from 'dotenv';
 import 'hardhat-deploy';
 import 'hardhat-gas-reporter';
 import { HardhatUserConfig } from 'hardhat/config';
-import moduleAlias from 'module-alias';
 // TS paths don't seem to be working with Hardhat, although the version of
 // Hardhat we use just implemented that feature
 // (https://github.com/nomiclabs/hardhat/pull/1992), so we use module-alias to
@@ -16,15 +14,14 @@ import moduleAlias from 'module-alias';
 import 'module-alias/register';
 import 'solidity-coverage';
 
+import config from '@config';
+
 import { OWNER_ACCOUNT_MAINNET_ADDRESS } from './constants';
 import './hardhatTasks';
 
 chai.use(chaiAsPromised);
-dotenv.config();
 
-console.log('process.env.MAINNET_FORKING_RPC_URL', process.env.MAINNET_FORKING_RPC_URL);
-
-const config: HardhatUserConfig = {
+const hardhatConfig: HardhatUserConfig = {
   solidity: {
     version: '0.8.4',
     settings: {
@@ -36,11 +33,8 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        url: process.env.MAINNET_FORKING_RPC_URL || '',
-        blockNumber:
-          process.env.NODE_ENV === 'test' && process.env.TEST_PROFITABLE_TRADE_BLOCK_NUMBER
-            ? +process.env.TEST_PROFITABLE_TRADE_BLOCK_NUMBER
-            : undefined,
+        url: config.mainnetForkingRpcUrl || '',
+        blockNumber: config.environment === 'test' ? config.testProfitableTrade.blockNumber : undefined,
       },
     },
   },
@@ -76,4 +70,4 @@ const config: HardhatUserConfig = {
   },
 };
 
-export default config;
+export default hardhatConfig;

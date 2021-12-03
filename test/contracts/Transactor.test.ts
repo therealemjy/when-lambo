@@ -2,6 +2,8 @@ import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
 
+import config from '@config';
+
 import { address as CRYPTO_COM_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/cryptoComRouter.json';
 import { address as SUSHISWAP_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/sushiswapRouter.json';
 import { address as UNISWAP_V2_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
@@ -9,20 +11,6 @@ import wethMainnetContractInfo from '@resources/thirdPartyContracts/mainnet/weth
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import wrapEth from '@chainHandler/utils/wrapEth';
-
-const profitableTestTrade = {
-  blockNumber: process.env.TEST_PROFITABLE_TRADE_BLOCK_NUMBER,
-  wethAmountToBorrow: ethers.BigNumber.from(process.env.TEST_PROFITABLE_TRADE_WETH_AMOUNT_TO_BORROW),
-  sellingExchangeIndex: +process.env.TEST_PROFITABLE_TRADE_SELLING_EXCHANGE_INDEX!,
-  tradedTokenAddress: process.env.TEST_PROFITABLE_TRADE_TRADED_TOKEN_ADDRESS!,
-  tradedTokenAmountOutMin: ethers.BigNumber.from(process.env.TEST_PROFITABLE_TRADE_TRADED_TOKEN_AMOUNT_OUT_MIN),
-  tradedTokenAmountOutExpected: ethers.BigNumber.from(
-    process.env.TEST_PROFITABLE_TRADE_TRADED_TOKEN_AMOUNT_OUT_EXPECTED
-  ),
-  buyingExchangeIndex: +process.env.TEST_PROFITABLE_TRADE_BUYING_EXCHANGE_INDEX!,
-  wethAmountOutMin: ethers.BigNumber.from(process.env.TEST_PROFITABLE_TRADE_WETH_AMOUNT_OUT_MIN),
-  wethAmountOutExpected: ethers.BigNumber.from(process.env.TEST_PROFITABLE_TRADE_WETH_AMOUNT_OUT_EXPECTED),
-};
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);
@@ -273,12 +261,12 @@ describe('contracts/Transactor', function () {
       await expect(
         TransactorContract.connect(externalUser).trade(
           currentBlockNumber + 1,
-          profitableTestTrade.wethAmountToBorrow,
-          profitableTestTrade.sellingExchangeIndex,
-          profitableTestTrade.wethAmountOutMin,
-          profitableTestTrade.buyingExchangeIndex,
-          profitableTestTrade.tradedTokenAddress,
-          profitableTestTrade.tradedTokenAmountOutMin,
+          config.testProfitableTrade.wethAmountToBorrow,
+          config.testProfitableTrade.sellingExchangeIndex,
+          config.testProfitableTrade.wethAmountOutMin,
+          config.testProfitableTrade.buyingExchangeIndex,
+          config.testProfitableTrade.tradedTokenAddress,
+          config.testProfitableTrade.tradedTokenAmountOutMin,
           BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
         )
       ).to.be.revertedWith('Owner only');
@@ -293,12 +281,12 @@ describe('contracts/Transactor', function () {
           // This transaction should be mined at currentBlockNumber + 1, so passing currentBlockNumber should
           // trigger a revert
           currentBlockNumber,
-          profitableTestTrade.wethAmountToBorrow,
-          profitableTestTrade.sellingExchangeIndex,
-          profitableTestTrade.wethAmountOutMin,
-          profitableTestTrade.buyingExchangeIndex,
-          profitableTestTrade.tradedTokenAddress,
-          profitableTestTrade.tradedTokenAmountOutMin,
+          config.testProfitableTrade.wethAmountToBorrow,
+          config.testProfitableTrade.sellingExchangeIndex,
+          config.testProfitableTrade.wethAmountOutMin,
+          config.testProfitableTrade.buyingExchangeIndex,
+          config.testProfitableTrade.tradedTokenAddress,
+          config.testProfitableTrade.tradedTokenAmountOutMin,
           BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
         )
       ).to.be.revertedWith('Trade expired');
@@ -319,24 +307,24 @@ describe('contracts/Transactor', function () {
       await expect(
         TransactorContract.trade(
           currentBlockNumber + 1,
-          profitableTestTrade.wethAmountToBorrow,
-          profitableTestTrade.sellingExchangeIndex,
-          profitableTestTrade.wethAmountOutMin,
-          profitableTestTrade.buyingExchangeIndex,
-          profitableTestTrade.tradedTokenAddress,
-          profitableTestTrade.tradedTokenAmountOutMin,
+          config.testProfitableTrade.wethAmountToBorrow,
+          config.testProfitableTrade.sellingExchangeIndex,
+          config.testProfitableTrade.wethAmountOutMin,
+          config.testProfitableTrade.buyingExchangeIndex,
+          config.testProfitableTrade.tradedTokenAddress,
+          config.testProfitableTrade.tradedTokenAmountOutMin,
           BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
         )
       )
         // Check a SuccessfulTrade event was emitted
         .to.emit(TransactorContract, 'SuccessfulTrade')
         .withArgs(
-          profitableTestTrade.tradedTokenAddress,
-          profitableTestTrade.wethAmountToBorrow,
-          profitableTestTrade.sellingExchangeIndex,
-          profitableTestTrade.tradedTokenAmountOutExpected,
-          profitableTestTrade.buyingExchangeIndex,
-          profitableTestTrade.wethAmountOutExpected
+          config.testProfitableTrade.tradedTokenAddress,
+          config.testProfitableTrade.wethAmountToBorrow,
+          config.testProfitableTrade.sellingExchangeIndex,
+          config.testProfitableTrade.tradedTokenAmountOutExpected,
+          config.testProfitableTrade.buyingExchangeIndex,
+          config.testProfitableTrade.wethAmountOutExpected
         );
 
       // Check the contract keeps the expected profit

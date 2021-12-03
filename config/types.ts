@@ -1,5 +1,7 @@
 import BigNumber from 'bignumber.js';
 
+export type Environment = 'development' | 'test' | 'production';
+
 export interface ParsedStrategy {
   TRADED_TOKEN_ADDRESS: string;
   TRADED_TOKEN_SYMBOL: string;
