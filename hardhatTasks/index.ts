@@ -1,1 +1,2 @@
+import './generateGasEstimates';
 import './withdrawTasks';

@@ -8,7 +8,7 @@
   "scripts": {
     "tsc": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "hardhat test",
+    "test": "NODE_ENV=test hardhat test",
     "format": "npm-run-all format:*",
     "format:json": "prettier --write \"**/*.json\"",
     "format:ts": "prettier --write \"**/*.ts\"",
@@ -83,6 +83,7 @@
   },
   "_moduleAliases": {
     "@constants": "./constants",
+    "@utils": "./utils",
     "@resources": "./resources",
     "@hardhatTasks": "./hardhatTasks",
     "@deployments": "./deployments",

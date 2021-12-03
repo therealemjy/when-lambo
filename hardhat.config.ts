@@ -22,6 +22,8 @@ import './hardhatTasks';
 chai.use(chaiAsPromised);
 dotenv.config();
 
+console.log('process.env.MAINNET_FORKING_RPC_URL', process.env.MAINNET_FORKING_RPC_URL);
+
 const config: HardhatUserConfig = {
   solidity: {
     version: '0.8.4',
@@ -35,9 +37,10 @@ const config: HardhatUserConfig = {
     hardhat: {
       forking: {
         url: process.env.MAINNET_FORKING_RPC_URL || '',
-        blockNumber: process.env.TEST_PROFITABLE_TRADE_BLOCK_NUMBER
-          ? +process.env.TEST_PROFITABLE_TRADE_BLOCK_NUMBER
-          : undefined,
+        blockNumber:
+          process.env.NODE_ENV === 'test' && process.env.TEST_PROFITABLE_TRADE_BLOCK_NUMBER
+            ? +process.env.TEST_PROFITABLE_TRADE_BLOCK_NUMBER
+            : undefined,
       },
     },
   },
