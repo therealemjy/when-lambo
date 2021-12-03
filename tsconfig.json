@@ -8,9 +8,26 @@
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "rootDirs": ["./"],
+    "baseUrl": "./",
+    "paths": {
+      "@constants": ["./constants"],
+      "@resources/*": ["./resources/*"],
+      "@hardhatTasks/*": ["./hardhatTasks/*"],
+      "@deployments/*": ["./deployments/*"],
+      "@chainHandler/*": ["./chainHandler/*"],
+      "@bot/*": ["./bot/*"]
+    }
   },
-  "include": ["./hardhat.config.ts", "./scripts", "./deploy", "./test", "typechain/**/*", "utils/**/*"],
+  "include": [
+    "./hardhat.config.ts",
+    "./test",
+    "./chainHandler/typechain",
+    "./chainHandler/deploy",
+    "./chainHandler/utils",
+    "./hardhatTasks"
+  ],
   "exclude": ["./bot", "./node_modules"],
   "files": ["./hardhat.config.ts"]
 }

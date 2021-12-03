@@ -24,9 +24,13 @@
     "outDir": "dist",
     "paths": {
       "@src/*": ["./src/*"],
-      "@constants/*": ["./constants/*"]
+      "@constants": ["../constants"],
+      "@resources/*": ["../resources/*"],
+      "@deployments/*": ["../deployments/*"],
+      "@chainHandler/*": ["../chainHandler/*"],
+      "@bot/*": ["../bot/*"]
     },
     "lib": ["es2020"]
   },
-  "exclude": ["node_modules", "dist", "build", "cache", "artifacts"]
+  "exclude": ["./dist"]
 }

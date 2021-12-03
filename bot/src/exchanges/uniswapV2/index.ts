@@ -1,14 +1,11 @@
 import BigNumber from 'bignumber.js';
-import { ethers } from 'ethers';
+
+import uniswapV2RouterContract from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
 
 import { Exchange, ExchangeName } from '@src/types';
 
-import uniswapV2RouterContract from './contracts/uniswapV2Router.json';
-
 class UniswapV2 implements Exchange {
   name: ExchangeName;
-
-  routerContract: ethers.Contract;
 
   constructor() {
     this.name = ExchangeName.UniswapV2;

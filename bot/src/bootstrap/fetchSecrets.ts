@@ -1,17 +1,21 @@
 import AWS from 'aws-sdk';
 
-import config from '@src/bootstrap/config';
+import config, { env } from '@src/config';
 
 import logger from './logger';
 
 type WLSecrets = {
-  mnemonic: string;
+  ownerAccountPrivateKey: string;
 };
 
 const fetchSecrets = async (): Promise<WLSecrets> => {
-  if (config.isDev && config.testMnemonic) {
+  if (config.isDev) {
     return {
-      mnemonic: config.testMnemonic,
+      // WARNING: this private key corresponds to a REAL account on the mainnet,
+      // but this private key is well known since it's one of the accounts
+      // Hardhat uses for tests. DO NOT ever send any funds to this address and
+      // do not use it for anything else than obtaining transaction estimates.
+      ownerAccountPrivateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
     };
   }
 
@@ -26,19 +30,19 @@ const fetchSecrets = async (): Promise<WLSecrets> => {
   });
 
   try {
-    let secret: any;
     const data = await client.getSecretValue({ SecretId: secretName }).promise();
+    const secret = data.SecretString ? (JSON.parse(data.SecretString) as WLSecrets) : undefined;
 
     // Decrypts secret using the associated KMS CMK.
     // Depending on whether the secret is a string or binary, one of these fields will be populated.
-    if (data.SecretString) {
-      secret = JSON.parse(data.SecretString);
+    if (!secret) {
+      throw new Error('Could not fetch secrets');
     }
 
     return {
-      mnemonic: secret.mnemonic,
+      ownerAccountPrivateKey: secret.ownerAccountPrivateKey,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     logger.error('Error while decoding secrets', err);
     throw err;
   }
