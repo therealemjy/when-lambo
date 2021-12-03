@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 
-import { Strategy } from './types';
-import formatStrategies, { ParsedStrategy } from './utils/formatStrategies';
+import { Strategy } from './bot/src/types';
+import formatStrategies, { ParsedStrategy } from './bot/src/utils/formatStrategies';
 
 // TODO: move to the root of the repo (?)
 

@@ -5,6 +5,7 @@
   "importOrder": [
     "./moduleAliases",
     "^@constants",
+    "^@config",
     "^@resources/(.*)$",
     "^@hardhatTasks/(.*)$",
     "^@deployments/(.*)$",

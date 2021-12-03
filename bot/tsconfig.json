@@ -24,6 +24,7 @@
     "outDir": "dist",
     "paths": {
       "@constants": ["../constants"],
+      "@config": ["../config"],
       "@resources/*": ["../resources/*"],
       "@deployments/*": ["../deployments/*"],
       "@chainHandler/*": ["../chainHandler/*"],

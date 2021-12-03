@@ -1,5 +1,6 @@
+import config from '@config';
+
 import logger from '@bot/src/bootstrap/logger';
-import config from '@bot/src/config';
 
 // Only keeps the last 10 executions
 const registerExecutionTime = (): void => {

@@ -1,6 +1,7 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 
-import config from './src/config';
+import config from '@config';
+
 import blockHandler from './src/blockHandler';
 import { bootstrap } from './src/bootstrap';
 import getAwsWSProvider from './src/bootstrap/aws/getProvider';

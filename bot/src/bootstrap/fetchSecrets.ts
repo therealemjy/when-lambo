@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 
-import config, { env } from '@bot/src/config';
+import config, { env } from '@config';
 
 import logger from './logger';
 

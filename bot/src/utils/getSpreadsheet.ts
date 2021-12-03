@@ -1,6 +1,6 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
-import config from '@bot/src/config';
+import config from '@config';
 
 const getSpreadsheet = async () => {
   // Initialize Google Spreadsheet instance

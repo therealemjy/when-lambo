@@ -83,6 +83,7 @@
   },
   "_moduleAliases": {
     "@constants": "./constants",
+    "@config": "./config",
     "@utils": "./utils",
     "@resources": "./resources",
     "@hardhatTasks": "./hardhatTasks",
