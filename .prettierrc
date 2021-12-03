@@ -10,7 +10,6 @@
     "^@deployments/(.*)$",
     "^@chainHandler/(.*)$",
     "^@bot/(.*)$",
-    "^@src/(.*)$",
     "^[./]"
   ],
   "importOrderSeparation": true,

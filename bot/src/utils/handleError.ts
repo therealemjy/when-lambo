@@ -1,7 +1,7 @@
-import logger from '@src/bootstrap/logger';
-import config from '@src/config';
-import formatError from '@src/utils/formatError';
-import sendSlackMessage, { formatErrorToSlackBlock } from '@src/utils/sendSlackMessage';
+import logger from '@bot/src/bootstrap/logger';
+import config from '@bot/src/config';
+import formatError from '@bot/src/utils/formatError';
+import sendSlackMessage, { formatErrorToSlackBlock } from '@bot/src/utils/sendSlackMessage';
 
 const handleError = (error: unknown, isUncaughtException = false) => {
   // Format the error to a human-readable format and send it to slack

@@ -1,6 +1,6 @@
-import logger from '@src/bootstrap/logger';
-import getSpreadsheet from '@src/utils/getSpreadsheet';
-import handleError from '@src/utils/handleError';
+import logger from '@bot/src/bootstrap/logger';
+import getSpreadsheet from '@bot/src/utils/getSpreadsheet';
+import handleError from '@bot/src/utils/handleError';
 
 import eventEmitter from '.';
 

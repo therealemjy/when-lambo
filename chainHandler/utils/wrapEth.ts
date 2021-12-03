@@ -2,12 +2,7 @@ import { ethers, Signer, BigNumber } from 'ethers';
 
 import wethMainnetContractInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
-const swapEthForWeth = async (
-  ethersInstance: typeof ethers,
-  signer: Signer,
-  ethAmount: BigNumber,
-  toAddress: string
-) => {
+const wrapEth = async (ethersInstance: typeof ethers, signer: Signer, ethAmount: BigNumber, toAddress: string) => {
   // Get contract
   const wethContract = new ethersInstance.Contract(
     wethMainnetContractInfo.address,
@@ -22,4 +17,4 @@ const swapEthForWeth = async (
   return wethContract.transfer(toAddress, value);
 };
 
-export default swapEthForWeth;
+export default wrapEth;

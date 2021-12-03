@@ -1,5 +1,5 @@
-import logger from '@src/bootstrap/logger';
-import config from '@src/config';
+import logger from '@bot/src/bootstrap/logger';
+import config from '@bot/src/config';
 
 // Only keeps the last 10 executions
 const registerExecutionTime = (): void => {

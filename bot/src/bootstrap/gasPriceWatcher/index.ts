@@ -1,9 +1,9 @@
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 
-import eventEmitter from '@src/bootstrap/eventEmitter';
-import logger from '@src/bootstrap/logger';
-import config from '@src/config';
+import eventEmitter from '@bot/src/bootstrap/eventEmitter';
+import logger from '@bot/src/bootstrap/logger';
+import config from '@bot/src/config';
 
 class GasPriceWatcher {
   constructor() {

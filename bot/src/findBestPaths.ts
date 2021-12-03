@@ -1,7 +1,7 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, Token, UsedExchangeNames, Path } from '@src/types';
+import { Exchange, Token, UsedExchangeNames, Path } from '@bot/src/types';
 
 import findBestDeals from './findBestDeals';
 

@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 
 import uniswapV2RouterContract from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
 
-import { Exchange, ExchangeName } from '@src/types';
+import { Exchange, ExchangeName } from '@bot/src/types';
 
 class UniswapV2 implements Exchange {
   name: ExchangeName;

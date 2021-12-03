@@ -8,7 +8,7 @@ import { address as UNISWAP_V2_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPa
 import wethMainnetContractInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
-import swapEthForWeth from '@chainHandler/utils/swapEthForWeth';
+import wrapEth from '@chainHandler/utils/wrapEth';
 
 const profitableTestTrade = {
   blockNumber: process.env.TEST_PROFITABLE_TRADE_BLOCK_NUMBER,
@@ -70,7 +70,7 @@ describe('contracts/Transactor', function () {
 
       // Send 1 WETH to the contract
       const transferredWethAmount = ONE_ETHER;
-      await swapEthForWeth(ethers, owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
+      await wrapEth(ethers, owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
 
       // Check contract received the WETH
       const contractWethBalanceBeforeDestruct = await wethContract.balanceOf(TransactorContract.address);
@@ -171,7 +171,7 @@ describe('contracts/Transactor', function () {
 
       // Transfer 1 WETH to the contract
       const transferredWethAmount = ONE_ETHER;
-      await swapEthForWeth(ethers, owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
+      await wrapEth(ethers, owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
 
       // Check contract received the WETH
       const transactorContractBalance = await wethContract.balanceOf(TransactorContract.address);

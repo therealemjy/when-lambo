@@ -9,7 +9,7 @@ import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json
 import withdraw from '@hardhatTasks/utils/withdrawFromTransactorContract';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
-import swapEthForWeth from '@chainHandler/utils/swapEthForWeth';
+import wrapEth from '@chainHandler/utils/wrapEth';
 
 const HRE = { ethers, getNamedAccounts } as HardhatRuntimeEnvironment;
 const ONE_ETHER = ethers.utils.parseEther('1');
@@ -89,7 +89,7 @@ describe('tasks/withdrawFromTransactorContract', function () {
         await owner.sendTransaction({ to: transactorContractAddress, value: transferredAmount });
       } else {
         // Transfer WETH to contract
-        await swapEthForWeth(ethers, owner, transferredAmount, transactorContractAddress);
+        await wrapEth(ethers, owner, transferredAmount, transactorContractAddress);
       }
 
       await withdraw(

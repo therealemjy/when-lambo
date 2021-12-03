@@ -1,9 +1,9 @@
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput } from '@src/exchanges/types';
-import Token from '@src/tokens/Token';
+import { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput } from '@bot/src/exchanges/types';
+import Token from '@bot/src/tokens/Token';
 
-export type { Token };
+export { default as Token } from '@bot/src/tokens/Token';
 export type { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput };
 
 export interface Strategy {

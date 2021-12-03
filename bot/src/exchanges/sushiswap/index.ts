@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 
 import sushiswapRouterContract from '@resources/thirdPartyContracts/mainnet/sushiswapRouter.json';
 
-import { Exchange, ExchangeName } from '@src/types';
+import { Exchange, ExchangeName } from '@bot/src/types';
 
 class Sushiswap implements Exchange {
   name: ExchangeName;

@@ -1,7 +1,7 @@
 import AWSWebsocketProvider from '@aws/web3-ws-provider';
 import { ethers } from 'ethers';
 
-import config from '@src/config';
+import config from '@bot/src/config';
 
 const getAwsWSProvider = () => {
   const provider = new ethers.providers.Web3Provider(

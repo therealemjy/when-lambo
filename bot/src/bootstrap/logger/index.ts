@@ -4,13 +4,13 @@ import RotatingFileStream from 'bunyan-rotating-file-stream';
 import 'console.table';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
-import eventEmitter from '@src/bootstrap/eventEmitter';
-import config from '@src/config';
-import { WETH } from '@src/tokens';
-import { Path } from '@src/types';
-import calculateProfit from '@src/utils/calculateProfit';
-import formatTimestamp from '@src/utils/formatTimestamp';
-import sendSlackMessage from '@src/utils/sendSlackMessage';
+import eventEmitter from '@bot/src/bootstrap/eventEmitter';
+import config from '@bot/src/config';
+import { WETH } from '@bot/src/tokens';
+import { Path } from '@bot/src/types';
+import calculateProfit from '@bot/src/utils/calculateProfit';
+import formatTimestamp from '@bot/src/utils/formatTimestamp';
+import sendSlackMessage from '@bot/src/utils/sendSlackMessage';
 
 import { WorksheetRow } from './types';
 

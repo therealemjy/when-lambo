@@ -2,7 +2,7 @@ import { ContractCallContext } from '@maxime.julian/ethereum-multicall';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ResultsFormatter, Token, Deal, UsedExchangeNames } from '@src/types';
+import { Exchange, ResultsFormatter, Token, Deal, UsedExchangeNames } from '@bot/src/types';
 
 import { WETH } from './tokens';
 

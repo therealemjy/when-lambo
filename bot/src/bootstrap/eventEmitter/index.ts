@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
 
-import { Path } from '@src/types';
+import { Path } from '@bot/src/types';
 
 interface MessageEvents {
   error: (error: unknown) => void;
