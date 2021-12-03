@@ -1,14 +1,11 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import ethers from 'ethers';
 
 import config from './src/config';
 import blockHandler from './src/blockHandler';
 import { bootstrap } from './src/bootstrap';
 import getAwsWSProvider from './src/bootstrap/aws/getProvider';
 import eventEmitter from './src/bootstrap/eventEmitter';
-import { WLSecrets } from './src/bootstrap/fetchSecrets';
 import logger from './src/bootstrap/logger';
-import { EstimateTransaction } from './src/exchanges/types';
 import CryptoComExchange from './src/exchanges/cryptoCom';
 import SushiswapExchange from './src/exchanges/sushiswap';
 import UniswapV2Exchange from './src/exchanges/uniswapV2';
@@ -22,44 +19,16 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-const init = async (secrets: WLSecrets) => {
+const init = async () => {
   const start = async () => {
     const provider = getAwsWSProvider();
-    const ownerAccount = new ethers.Wallet(secrets.ownerAccountPrivateKey, provider);
+    // const ownerAccount = new ethers.Wallet(secrets.ownerAccountPrivateKey, provider);
     const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
 
     // Instantiate exchange services
     const uniswapV2ExchangeService = new UniswapV2Exchange();
     const sushiswapExchangeService = new SushiswapExchange();
     const cryptoComExchangeService = new CryptoComExchange();
-
-    // Extract estimate transactions from strategies
-    const estimateTransactions = config.strategies.reduce((allEstimateTransactions, strategy) => {
-      // Skip if we already have an estimate transaction for the toToken in the strategy
-      if (
-        allEstimateTransactions.find(
-          (estimateTransaction) => estimateTransaction.toToken.address === strategy.toToken.address
-        )
-      ) {
-        return allEstimateTransactions;
-      }
-
-      return [
-        ...allEstimateTransactions,
-        {
-          // We only need to check for one amount in order to get an estimate
-          wethDecimalAmount: strategy.borrowedWethAmounts[0],
-          toToken: strategy.toToken,
-        },
-      ];
-    }, [] as EstimateTransaction[]);
-
-    const initArgs = { estimateTransactions, signer: ownerAccount };
-    await Promise.all([
-      uniswapV2ExchangeService.initialize(initArgs),
-      sushiswapExchangeService.initialize(initArgs),
-      cryptoComExchangeService.initialize(initArgs),
-    ]);
 
     provider.addListener(
       'block',
@@ -89,9 +58,9 @@ const init = async (secrets: WLSecrets) => {
 
 (async () => {
   try {
-    const secrets = await bootstrap();
+    await bootstrap();
 
-    await init(secrets);
+    await init();
   } catch (err) {
     eventEmitter.emit('error', err);
     process.exit(1);

@@ -64,7 +64,7 @@ const blockHandler =
 
     // Execute all strategies simultaneously
     const paths = await Promise.all(
-      config.strategies.map((strategy) =>
+      strategies.map((strategy) =>
         executeStrategy({
           blockNumber,
           multicall,

@@ -1,7 +1,7 @@
 import http from 'http';
 
 import { registerEventListeners } from './eventEmitter/registerEvents';
-import fetchSecrets, { WLSecrets } from './fetchSecrets';
+import fetchSecrets from './fetchSecrets';
 import gasPriceWatcher from './gasPriceWatcher';
 import logger from './logger';
 
@@ -52,7 +52,7 @@ const server = http.createServer(function (req, res) {
   }
 });
 
-export const bootstrap = async (): Promise<WLSecrets> =>
+export const bootstrap = async (): Promise<void> =>
   new Promise((resolve) => {
     server.listen(3000, async () => {
       logger.log('Server started running on port 3000');
@@ -71,6 +71,6 @@ export const bootstrap = async (): Promise<WLSecrets> =>
       // Pull gas prices every 5 seconds
       gasPriceWatcher.start(5000);
 
-      resolve(secrets);
+      resolve();
     });
   });
