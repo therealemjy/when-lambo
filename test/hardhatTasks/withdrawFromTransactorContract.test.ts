@@ -6,7 +6,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
 import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json';
 
-import withdraw from '@hardhatTasks/utils/withdrawFromTransactorContract';
+import withdraw from '@hardhatTasks/withdrawTasks/withdrawFromTransactorContract';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import wrapEth from '@chainHandler/utils/wrapEth';

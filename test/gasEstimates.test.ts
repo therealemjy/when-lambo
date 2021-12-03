@@ -86,7 +86,7 @@ const tokens = formattedStrategies.reduce((allTokens, formattedStrategy) => {
   return [...allTokens, formattedStrategy.toToken];
 }, [] as Token[]);
 
-describe.only('ExchangeTests', function () {
+describe('ExchangeTests', function () {
   it('Exchanges', async function () {
     const { ownerAddress } = await getNamedAccounts();
     const owner = await ethers.getSigner(ownerAddress);
