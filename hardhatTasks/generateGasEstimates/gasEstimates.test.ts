@@ -2,6 +2,8 @@ import 'console.table';
 import { BigNumber, Signer } from 'ethers';
 import { ethers, getNamedAccounts } from 'hardhat';
 
+import config from '@config';
+
 import cryptoComRouterInfo from '@resources/thirdPartyContracts/mainnet/cryptoComRouter.json';
 import sushiswapRouterInfo from '@resources/thirdPartyContracts/mainnet/sushiswapRouter.json';
 import uniswapV2RouterInfo from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
@@ -11,9 +13,6 @@ import wrapEth from '@chainHandler/utils/wrapEth';
 
 import Token from '@bot/src/tokens/Token';
 import { ExchangeName } from '@bot/src/types';
-import formatStrategies, { ParsedStrategy } from '@bot/src/utils/formatStrategies';
-
-const parsedStrategies: ParsedStrategy[] = JSON.parse(process.env.STRINGIFIED_STRATEGIES!);
 
 export interface EstimateTransaction {
   wethDecimalAmount: BigNumber;
@@ -76,9 +75,7 @@ const estimateSwapGas = async (
   return receipt.gasUsed;
 };
 
-const formattedStrategies = formatStrategies(parsedStrategies, +process.env.STRATEGY_BORROWED_AMOUNTS_COUNT!);
-
-const tokens = formattedStrategies.reduce((allTokens, formattedStrategy) => {
+const tokens = config.strategies.reduce((allTokens, formattedStrategy) => {
   if (allTokens.find((token) => token.address === formattedStrategy.toToken.address)) {
     return allTokens;
   }

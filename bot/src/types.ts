@@ -6,15 +6,6 @@ import Token from '@bot/src/tokens/Token';
 export { default as Token } from '@bot/src/tokens/Token';
 export type { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput };
 
-export interface Strategy {
-  borrowedWethAmounts: BigNumber[];
-  toToken: {
-    address: string;
-    symbol: string;
-    decimals: number;
-  };
-}
-
 // These values need to correspond to the ones used in the Transactor contract
 export enum ExchangeName {
   UniswapV2 = 'UniswapV2',
