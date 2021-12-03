@@ -1,6 +1,6 @@
 import 'console.table';
 import { BigNumber, Signer } from 'ethers';
-import { ethers, deployments, getNamedAccounts } from 'hardhat';
+import { ethers, getNamedAccounts } from 'hardhat';
 
 import cryptoComRouterInfo from '@resources/thirdPartyContracts/mainnet/cryptoComRouter.json';
 import sushiswapRouterInfo from '@resources/thirdPartyContracts/mainnet/sushiswapRouter.json';
@@ -46,13 +46,13 @@ const exchangeContracts: ExchangeContract[] = [
 
 const estimateSwapGas = async (
   exchangeContract: ExchangeContract,
-  amountIn: BigNumber,
   tokenAddress: string,
   signer: Signer
 ): Promise<BigNumber> => {
   const signerAddress = await signer.getAddress();
 
   // Wrap ETH to WETH on signer account
+  const amountIn = ethers.utils.parseEther('1.0');
   await wrapEth(ethers, signer, amountIn, signerAddress);
 
   const weth = new ethers.Contract(wethInfo.address, wethInfo.abi, signer);
@@ -78,31 +78,16 @@ const estimateSwapGas = async (
 
 const formattedStrategies = formatStrategies(parsedStrategies, +process.env.STRATEGY_BORROWED_AMOUNTS_COUNT!);
 
-const estimateTransactions = formattedStrategies.reduce((allEstimateTransactions, formattedStrategy) => {
-  if (
-    allEstimateTransactions.find(
-      (allEstimateTransaction) => allEstimateTransaction.toToken.address === formattedStrategy.toToken.address
-    )
-  ) {
-    return allEstimateTransactions;
+const tokens = formattedStrategies.reduce((allTokens, formattedStrategy) => {
+  if (allTokens.find((token) => token.address === formattedStrategy.toToken.address)) {
+    return allTokens;
   }
 
-  const estimateTransaction: EstimateTransaction = {
-    toToken: formattedStrategy.toToken,
-    wethDecimalAmount: ethers.BigNumber.from(formattedStrategy.borrowedWethAmounts[0].toString()),
-  };
-
-  return [...allEstimateTransactions, estimateTransaction];
-}, [] as EstimateTransaction[]);
-
-const setup = deployments.createFixture(async () => {
-  await deployments.fixture(['Transactor']);
-});
+  return [...allTokens, formattedStrategy.toToken];
+}, [] as Token[]);
 
 describe.only('ExchangeTests', function () {
   it('Exchanges', async function () {
-    await setup();
-
     const { ownerAddress } = await getNamedAccounts();
     const owner = await ethers.getSigner(ownerAddress);
     const rows: unknown[] = [];
@@ -110,18 +95,21 @@ describe.only('ExchangeTests', function () {
     for (let e = 0; e < exchangeContracts.length; e++) {
       const exchangeContract = exchangeContracts[e];
 
-      for (let i = 0; i < estimateTransactions.length; i++) {
-        const estimateTransaction = estimateTransactions[i];
-        const gasEstimate = await estimateSwapGas(
-          exchangeContract,
-          estimateTransaction.wethDecimalAmount,
-          estimateTransaction.toToken.address,
-          owner
-        );
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        const gasEstimate = await estimateSwapGas(exchangeContract, token.address, owner).catch((error) => {
+          if (error.message === 'Transaction reverted without a reason string') {
+            // If we get this error message, then it means the exchange simply does not have
+            // any pool containing WETH and the token we want to trade
+            return undefined;
+          }
+
+          throw error;
+        });
 
         rows.push({
           'Exchange contract': exchangeContract.name,
-          [`WETH -> ${estimateTransaction.toToken.symbol}`]: gasEstimate.toString(),
+          [`WETH -> ${token.symbol}`]: gasEstimate ? gasEstimate.toString() : 'N/A',
         });
       }
     }
