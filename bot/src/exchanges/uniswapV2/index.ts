@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js';
+import ethers from 'ethers';
 
 import uniswapV2RouterContract from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
+import wethContract from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 import { Exchange, ExchangeName } from '@src/types';
 
@@ -10,6 +12,41 @@ class UniswapV2 implements Exchange {
   constructor() {
     this.name = ExchangeName.UniswapV2;
   }
+
+  initialize: Exchange['initialize'] = async ({ estimateTransactions, signer }) => {
+    // Get router contract
+    const routerContract = new ethers.Contract(uniswapV2RouterContract.address, uniswapV2RouterContract.abi, signer);
+
+    // Since we're only interested in the gas estimate of the transaction, we
+    // put the smallest amount possible as amountOutMin to make sure the
+    // transaction succeeds
+    const amountOutMin = 1;
+    const signerAddress = await signer.getAddress();
+    const deadline = new Date(new Date().getTime() + 1200000).getTime(); // 2 minutes from now
+
+    const promises = estimateTransactions.map(async ({ wethDecimalAmount, toToken }) => {
+      console.log(wethDecimalAmount.toFixed());
+
+      const estimate = await routerContract.estimateGas.swapExactTokensForTokens(
+        ethers.BigNumber.from(wethDecimalAmount.toFixed()),
+        amountOutMin,
+        [wethContract.address, toToken.address],
+        signerAddress,
+        deadline,
+        // Since this is an estimate only, we can set a gas price of 0 and it
+        // will still succeed
+        { gasPrice: '0', gasLimit: ethers.utils.hexlify(3000000) }
+      );
+
+      console.log('HERE?');
+
+      return estimate;
+    });
+
+    const estimates = await Promise.all(promises);
+
+    console.log('estimates', estimates);
+  };
 
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({
     callReference,

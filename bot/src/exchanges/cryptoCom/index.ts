@@ -11,6 +11,10 @@ class CryptoCom implements Exchange {
     this.name = ExchangeName.CryptoCom;
   }
 
+  initialize: Exchange['initialize'] = async () => {
+    // TODO
+  };
+
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({
     callReference,
     fromTokenDecimalAmounts,

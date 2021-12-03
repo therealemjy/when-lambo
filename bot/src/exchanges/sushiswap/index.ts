@@ -11,6 +11,10 @@ class Sushiswap implements Exchange {
     this.name = ExchangeName.Sushiswap;
   }
 
+  initialize: Exchange['initialize'] = async () => {
+    // TODO
+  };
+
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({
     callReference,
     fromTokenDecimalAmounts,

@@ -7,7 +7,7 @@ export type { Token };
 export type { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput };
 
 export interface Strategy {
-  borrowedAmounts: BigNumber[];
+  borrowedWethAmounts: BigNumber[];
   toToken: {
     address: string;
     symbol: string;

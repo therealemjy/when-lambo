@@ -81,8 +81,6 @@ describe('tasks/withdrawFromTransactorContract', function () {
       const owner = await ethers.getSigner(ownerAddress);
       const vault = await ethers.getSigner(vaultAddress);
 
-      console.log(transactorContractAddress);
-
       const transferredAmount = ONE_ETHER;
       const vaultBalanceBeforeWithdrawal = await getAccountBalance(vault, tokenSymbol);
 

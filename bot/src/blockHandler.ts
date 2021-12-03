@@ -23,7 +23,7 @@ const executeStrategy = async ({
   try {
     const paths = await findBestPaths({
       multicall,
-      fromTokenDecimalAmounts: strategy.borrowedAmounts,
+      fromTokenDecimalAmounts: strategy.borrowedWethAmounts,
       fromToken: WETH,
       toToken: {
         symbol: strategy.toToken.symbol,
@@ -42,7 +42,7 @@ const executeStrategy = async ({
 };
 
 const blockHandler =
-  ({ multicall, exchanges }: { multicall: Multicall; exchanges: Exchange[] }) =>
+  ({ multicall, strategies, exchanges }: { multicall: Multicall; strategies: Strategy[]; exchanges: Exchange[] }) =>
   async (blockNumber: string) => {
     // Record time for perf monitoring
     global.botExecutionMonitoringTick = new Date().getTime();
@@ -62,7 +62,7 @@ const blockHandler =
 
     // Execute all strategies simultaneously
     await Promise.all(
-      config.strategies.map((strategy) =>
+      strategies.map((strategy) =>
         executeStrategy({
           blockNumber,
           multicall,

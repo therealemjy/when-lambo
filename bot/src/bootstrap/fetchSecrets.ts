@@ -4,7 +4,7 @@ import config, { env } from '@src/config';
 
 import logger from './logger';
 
-type WLSecrets = {
+export type WLSecrets = {
   ownerAccountPrivateKey: string;
 };
 
