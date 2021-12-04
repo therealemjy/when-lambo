@@ -10,7 +10,7 @@ import formatStrategies from './formatStrategies';
 import { ParsedStrategy, EnvConfig, Environment } from './types';
 
 export * from './types';
-export { GasEstimates } from '@localTypes';
+export type { GasEstimates } from '@localTypes';
 
 dotenv.config();
 

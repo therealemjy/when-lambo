@@ -1,6 +1,6 @@
-import http from 'http';
 import BigNumber from 'bignumber.js';
 import TypedEmitter from 'typed-emitter';
+import http from 'http';
 
 import logger from '@logger';
 import config, { EnvConfig, Strategy } from '@config';
@@ -115,7 +115,7 @@ export const bootstrap = async (): Promise<Services> =>
       await registerEventListeners();
 
       // Pull gas prices every 5 seconds
-      gasPriceWatcher.start(services, 5000);
+      await gasPriceWatcher.start(services, (gasPrices) => (services.state.currentGasPrices = gasPrices), 5000);
 
       // We will use this instance of state throughout the bot with dependencies injection, making testing way easier
       resolve(services);
