@@ -1,24 +1,25 @@
 import config from '@config';
 
 import logger from '@bot/src/bootstrap/logger';
+import { State } from '@bot/src/bootstrap';
 
 // Only keeps the last 10 executions
-const registerExecutionTime = (): void => {
+const registerExecutionTime = (state: State): void => {
   const currentDateTime = new Date().getTime();
-  const executionTimeMS = currentDateTime - global.botExecutionMonitoringTick;
+  const executionTimeMS = currentDateTime - state.botExecutionMonitoringTick;
 
   if (config.isDev) {
     logger.log(`[PERF] - Executed in ${executionTimeMS}ms.`);
   }
 
   // Used for perf "How long on average does it take to monitor prices"
-  global.perfMonitoringRecords.push(executionTimeMS);
+  state.perfMonitoringRecords.push(executionTimeMS);
 
   // Used for health check "When was the last execution"
-  global.lastMonitoringDateTime = currentDateTime;
+  state.lastMonitoringDateTime = currentDateTime;
 
-  if (global.perfMonitoringRecords.length === 21) {
-    global.perfMonitoringRecords.shift();
+  if (state.perfMonitoringRecords.length === 21) {
+    state.perfMonitoringRecords.shift();
   }
 };
 

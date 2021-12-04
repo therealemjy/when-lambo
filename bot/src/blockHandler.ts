@@ -9,17 +9,20 @@ import findBestPaths from './findBestPaths';
 import { WETH } from './tokens';
 import { Exchange } from './types';
 import registerExecutionTime from './utils/registerExecutionTime';
+import { State } from './bootstrap';
 
 const executeStrategy = async ({
   blockNumber,
   multicall,
   strategy,
   exchanges,
+  state,
 }: {
   blockNumber: string;
   multicall: Multicall;
   strategy: Strategy;
   exchanges: Exchange[];
+  state: State;
 }) => {
   try {
     const paths = await findBestPaths({
@@ -33,7 +36,7 @@ const executeStrategy = async ({
       },
       exchanges,
       slippageAllowancePercent: config.slippageAllowancePercent,
-      gasPriceWei: global.currentGasPrices.rapid,
+      gasPriceWei: state.currentGasPrices.rapid,
     });
 
     eventEmitter.emit('paths', blockNumber, paths);
@@ -49,14 +52,16 @@ const blockHandler = async ({
   strategies,
   exchanges,
   blockNumber,
+  state,
 }: {
   multicall: Multicall;
   strategies: Strategy[];
   exchanges: Exchange[];
   blockNumber: string;
+  state: State;
 }) => {
   // Record time for perf monitoring
-  global.botExecutionMonitoringTick = new Date().getTime();
+  state.botExecutionMonitoringTick = new Date().getTime();
 
   logger.log(`New block received. Block # ${blockNumber}`);
 
@@ -68,11 +73,12 @@ const blockHandler = async ({
         multicall,
         strategy,
         exchanges,
+        state,
       })
     )
   );
 
-  registerExecutionTime();
+  registerExecutionTime(state);
 
   return paths.flat();
 };

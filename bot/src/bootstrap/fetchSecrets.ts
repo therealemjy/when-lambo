@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 
 import config, { env } from '@config';
 
-import logger from './logger';
+import logger from '@bot/src/bootstrap/logger';
 
 export type WLSecrets = {
   ownerAccountPrivateKey: string;
@@ -33,8 +33,6 @@ const fetchSecrets = async (): Promise<WLSecrets> => {
     const data = await client.getSecretValue({ SecretId: secretName }).promise();
     const secret = data.SecretString ? (JSON.parse(data.SecretString) as WLSecrets) : undefined;
 
-    // Decrypts secret using the associated KMS CMK.
-    // Depending on whether the secret is a string or binary, one of these fields will be populated.
     if (!secret) {
       throw new Error('Could not fetch secrets');
     }

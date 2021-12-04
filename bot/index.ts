@@ -9,6 +9,7 @@ import logger from './src/bootstrap/logger';
 import exchanges from './src/exchanges';
 import handleError from './src/utils/handleError';
 import CancelablePromise from './src/utils/cancelablePromise';
+import { State } from './src/bootstrap';
 
 // Catch unhandled exceptions
 process.on('uncaughtException', (error) => {
@@ -16,7 +17,7 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-const init = async () => {
+const init = async (state: State) => {
   const start = async () => {
     let isMonitoring = false;
     let cancelablePromise: CancelablePromise | undefined = undefined;
@@ -41,6 +42,7 @@ const init = async () => {
             multicall,
             strategies: config.strategies,
             exchanges,
+            state,
           })
         );
       } catch (err: any) {
@@ -66,9 +68,9 @@ const init = async () => {
 
 (async () => {
   try {
-    await bootstrap();
+    const state = await bootstrap();
 
-    await init();
+    await init(state);
   } catch (err) {
     eventEmitter.emit('error', err);
     process.exit(1);
