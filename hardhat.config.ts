@@ -14,8 +14,7 @@ import { HardhatUserConfig } from 'hardhat/config';
 import 'module-alias/register';
 import 'solidity-coverage';
 
-import config from '@config';
-
+import chainHandlerConfig from './chainHandler/config';
 import { OWNER_ACCOUNT_MAINNET_ADDRESS } from './constants';
 import './tasks';
 
@@ -33,8 +32,9 @@ const hardhatConfig: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        url: config.mainnetForkingRpcUrl || '',
-        blockNumber: config.environment === 'test' ? config.testProfitableTrade.blockNumber : undefined,
+        url: chainHandlerConfig.mainnetForkingRpcUrl || '',
+        blockNumber:
+          chainHandlerConfig.environment === 'test' ? chainHandlerConfig.testProfitableTrade.blockNumber : undefined,
       },
     },
   },
@@ -44,15 +44,15 @@ const hardhatConfig: HardhatUserConfig = {
   },
   namedAccounts: {
     ownerAddress: {
-      hardhat: config.testAccounts.owner.address, // assign the first user as owner
+      hardhat: chainHandlerConfig.testAccounts.owner.address, // assign the first user as owner
       mainnet: OWNER_ACCOUNT_MAINNET_ADDRESS,
     },
     vaultAddress: {
-      hardhat: config.testAccounts.vault.address,
+      hardhat: chainHandlerConfig.testAccounts.vault.address,
       // TODO: add mainnet address
     },
     externalUserAddress: {
-      hardhat: config.testAccounts.externalUser.address, // assign another account as external user (used in tests only)
+      hardhat: chainHandlerConfig.testAccounts.externalUser.address, // assign another account as external user (used in tests only)
     },
   },
   paths: {

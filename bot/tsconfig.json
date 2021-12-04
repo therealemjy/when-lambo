@@ -25,7 +25,6 @@
     "paths": {
       "@localTypes": ["../types"],
       "@constants": ["../constants"],
-      "@config": ["../config"],
       "@logger": ["../logger"],
       "@dist/*": ["../dist/*"],
       "@tasks/*": ["../tasks/*"],

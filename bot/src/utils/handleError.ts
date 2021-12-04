@@ -1,6 +1,6 @@
-import config from '@config';
 import logger from '@logger';
 
+import config from '@bot/src/bootstrap/config';
 import formatError from '@bot/src/utils/formatError';
 import sendSlackMessage, { formatErrorToSlackBlock } from '@bot/src/utils/sendSlackMessage';
 

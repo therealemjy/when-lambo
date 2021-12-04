@@ -1,6 +1,6 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 
-import { Strategy } from '@config';
+import { Strategy } from '@localTypes';
 
 import { Services } from './bootstrap';
 import findBestPaths from './findBestPaths';

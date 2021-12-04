@@ -14,7 +14,6 @@
     "paths": {
       "@localTypes": ["./types"],
       "@constants": ["./constants"],
-      "@config": ["./config"],
       "@logger": ["./logger"],
       "@dist/*": ["./dist/*"],
       "@resources/*": ["./resources/*"],
@@ -29,6 +28,7 @@
     "./logger",
     "./test",
     "./scripts",
+    "./utils",
     "./tasks",
     "./chainHandler/typechain",
     "./chainHandler/deploy",

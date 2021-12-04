@@ -2,10 +2,10 @@ import fs from 'fs';
 import hre, { deployments } from 'hardhat';
 import 'hardhat-deploy';
 
-import config from '@config';
 import { GasEstimates } from '@localTypes';
 import logger from '@logger';
 
+import config from '@chainHandler/config';
 import wrapEth from '@chainHandler/utils/wrapEth';
 
 import exchanges from '@bot/src/exchanges';

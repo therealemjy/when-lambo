@@ -1,16 +1,17 @@
 import BigNumber from 'bignumber.js';
-import TypedEmitter from 'typed-emitter';
 import http from 'http';
+import config, { EnvConfig } from 'src/bootstrap/config';
+import TypedEmitter from 'typed-emitter';
 
+import { Strategy } from '@localTypes';
 import logger from '@logger';
-import config, { EnvConfig, Strategy } from '@config';
 
-import { registerEventListeners } from './eventEmitter/registerEvents';
-import fetchSecrets from './fetchSecrets';
-import gasPriceWatcher from './gasPriceWatcher';
 import exchanges from '../exchanges';
 import UniswapLikeExchange from '../exchanges/UniswapLikeExchange';
 import eventEmitter, { MessageEvents } from './eventEmitter';
+import { registerEventListeners } from './eventEmitter/registerEvents';
+import fetchSecrets from './fetchSecrets';
+import gasPriceWatcher from './gasPriceWatcher';
 
 export type State = {
   lastMonitoringDateTime: number | null;

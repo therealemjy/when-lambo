@@ -4,10 +4,10 @@ import RotatingFileStream from 'bunyan-rotating-file-stream';
 import 'console.table';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
-import config from '@config';
 import { TRADE_GAS_ESTIMATE_WITHOUT_SWAPS } from '@constants';
 import { ExchangeIndex } from '@localTypes';
 
+import config from '@bot/src/bootstrap/config';
 import eventEmitter from '@bot/src/bootstrap/eventEmitter';
 import { WETH } from '@bot/src/tokens';
 import { Path } from '@bot/src/types';
