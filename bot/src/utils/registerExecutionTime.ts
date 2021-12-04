@@ -1,10 +1,10 @@
 import config from '@config';
 import logger from '@logger';
 
-import { State } from '@bot/src/bootstrap';
+import { Services } from '@bot/src/bootstrap';
 
 // Only keeps the last 10 executions
-const registerExecutionTime = (state: State): void => {
+const registerExecutionTime = ({ state }: Services): void => {
   const currentDateTime = new Date().getTime();
   const executionTimeMS = currentDateTime - state.botExecutionMonitoringTick;
 

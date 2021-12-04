@@ -4,16 +4,16 @@ import BigNumber from 'bignumber.js';
 import config from '@config';
 import logger from '@logger';
 
-import { State } from '@bot/src/bootstrap';
+import { Services } from '@bot/src/bootstrap';
 import eventEmitter from '@bot/src/bootstrap/eventEmitter';
 
 class GasPriceWatcher {
-  public start(state: State, interval: number) {
+  public start(services: Services, interval: number) {
     logger.log('Gas price watcher started.');
-    setInterval(() => this.getPrices(state), interval);
+    setInterval(() => this.getPrices(services), interval);
   }
 
-  private async getPrices(state: State) {
+  private async getPrices(services: Services) {
     try {
       const res = await axios.get<{
         data: {
@@ -24,7 +24,7 @@ class GasPriceWatcher {
         };
       }>('https://etherchain.org/api/gasnow');
 
-      state.currentGasPrices = {
+      services.state.currentGasPrices = {
         // In order to make sure transactions are mined as fast as possible, we
         // multiply the gas price for rapid transactions by a given
         // multiplicator

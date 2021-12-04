@@ -1,16 +1,11 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 
-import config from '@config';
-import logger from '@logger';
-
 import blockHandler from './src/blockHandler';
-import { bootstrap } from './src/bootstrap';
+import { bootstrap, Services } from './src/bootstrap';
 import getAwsWSProvider from './src/bootstrap/aws/getProvider';
-import eventEmitter from './src/bootstrap/eventEmitter';
-import exchanges from './src/exchanges';
 import CancelablePromise from './src/utils/cancelablePromise';
-import { State } from './src/bootstrap';
 import handleError from './src/utils/handleError';
+import eventEmitter from './src/bootstrap/eventEmitter';
 
 // Catch unhandled exceptions
 process.on('uncaughtException', (error) => {
@@ -18,7 +13,7 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-const init = async (state: State) => {
+const init = async (services: Services) => {
   const start = async () => {
     let isMonitoring = false;
     let cancelablePromise: CancelablePromise | undefined = undefined;
@@ -28,7 +23,7 @@ const init = async (state: State) => {
     const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
 
     provider.addListener('block', async (blockNumber: string) => {
-      logger.log(`New block received. Block # ${blockNumber}`);
+      services.logger.log(`New block received. Block # ${blockNumber}`);
 
       // Abort previous execution
       if (isMonitoring && cancelablePromise) {
@@ -40,21 +35,15 @@ const init = async (state: State) => {
 
       try {
         await cancelablePromise.wrap(
-          blockHandler({
+          blockHandler(services, {
             blockNumber,
             multicall,
-            strategies: config.strategies,
-            exchanges,
-            gasEstimates: config.gasEstimates,
-            state,
-            config,
-            eventEmitter,
           })
         );
       } catch (err: any) {
         // Means we intentionally cancelled the promise
         if (err.message === 'aborted') {
-          logger.log(`--- Block ${blockNumber} cancelled ---`);
+          services.logger.log(`--- Block ${blockNumber} cancelled ---`);
           return;
         }
 
@@ -65,7 +54,7 @@ const init = async (state: State) => {
       }
     });
 
-    logger.log('Price monitoring bot started.');
+    services.logger.log('Price monitoring bot started.');
   };
 
   // Start bot
@@ -74,9 +63,9 @@ const init = async (state: State) => {
 
 (async () => {
   try {
-    const state = await bootstrap();
+    const services = await bootstrap();
 
-    await init(state);
+    await init(services);
   } catch (err) {
     eventEmitter.emit('error', err);
     process.exit(1);

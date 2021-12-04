@@ -1,34 +1,24 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import TypedEmitter from 'typed-emitter';
 
-import { Strategy, GasEstimates, EnvConfig } from '@config';
+import { Strategy } from '@config';
 
-import { State } from './bootstrap';
-import { MessageEvents } from './bootstrap/eventEmitter';
+import { Services } from './bootstrap';
 import findBestPaths from './findBestPaths';
 import { WETH } from './tokens';
-import { Exchange } from './types';
 import registerExecutionTime from './utils/registerExecutionTime';
 
-const executeStrategy = async ({
-  blockNumber,
-  multicall,
-  strategy,
-  exchanges,
-  gasEstimates,
-  state,
-  eventEmitter,
-  config,
-}: {
+type ExecuteStrategyArgs = {
   blockNumber: string;
   multicall: Multicall;
   strategy: Strategy;
-  exchanges: Exchange[];
-  gasEstimates: GasEstimates;
-  state: State;
-  eventEmitter: TypedEmitter<MessageEvents>;
-  config: EnvConfig;
-}) => {
+};
+
+type BlockHandlerArgs = {
+  multicall: Multicall;
+  blockNumber: string;
+};
+
+const executeStrategy = async (services: Services, { blockNumber, multicall, strategy }: ExecuteStrategyArgs) => {
   try {
     const paths = await findBestPaths({
       multicall,
@@ -39,61 +29,36 @@ const executeStrategy = async ({
         address: strategy.toToken.address,
         decimals: strategy.toToken.decimals,
       },
-      exchanges,
-      slippageAllowancePercent: config.slippageAllowancePercent,
-      gasEstimates,
-      gasPriceWei: state.currentGasPrices.rapid,
+      exchanges: services.exchanges,
+      slippageAllowancePercent: services.config.slippageAllowancePercent,
+      gasEstimates: services.config.gasEstimates,
+      gasPriceWei: services.state.currentGasPrices.rapid,
     });
 
-    eventEmitter.emit('paths', blockNumber, paths);
+    services.eventEmitter.emit('paths', blockNumber, paths);
     return paths;
   } catch (error: unknown) {
-    eventEmitter.emit('error', error);
+    services.eventEmitter.emit('error', error);
     return [];
   }
 };
 
-const blockHandler = async ({
-  multicall,
-  strategies,
-  exchanges,
-  blockNumber,
-  gasEstimates,
-  state,
-  eventEmitter,
-  config,
-}: {
-  multicall: Multicall;
-  strategies: Strategy[];
-  exchanges: Exchange[];
-  blockNumber: string;
-  gasEstimates: GasEstimates;
-  state: State;
-  eventEmitter: TypedEmitter<MessageEvents>;
-  config: EnvConfig;
-}) => {
+const blockHandler = async (services: Services, { multicall, blockNumber }: BlockHandlerArgs) => {
   // Record time for perf monitoring
-  state.botExecutionMonitoringTick = new Date().getTime();
+  services.state.botExecutionMonitoringTick = new Date().getTime();
 
   // Execute all strategies simultaneously
-  const paths = await Promise.all(
-    strategies.map((strategy) =>
-      executeStrategy({
+  await Promise.all(
+    services.strategies.map((strategy) =>
+      executeStrategy(services, {
         blockNumber,
         multicall,
         strategy,
-        exchanges,
-        gasEstimates,
-        state,
-        eventEmitter,
-        config,
       })
     )
   );
 
-  registerExecutionTime(state);
-
-  return paths.flat();
+  registerExecutionTime(services);
 };
 
 export default blockHandler;

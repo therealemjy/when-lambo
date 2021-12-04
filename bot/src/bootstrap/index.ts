@@ -1,11 +1,16 @@
 import http from 'http';
 import BigNumber from 'bignumber.js';
+import TypedEmitter from 'typed-emitter';
 
 import logger from '@logger';
+import config, { EnvConfig, Strategy } from '@config';
 
 import { registerEventListeners } from './eventEmitter/registerEvents';
 import fetchSecrets from './fetchSecrets';
 import gasPriceWatcher from './gasPriceWatcher';
+import exchanges from '../exchanges';
+import UniswapLikeExchange from '../exchanges/UniswapLikeExchange';
+import eventEmitter, { MessageEvents } from './eventEmitter';
 
 export type State = {
   lastMonitoringDateTime: number | null;
@@ -26,7 +31,7 @@ export type State = {
   };
 };
 
-const state: State = {
+const defaultState: State = {
   // Set to the last date the bot checked prices
   lastMonitoringDateTime: null,
   botExecutionMonitoringTick: 0,
@@ -40,17 +45,35 @@ const state: State = {
   secrets: undefined,
 };
 
+export type Services = {
+  state: State;
+  config: EnvConfig;
+  logger: typeof logger;
+  exchanges: UniswapLikeExchange[];
+  eventEmitter: TypedEmitter<MessageEvents>;
+  strategies: Strategy[];
+};
+
+const services: Services = {
+  state: defaultState,
+  config,
+  logger,
+  exchanges,
+  eventEmitter,
+  strategies: config.strategies,
+};
+
 const server = http.createServer(function (req, res) {
   // GET /health
   if (req.url === '/health' && req.method === 'GET') {
-    if (!state.lastMonitoringDateTime) {
+    if (!services.state.lastMonitoringDateTime) {
       res.writeHead(500);
       res.end('Monitoring not started yet');
       return;
     }
 
     const currentDateTime = new Date().getTime();
-    const secondsElapsedSinceLastMonitoring = (currentDateTime - state.lastMonitoringDateTime) / 1000;
+    const secondsElapsedSinceLastMonitoring = (currentDateTime - services.state.lastMonitoringDateTime) / 1000;
 
     if (secondsElapsedSinceLastMonitoring >= 60) {
       res.writeHead(500);
@@ -63,21 +86,21 @@ const server = http.createServer(function (req, res) {
   }
 
   if (req.url === '/perf' && req.method === 'GET') {
-    if (!state.perfMonitoringRecords) {
+    if (!services.state.perfMonitoringRecords) {
       res.writeHead(500);
       res.end('Monitoring not started yet');
       return;
     }
 
-    const sum = state.perfMonitoringRecords.reduce((a, b) => (a += b));
-    const len = state.perfMonitoringRecords.length;
+    const sum = services.state.perfMonitoringRecords.reduce((a, b) => (a += b));
+    const len = services.state.perfMonitoringRecords.length;
 
     res.writeHead(200);
     res.end(`Average monitoring speed: ${sum / len}ms`);
   }
 });
 
-export const bootstrap = async (): Promise<State> =>
+export const bootstrap = async (): Promise<Services> =>
   new Promise((resolve) => {
     server.listen(3000, async () => {
       logger.log('Server started running on port 3000');
@@ -86,15 +109,15 @@ export const bootstrap = async (): Promise<State> =>
       const secrets = await fetchSecrets();
 
       // Register secrets in global variable
-      state.secrets = secrets;
+      services.state.secrets = secrets;
 
       // Register event listeners
       await registerEventListeners();
 
       // Pull gas prices every 5 seconds
-      gasPriceWatcher.start(state, 5000);
+      gasPriceWatcher.start(services, 5000);
 
       // We will use this instance of state throughout the bot with dependencies injection, making testing way easier
-      resolve(state);
+      resolve(services);
     });
   });
