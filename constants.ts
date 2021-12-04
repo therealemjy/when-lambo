@@ -5,5 +5,3 @@ export const VAULT_ACCOUNT_MAINNET_ADDRESS = 'TO BE DEFINED';
 // the gas necessary for the exchange swaps themselves (these are fetched separately, see
 // fetchGasEstimates script)
 export const TRADE_GAS_ESTIMATE_WITHOUT_SWAPS = 180000;
-export const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
-export const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/swapGasEstimates.json`;

@@ -3,7 +3,6 @@ import hre, { deployments } from 'hardhat';
 import 'hardhat-deploy';
 
 import config from '@config';
-import { DIST_FOLDER_PATH, SWAP_GAS_ESTIMATES_FILE_PATH } from '@constants';
 import { GasEstimates } from '@localTypes';
 import logger from '@logger';
 
@@ -13,6 +12,9 @@ import exchanges from '@bot/src/exchanges';
 
 // @ts-ignore
 const ethers = hre.ethers;
+
+const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
+const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/swapGasEstimates.json`;
 
 const tokenAddresses = config.strategies.reduce((allTokenAddresses, formattedStrategy) => {
   if (allTokenAddresses.find((tokenAddress) => tokenAddress === formattedStrategy.toToken.address)) {
