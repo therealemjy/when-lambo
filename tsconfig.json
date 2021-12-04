@@ -16,6 +16,7 @@
       "@constants": ["./constants"],
       "@config": ["./config"],
       "@logger": ["./logger"],
+      "@dist/*": ["./dist/*"],
       "@resources/*": ["./resources/*"],
       "@tasks/*": ["./tasks/*"],
       "@deployments/*": ["./deployments/*"],

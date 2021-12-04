@@ -87,8 +87,9 @@
   "_moduleAliases": {
     "@localTypes": "./types",
     "@constants": "./constants",
-    "@logger": "./logger",
     "@config": "./config",
+    "@logger": "./logger",
+    "@dist": ["./dist"],
     "@tasks": "./tasks",
     "@utils": "./utils",
     "@resources": "./resources",

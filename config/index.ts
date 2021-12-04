@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
 import { ethers } from 'ethers';
-import fs from 'fs';
 
-import { SWAP_GAS_ESTIMATES_FILE_PATH } from '@constants';
 import { ExchangeIndex, GasEstimates } from '@localTypes';
+
+import swapGasEstimates from '@dist/swapGasEstimates.json';
 
 import env from './env';
 import formatStrategies from './formatStrategies';
@@ -15,25 +15,6 @@ export type { GasEstimates } from '@localTypes';
 dotenv.config();
 
 const parsedStrategies: ParsedStrategy[] = JSON.parse(env('STRINGIFIED_STRATEGIES'));
-
-const getGasEstimates = () => {
-  if (process.env.IS_FETCHING_GAS_ESTIMATES) {
-    return {};
-  }
-
-  if (!fs.existsSync(SWAP_GAS_ESTIMATES_FILE_PATH)) {
-    console.error(
-      `Gas estimates file not found. It looks like gas estimates have not been fetched yet, please run npm run fetch-gas-estimates then run this command again.`
-    );
-
-    return {};
-  }
-
-  const fileContent = fs.readFileSync(SWAP_GAS_ESTIMATES_FILE_PATH, 'utf8');
-  return JSON.parse(fileContent);
-};
-
-const gasEstimates: GasEstimates = getGasEstimates();
 
 const config: EnvConfig = {
   serverId: env('SERVER_ID'),
@@ -48,7 +29,7 @@ const config: EnvConfig = {
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
-  gasEstimates,
+  gasEstimates: swapGasEstimates as GasEstimates,
   googleSpreadSheet: {
     id: env('GOOGLE_SPREADSHEET_SPREADSHEET_ID'),
     clientEmail: env('GOOGLE_SPREADSHEET_CLIENT_EMAIL'),
