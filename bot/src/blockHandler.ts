@@ -1,6 +1,6 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 
-import config, { Strategy } from '@config';
+import config, { Strategy, GasEstimates } from '@config';
 import logger from '@logger';
 
 import eventEmitter from './bootstrap/eventEmitter';
@@ -14,11 +14,13 @@ const executeStrategy = async ({
   multicall,
   strategy,
   exchanges,
+  gasEstimates,
 }: {
   blockNumber: string;
   multicall: Multicall;
   strategy: Strategy;
   exchanges: Exchange[];
+  gasEstimates: GasEstimates;
 }) => {
   try {
     const paths = await findBestPaths({
@@ -32,6 +34,7 @@ const executeStrategy = async ({
       },
       exchanges,
       slippageAllowancePercent: config.slippageAllowancePercent,
+      gasEstimates,
       gasPriceWei: global.currentGasPrices.rapid,
     });
 
@@ -48,11 +51,13 @@ const blockHandler = async ({
   strategies,
   exchanges,
   blockNumber,
+  gasEstimates,
 }: {
   multicall: Multicall;
   strategies: Strategy[];
   exchanges: Exchange[];
   blockNumber: string;
+  gasEstimates: GasEstimates;
 }) => {
   // Record time for perf monitoring
   global.botExecutionMonitoringTick = new Date().getTime();
@@ -67,6 +72,7 @@ const blockHandler = async ({
         multicall,
         strategy,
         exchanges,
+        gasEstimates,
       })
     )
   );

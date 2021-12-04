@@ -5,6 +5,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { LEDGER_OWNER_ACCOUNT_PATH, VAULT_ACCOUNT_MAINNET_ADDRESS } from '@constants';
 // TODO: import mainnet info once contract has been deployed on it
 import { address as transactorContractAddress } from '@deployments/localhost/Transactor.json';
+import logger from '@logger';
 
 import withdrawFromTransactorContract from './withdrawFromTransactorContract';
 
@@ -19,10 +20,10 @@ const withdraw = async (
   hre: HardhatRuntimeEnvironment
 ) => {
   // Display transaction information
-  console.log('Review and confirm the next transaction. Press ctrl + c to cancel.\n');
-  console.log(`Amount: ${tokenAmount} ${tokenSymbol}`);
-  console.log(`From: Transactor contract (${transactorContractAddress})`);
-  console.log(`To: vault account (${VAULT_ACCOUNT_MAINNET_ADDRESS})\n`);
+  logger.log('Review and confirm the next transaction. Press ctrl + c to cancel.\n');
+  logger.log(`Amount: ${tokenAmount} ${tokenSymbol}`);
+  logger.log(`From: Transactor contract (${transactorContractAddress})`);
+  logger.log(`To: vault account (${VAULT_ACCOUNT_MAINNET_ADDRESS})\n`);
 
   // Connect to ledger to retrieve signer
   const signer = new LedgerSigner(hre.ethers.provider, 'hid', LEDGER_OWNER_ACCOUNT_PATH);

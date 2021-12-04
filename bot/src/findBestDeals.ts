@@ -2,6 +2,9 @@ import { ContractCallContext } from '@maxime.julian/ethereum-multicall';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
+import { GasEstimates } from '@localTypes';
+import { address as wethAddress } from '@resources/thirdPartyContracts/mainnet/weth.json';
+
 import { Exchange, ResultsFormatter, Token, Deal, UsedExchangeIndexes } from '@bot/src/types';
 
 import { WETH } from './tokens';
@@ -32,6 +35,7 @@ const findBestDeals = async ({
   exchanges,
   slippageAllowancePercent,
   gasPriceWei,
+  gasEstimates,
   usedExchangeIndexes, // Reference of all the exchanges used to obtain each fromTokenDecimalAmount
 }: {
   multicall: Multicall;
@@ -40,6 +44,7 @@ const findBestDeals = async ({
   toToken: Token;
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
+  gasEstimates: GasEstimates;
   exchanges: Exchange[];
   usedExchangeIndexes?: UsedExchangeIndexes;
 }) => {
@@ -99,6 +104,14 @@ const findBestDeals = async ({
         formattedResult.toTokenDecimalAmount.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
       );
 
+      // Get estimated gas necessary to execute the swap.
+      // In the gas estimates file, the traded token is used as a reference for each gas estimate, which
+      // is why here we use the address of the token that's not WETH as a reference.
+      const refTokenAddress = fromToken.address === wethAddress ? toToken.address : fromToken.address;
+
+      // TODO: add safe guard that logs an error in case the estimate wasn't found
+      const gasEstimate = gasEstimates[exchange.index][refTokenAddress];
+
       const deal = {
         timestamp: new Date(),
         exchangeIndex: exchange.index,
@@ -107,7 +120,7 @@ const findBestDeals = async ({
         toToken,
         toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
         slippageAllowancePercent,
-        estimatedGasCost: gasPriceWei.multipliedBy(formattedResult.estimatedGas),
+        estimatedGasCost: gasPriceWei.multipliedBy(gasEstimate),
       };
 
       const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()];

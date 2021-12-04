@@ -42,6 +42,7 @@ const init = async () => {
             multicall,
             strategies: config.strategies,
             exchanges,
+            gasEstimates: config.gasEstimates,
           })
         );
       } catch (err: any) {
