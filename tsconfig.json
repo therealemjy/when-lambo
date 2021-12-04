@@ -25,10 +25,11 @@
   "include": [
     "./hardhat.config.ts",
     "./test",
+    "./scripts",
+    "./tasks",
     "./chainHandler/typechain",
     "./chainHandler/deploy",
-    "./chainHandler/utils",
-    "./tasks"
+    "./chainHandler/utils"
   ],
   "exclude": ["./bot", "./node_modules"],
   "files": ["./hardhat.config.ts"]

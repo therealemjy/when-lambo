@@ -55,6 +55,11 @@ export interface EnvConfig {
     wethAmountOutMin: BigNumber;
     wethAmountOutExpected: BigNumber;
   };
+  testAccountAddresses: {
+    owner: string;
+    vault: string;
+    externalUser: string;
+  };
 }
 
 const parsedStrategies: ParsedStrategy[] = JSON.parse(env('STRINGIFIED_STRATEGIES'));
@@ -66,9 +71,9 @@ const config: EnvConfig = {
     accessKeyIdEthNode: env('AWS_ACCESS_KEY_ID_ETH_NODE'),
     secretAccessKeyEthNode: env('AWS_SECRET_ACCESS_KEY_ETH_NODE'),
   },
-  environment: env('NODE_ENV') as Environment,
-  isProd: env('NODE_ENV') === 'production',
-  isDev: env('NODE_ENV') === 'development',
+  environment: (process.env.NODE_ENV as Environment) || 'development',
+  isProd: (process.env.NODE_ENV as Environment) === 'production',
+  isDev: (process.env.NODE_ENV as Environment) === 'development',
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
@@ -93,6 +98,11 @@ const config: EnvConfig = {
     buyingExchangeIndex: +env('TEST_PROFITABLE_TRADE_BUYING_EXCHANGE_INDEX') as ExchangeIndex,
     wethAmountOutMin: ethers.BigNumber.from(env('TEST_PROFITABLE_TRADE_WETH_AMOUNT_OUT_MIN')),
     wethAmountOutExpected: ethers.BigNumber.from(env('TEST_PROFITABLE_TRADE_WETH_AMOUNT_OUT_EXPECTED')),
+  },
+  testAccountAddresses: {
+    owner: env('TEST_OWNER_ACCOUNT_MAINNET_ADDRESS'),
+    vault: env('TEST_VAULT_ACCOUNT_MAINNET_ADDRESS'),
+    externalUser: env('TEST_EXTERNAL_USER_ACCOUNT_MAINNET_ADDRESS'),
   },
 };
 
