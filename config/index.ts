@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { ethers, BigNumber } from 'ethers';
 
-import { ExchangeIndex } from '@bot/src/types';
+import { ExchangeIndex } from '@localTypes';
 
 import formatStrategies from './formatStrategies';
 import { ParsedStrategy, Strategy, Environment } from './types';

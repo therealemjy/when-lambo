@@ -23,6 +23,7 @@
     "sourceMap": true,
     "outDir": "dist",
     "paths": {
+      "@localTypes": ["../types"],
       "@constants": ["../constants"],
       "@config": ["../config"],
       "@resources/*": ["../resources/*"],

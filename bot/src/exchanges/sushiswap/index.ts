@@ -1,8 +1,10 @@
 import BigNumber from 'bignumber.js';
 
+import { ExchangeIndex } from '@localTypes';
+
 import sushiswapRouterContract from '@resources/thirdPartyContracts/mainnet/sushiswapRouter.json';
 
-import { Exchange, ExchangeIndex } from '@bot/src/types';
+import { Exchange } from '@bot/src/types';
 
 class Sushiswap implements Exchange {
   index: ExchangeIndex;

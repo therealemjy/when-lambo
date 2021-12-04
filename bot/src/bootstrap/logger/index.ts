@@ -4,9 +4,10 @@ import RotatingFileStream from 'bunyan-rotating-file-stream';
 import 'console.table';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
+import { ExchangeIndex } from '@localTypes';
+
 import config from '@config';
 
-import { ExchangeIndex } from '@bot/src/types';
 import eventEmitter from '@bot/src/bootstrap/eventEmitter';
 import { WETH } from '@bot/src/tokens';
 import { Path } from '@bot/src/types';

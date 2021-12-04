@@ -1,7 +1,9 @@
 import { ContractCallContext, ContractCallReturnContext } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Token, ExchangeIndex } from '@bot/src/types';
+import { ExchangeIndex } from '@localTypes';
+
+import { Token } from '@bot/src/types';
 
 export interface IGetDecimalAmountOutCallContextInput {
   callReference: string;

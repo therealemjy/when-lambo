@@ -1,8 +1,10 @@
 import BigNumber from 'bignumber.js';
 
+import { ExchangeIndex } from '@localTypes';
+
 import uniswapV2RouterContract from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
 
-import { Exchange, ExchangeIndex } from '@bot/src/types';
+import { Exchange } from '@bot/src/types';
 
 class UniswapV2 implements Exchange {
   index: ExchangeIndex;

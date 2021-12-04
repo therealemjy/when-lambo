@@ -12,6 +12,7 @@
     "rootDirs": ["./"],
     "baseUrl": "./",
     "paths": {
+      "@localTypes": ["./types"],
       "@constants": ["./constants"],
       "@config": ["./config"],
       "@resources/*": ["./resources/*"],

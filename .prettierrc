@@ -4,6 +4,7 @@
   "tabWidth": 2,
   "importOrder": [
     "./moduleAliases",
+    "^@localTypes",
     "^@constants",
     "^@config",
     "^@resources/(.*)$",

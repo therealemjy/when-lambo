@@ -84,6 +84,7 @@
     "websocket": "^1.0.34"
   },
   "_moduleAliases": {
+    "@localTypes": "./types",
     "@constants": "./constants",
     "@config": "./config",
     "@utils": "./utils",

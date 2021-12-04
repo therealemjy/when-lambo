@@ -44,10 +44,7 @@ const hardhatConfig: HardhatUserConfig = {
   },
   namedAccounts: {
     ownerAddress: {
-      // hardhat: 0, // assign the first user as owner
-      // DEV ONLY
       hardhat: 0, // assign the first user as owner
-      // END DEV ONLY
       mainnet: OWNER_ACCOUNT_MAINNET_ADDRESS,
     },
     vaultAddress: {

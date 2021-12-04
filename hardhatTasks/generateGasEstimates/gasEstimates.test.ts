@@ -2,6 +2,8 @@ import 'console.table';
 import { BigNumber, Signer } from 'ethers';
 import { ethers, getNamedAccounts } from 'hardhat';
 
+import { ExchangeIndex } from '@localTypes';
+
 import config from '@config';
 
 import cryptoComRouterInfo from '@resources/thirdPartyContracts/mainnet/cryptoComRouter.json';
@@ -12,7 +14,6 @@ import wethInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 import wrapEth from '@chainHandler/utils/wrapEth';
 
 import Token from '@bot/src/tokens/Token';
-import { ExchangeIndex } from '@bot/src/types';
 
 export interface EstimateTransaction {
   wethDecimalAmount: BigNumber;

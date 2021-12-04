@@ -1,8 +1,10 @@
 import BigNumber from 'bignumber.js';
 
+import { ExchangeIndex } from '@localTypes';
+
 import cryptoComRouterContract from '@resources/thirdPartyContracts/mainnet/cryptoComRouter.json';
 
-import { Exchange, ExchangeIndex } from '@bot/src/types';
+import { Exchange } from '@bot/src/types';
 
 class CryptoCom implements Exchange {
   index: ExchangeIndex;
