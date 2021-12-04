@@ -18,4 +18,3 @@ coverage.json
 # Hardhat files
 cache
 artifacts
-chainHandler/typechain
