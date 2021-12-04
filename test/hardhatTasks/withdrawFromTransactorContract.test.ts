@@ -1,4 +1,3 @@
-import withdraw from '@tasks/withdrawTasks/withdrawFromTransactorContract';
 import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
@@ -6,6 +5,8 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
 import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json';
+
+import withdraw from '@tasks/withdrawTasks/withdrawFromTransactorContract';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import wrapEth from '@chainHandler/utils/wrapEth';
@@ -88,7 +89,7 @@ describe('tasks/withdrawFromTransactorContract', function () {
         await owner.sendTransaction({ to: transactorContractAddress, value: transferredAmount });
       } else {
         // Transfer WETH to contract
-        await wrapEth(ethers, owner, transferredAmount, transactorContractAddress);
+        await wrapEth(owner, transferredAmount, transactorContractAddress);
       }
 
       await withdraw(

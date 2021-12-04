@@ -15,6 +15,11 @@ class CryptoCom implements Exchange {
     this.name = ExchangeIndex[ExchangeIndex.CryptoCom];
   }
 
+  estimateGetDecimalAmountOut: Exchange['estimateGetDecimalAmountOut'] = async () => {
+    // TODO:
+    return undefined;
+  };
+
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({
     callReference,
     fromTokenDecimalAmounts,

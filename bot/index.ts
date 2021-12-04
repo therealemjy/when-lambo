@@ -7,9 +7,7 @@ import { bootstrap } from './src/bootstrap';
 import getAwsWSProvider from './src/bootstrap/aws/getProvider';
 import eventEmitter from './src/bootstrap/eventEmitter';
 import logger from './src/bootstrap/logger';
-import CryptoComExchange from './src/exchanges/cryptoCom';
-import SushiswapExchange from './src/exchanges/sushiswap';
-import UniswapV2Exchange from './src/exchanges/uniswapV2';
+import exchanges from './src/exchanges';
 import handleError from './src/utils/handleError';
 
 // const THIRTY_MINUTES_IN_MILLISECONDS = 1000 * 60 * 30;
@@ -27,16 +25,12 @@ const init = async () => {
     const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
 
     // Instantiate exchange services
-    const uniswapV2ExchangeService = new UniswapV2Exchange();
-    const sushiswapExchangeService = new SushiswapExchange();
-    const cryptoComExchangeService = new CryptoComExchange();
-
     provider.addListener(
       'block',
       blockHandler({
         multicall,
         strategies: config.strategies,
-        exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, cryptoComExchangeService],
+        exchanges,
       })
     );
 

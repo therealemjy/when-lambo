@@ -15,6 +15,11 @@ class Sushiswap implements Exchange {
     this.name = ExchangeIndex[ExchangeIndex.Sushiswap];
   }
 
+  estimateGetDecimalAmountOut: Exchange['estimateGetDecimalAmountOut'] = async () => {
+    // TODO:
+    return undefined;
+  };
+
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({
     callReference,
     fromTokenDecimalAmounts,
