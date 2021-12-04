@@ -1,4 +1,6 @@
-import hre from 'hardhat';
+import BigNumber from 'bignumber.js';
+import hre, { deployments } from 'hardhat';
+import 'hardhat-deploy';
 
 import config from '@config';
 
@@ -18,6 +20,14 @@ const tokens = config.strategies.reduce((allTokens, formattedStrategy) => {
   return [...allTokens, formattedStrategy.toToken];
 }, [] as Token[]);
 
+const gasEstimates: {
+  [exchangeIndex: number]: {
+    [tokenAddress: string]: BigNumber;
+  };
+} = {};
+
+const setup = deployments.createFixture(() => deployments.fixture());
+
 const fetchGasEstimates = async () => {
   // Because this script will only ever be run locally on Hardhat's local network, we can use
   // the test owner account as signer
@@ -29,25 +39,41 @@ const fetchGasEstimates = async () => {
 
   for (let e = 0; e < exchanges.length; e++) {
     const exchange = exchanges[e];
+    const exchangeGasEstimates: {
+      [swap: string]: string;
+    } = {};
 
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
 
+      // Reset blockchain state
+      await setup();
+
       // Wrap ETH to WETH on signer account
       await wrapEth(testOwner, testAmountIn, testOwnerAddress);
 
-      // Fetch estimated gas
       const gasEstimate = await exchange.estimateGetDecimalAmountOut({
         signer: testOwner,
         amountIn: testAmountIn,
         toTokenAddress: token.address,
       });
 
-      rows.push({
-        'Exchange name': exchange.name,
-        [`WETH -> ${token.symbol}`]: gasEstimate ? gasEstimate.toString() : 'N/A',
-      });
+      // Initialize exchange estimates if it has not been done yet
+      if (!gasEstimates[exchange.index]) {
+        gasEstimates[exchange.index] = {};
+      }
+
+      if (gasEstimate) {
+        gasEstimates[exchange.index][token.address] = gasEstimate;
+      }
+
+      exchangeGasEstimates[`WETH -> ${token.symbol}`] = gasEstimate ? gasEstimate.toString() : 'N/A';
     }
+
+    rows.push({
+      'Exchange name': exchange.name,
+      ...exchangeGasEstimates,
+    });
   }
 
   console.table(rows);

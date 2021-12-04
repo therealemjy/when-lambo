@@ -21,7 +21,7 @@ export interface IGetDecimalAmountOutCallContextInput {
 export interface Exchange {
   name: string;
   index: ExchangeIndex;
-  estimateGetDecimalAmountOut: (args: IGetEstimateDecimalAmountOutInput) => Promise<number | undefined>;
+  estimateGetDecimalAmountOut: (args: IGetEstimateDecimalAmountOutInput) => Promise<BigNumber | undefined>;
   getDecimalAmountOutCallContext: (args: IGetDecimalAmountOutCallContextInput) => {
     context: ContractCallContext;
     resultsFormatter: ResultsFormatter;

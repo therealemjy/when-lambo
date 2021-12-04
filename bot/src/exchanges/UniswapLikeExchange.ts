@@ -3,6 +3,8 @@ import { ethers } from 'ethers';
 
 import { ExchangeIndex } from '@localTypes';
 
+import config from '@config';
+
 import wethInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 import { Exchange } from '@bot/src/types';
@@ -28,12 +30,18 @@ class UniswapLikeExchange implements Exchange {
     amountIn,
     toTokenAddress,
   }) => {
+    if (config.isProd) {
+      throw new Error(
+        'estimateGetDecimalAmountOut can only be run in non-production environments, as it sends real transactions to the node! Make sure to only run this method on a test/forked network only with fake ETH.'
+      );
+    }
+
     const deadline = new Date(new Date().getTime() + 120000).getTime();
     const signerAddress = await signer.getAddress();
     const wethContract = new ethers.Contract(wethInfo.address, wethInfo.abi, signer);
     const routerContract = new ethers.Contract(this.routerContractInfo.address, this.routerContractInfo.abi, signer);
 
-    let gasUsed: number;
+    let gasUsed: BigNumber;
 
     try {
       // Give approval to router account to withdraw WETH from signer
