@@ -96,7 +96,7 @@ class UniswapLikeExchange implements Exchange {
             fromTokenDecimalAmount: new BigNumber(callReturnContext.methodParameters[0]),
             toToken,
             toTokenDecimalAmount: new BigNumber(callReturnContext.returnValues[1].hex),
-            estimatedGas: new BigNumber(115000),
+            estimatedGas: new BigNumber(115000), // TODO: get from fetched gas estimates
           })),
     };
   };
