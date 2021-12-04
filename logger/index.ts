@@ -5,6 +5,7 @@ import 'console.table';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import config from '@config';
+import { TRADE_GAS_ESTIMATE_WITHOUT_SWAPS } from '@constants';
 import { ExchangeIndex } from '@localTypes';
 
 import eventEmitter from '@bot/src/bootstrap/eventEmitter';
@@ -57,6 +58,8 @@ const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: Googl
 
     const gasCost = path[0].estimatedGasCost
       .plus(path[1].estimatedGasCost)
+      // Add estimated gas to trade with Transactor (without accounting for the swap themselves)
+      .plus(TRADE_GAS_ESTIMATE_WITHOUT_SWAPS)
       // Add gasLimit margin
       .multipliedBy(config.gasLimitMultiplicator);
     const gasCostWETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);

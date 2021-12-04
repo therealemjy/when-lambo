@@ -1,5 +1,5 @@
-import http from 'http';
 import BigNumber from 'bignumber.js';
+import http from 'http';
 
 import logger from '@logger';
 
@@ -92,7 +92,7 @@ export const bootstrap = async (): Promise<State> =>
       await registerEventListeners();
 
       // Pull gas prices every 5 seconds
-      gasPriceWatcher.start(state, 5000);
+      await gasPriceWatcher.start((gasPrices) => (state.currentGasPrices = gasPrices), 5000);
 
       // We will use this instance of state throughout the bot with dependencies injection, making testing way easier
       resolve(state);
