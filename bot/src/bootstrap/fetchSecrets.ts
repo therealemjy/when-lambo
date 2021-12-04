@@ -1,7 +1,6 @@
 import AWS from 'aws-sdk';
 
 import config from '@config';
-
 import logger from '@logger';
 
 export type WLSecrets = {

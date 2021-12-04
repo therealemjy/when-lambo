@@ -2,12 +2,9 @@ import fs from 'fs';
 import hre, { deployments } from 'hardhat';
 import 'hardhat-deploy';
 
-import { GasEstimates } from '@localTypes';
-
-import { DIST_FOLDER_PATH, SWAP_GAS_ESTIMATES_FILE_PATH } from '@constants';
-
 import config from '@config';
-
+import { DIST_FOLDER_PATH, SWAP_GAS_ESTIMATES_FILE_PATH } from '@constants';
+import { GasEstimates } from '@localTypes';
 import logger from '@logger';
 
 import wrapEth from '@chainHandler/utils/wrapEth';

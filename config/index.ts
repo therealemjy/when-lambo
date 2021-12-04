@@ -2,9 +2,8 @@ import dotenv from 'dotenv';
 import { ethers } from 'ethers';
 import fs from 'fs';
 
-import { ExchangeIndex, GasEstimates } from '@localTypes';
-
 import { SWAP_GAS_ESTIMATES_FILE_PATH } from '@constants';
+import { ExchangeIndex, GasEstimates } from '@localTypes';
 
 import env from './env';
 import formatStrategies from './formatStrategies';

@@ -1,8 +1,6 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 
-import config from '@config';
-import { Strategy } from '@config';
-
+import config, { Strategy } from '@config';
 import logger from '@logger';
 
 import eventEmitter from './bootstrap/eventEmitter';

@@ -1,6 +1,6 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import config from '@config';
 
+import config from '@config';
 import logger from '@logger';
 
 import blockHandler from './src/blockHandler';
@@ -8,8 +8,8 @@ import { bootstrap } from './src/bootstrap';
 import getAwsWSProvider from './src/bootstrap/aws/getProvider';
 import eventEmitter from './src/bootstrap/eventEmitter';
 import exchanges from './src/exchanges';
-import handleError from './src/utils/handleError';
 import CancelablePromise from './src/utils/cancelablePromise';
+import handleError from './src/utils/handleError';
 
 // Catch unhandled exceptions
 process.on('uncaughtException', (error) => {

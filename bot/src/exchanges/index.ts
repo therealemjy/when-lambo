@@ -1,5 +1,4 @@
 import { ExchangeIndex } from '@localTypes';
-
 import cryptoComRouterContract from '@resources/thirdPartyContracts/mainnet/cryptoComRouter.json';
 import sushiswapRouterContract from '@resources/thirdPartyContracts/mainnet/sushiswapRouter.json';
 import uniswapV2RouterInfo from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
