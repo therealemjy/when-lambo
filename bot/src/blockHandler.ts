@@ -44,42 +44,37 @@ const executeStrategy = async ({
   }
 };
 
-const blockHandler =
-  ({ multicall, strategies, exchanges }: { multicall: Multicall; strategies: Strategy[]; exchanges: Exchange[] }) =>
-  async (blockNumber: string) => {
-    // Record time for perf monitoring
-    global.botExecutionMonitoringTick = new Date().getTime();
+const blockHandler = async ({
+  multicall,
+  strategies,
+  exchanges,
+  blockNumber,
+}: {
+  multicall: Multicall;
+  strategies: Strategy[];
+  exchanges: Exchange[];
+  blockNumber: string;
+}) => {
+  // Record time for perf monitoring
+  global.botExecutionMonitoringTick = new Date().getTime();
 
-    logger.log(`New block received. Block # ${blockNumber}`);
+  logger.log(`New block received. Block # ${blockNumber}`);
 
-    if (global.isMonitoring) {
-      logger.log('Block skipped! Price monitoring ongoing.');
-    }
+  // Execute all strategies simultaneously
+  const paths = await Promise.all(
+    strategies.map((strategy) =>
+      executeStrategy({
+        blockNumber,
+        multicall,
+        strategy,
+        exchanges,
+      })
+    )
+  );
 
-    // Check script isn't currently running
-    if (global.isMonitoring) {
-      return;
-    }
+  registerExecutionTime();
 
-    global.isMonitoring = true;
-
-    // Execute all strategies simultaneously
-    const paths = await Promise.all(
-      strategies.map((strategy) =>
-        executeStrategy({
-          blockNumber,
-          multicall,
-          strategy,
-          exchanges,
-        })
-      )
-    );
-
-    // Reset monitoring status so the script doesn't stop
-    global.isMonitoring = false;
-    registerExecutionTime();
-
-    return paths.flat();
-  };
+  return paths.flat();
+};
 
 export default blockHandler;
