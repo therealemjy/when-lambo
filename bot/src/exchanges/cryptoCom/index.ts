@@ -2,13 +2,15 @@ import BigNumber from 'bignumber.js';
 
 import cryptoComRouterContract from '@resources/thirdPartyContracts/mainnet/cryptoComRouter.json';
 
-import { Exchange, ExchangeName } from '@bot/src/types';
+import { Exchange, ExchangeIndex } from '@bot/src/types';
 
 class CryptoCom implements Exchange {
-  name: ExchangeName;
+  index: ExchangeIndex;
+  name: string;
 
   constructor() {
-    this.name = ExchangeName.CryptoCom;
+    this.index = ExchangeIndex.CryptoCom;
+    this.name = ExchangeIndex[ExchangeIndex.CryptoCom];
   }
 
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({

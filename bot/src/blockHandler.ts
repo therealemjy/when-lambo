@@ -1,12 +1,13 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 
 import config from '@config';
+import { Strategy } from '@config';
 
 import eventEmitter from './bootstrap/eventEmitter';
 import logger from './bootstrap/logger';
 import findBestPaths from './findBestPaths';
 import { WETH } from './tokens';
-import { Exchange, Strategy } from './types';
+import { Exchange } from './types';
 import registerExecutionTime from './utils/registerExecutionTime';
 
 const executeStrategy = async ({

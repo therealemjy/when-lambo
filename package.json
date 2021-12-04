@@ -6,13 +6,14 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "tsc": "tsc --noEmit",
+    "tsc": "npm run bot:tsc && tsc --noEmit",
     "lint": "eslint .",
     "test": "NODE_ENV=test hardhat test",
     "format": "npm-run-all format:*",
     "format:json": "prettier --write \"**/*.json\"",
     "format:ts": "prettier --write \"**/*.ts\"",
     "prebot:deploy": "rm -rf ./bot/dist && npm run bot:build && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
+    "bot:tsc": "tsc --noEmit --project ./bot/tsconfig.json",
     "bot:deploy": "npx pm2 deploy one update --force && npx pm2 deploy two update --force && npx pm2 deploy three update --force && npx pm2 deploy four update --force && npx pm2 deploy five update --force && npx pm2 deploy six update --force",
     "bot:build": "./node_modules/.bin/esbuild bot/index.ts --bundle --outfile=./bot/dist/index.js --platform=node",
     "bot:dev": "rm -rf ./bot/dist && npm run bot:build && NODE_ENV=development node --inspect ./bot/dist/index | ./node_modules/.bin/bunyan",
@@ -32,6 +33,7 @@
     "ethers": "^5.5.1",
     "google-spreadsheet": "^3.2.0",
     "serialize-error": "^8.1.0",
+    "typed-emitter": "^1.4.0",
     "websocket": "^1.0.34"
   },
   "devDependencies": {

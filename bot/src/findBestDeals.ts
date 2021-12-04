@@ -2,7 +2,7 @@ import { ContractCallContext } from '@maxime.julian/ethereum-multicall';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, ResultsFormatter, Token, Deal, UsedExchangeNames } from '@bot/src/types';
+import { Exchange, ResultsFormatter, Token, Deal, UsedExchangeIndexes } from '@bot/src/types';
 
 import { WETH } from './tokens';
 
@@ -32,7 +32,7 @@ const findBestDeals = async ({
   exchanges,
   slippageAllowancePercent,
   gasPriceWei,
-  usedExchangeNames, // Reference of all the exchanges used to obtain each fromTokenDecimalAmount
+  usedExchangeIndexes, // Reference of all the exchanges used to obtain each fromTokenDecimalAmount
 }: {
   multicall: Multicall;
   fromTokenDecimalAmounts: BigNumber[];
@@ -41,7 +41,7 @@ const findBestDeals = async ({
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
   exchanges: Exchange[];
-  usedExchangeNames?: UsedExchangeNames;
+  usedExchangeIndexes?: UsedExchangeIndexes;
 }) => {
   const resultsFormatters: {
     [key: string]: ResultsFormatter;
@@ -49,14 +49,14 @@ const findBestDeals = async ({
 
   // Get prices from all the exchanges
   const multicallContexts = exchanges.reduce<ContractCallContext[]>((contexts, exchange) => {
-    const filteredFromTokenDecimalAmounts = !usedExchangeNames
+    const filteredFromTokenDecimalAmounts = !usedExchangeIndexes
       ? fromTokenDecimalAmounts
-      : // If usedExchangeNames was provided, remove all the fromTokenDecimalAmounts
+      : // If usedExchangeIndexes was provided, remove all the fromTokenDecimalAmounts
         // previously found on the exchange. We do this to prevent front-running
         // ourselves by buying from an exchange and selling to the same exchange
         // in the same path.
         fromTokenDecimalAmounts.filter(
-          (fromTokenDecimalAmount) => usedExchangeNames[fromTokenDecimalAmount.toFixed()] !== exchange.name
+          (fromTokenDecimalAmount) => usedExchangeIndexes[fromTokenDecimalAmount.toFixed()] !== exchange.index
         );
 
     const { context, resultsFormatter } = exchange.getDecimalAmountOutCallContext({
@@ -101,7 +101,7 @@ const findBestDeals = async ({
 
       const deal = {
         timestamp: new Date(),
-        exchangeName: exchange.name,
+        exchangeIndex: exchange.index,
         fromToken,
         fromTokenDecimalAmount: formattedResult.fromTokenDecimalAmount,
         toToken,

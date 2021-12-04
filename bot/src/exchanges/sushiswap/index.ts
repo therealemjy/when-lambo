@@ -2,13 +2,15 @@ import BigNumber from 'bignumber.js';
 
 import sushiswapRouterContract from '@resources/thirdPartyContracts/mainnet/sushiswapRouter.json';
 
-import { Exchange, ExchangeName } from '@bot/src/types';
+import { Exchange, ExchangeIndex } from '@bot/src/types';
 
 class Sushiswap implements Exchange {
-  name: ExchangeName;
+  index: ExchangeIndex;
+  name: string;
 
   constructor() {
-    this.name = ExchangeName.Sushiswap;
+    this.index = ExchangeIndex.Sushiswap;
+    this.name = ExchangeIndex[ExchangeIndex.Sushiswap];
   }
 
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({

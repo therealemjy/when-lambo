@@ -6,13 +6,8 @@ import Token from '@bot/src/tokens/Token';
 export { default as Token } from '@bot/src/tokens/Token';
 export type { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput };
 
+// TODO: move to root of repo
 // These values need to correspond to the ones used in the Transactor contract
-export enum ExchangeName {
-  UniswapV2 = 'UniswapV2',
-  Sushiswap = 'Sushiswap',
-  CryptoCom = 'CryptoCom',
-}
-
 export enum ExchangeIndex {
   UniswapV2 = 0,
   Sushiswap = 1,
@@ -21,7 +16,7 @@ export enum ExchangeIndex {
 
 export interface Deal {
   timestamp: Date;
-  exchangeName: ExchangeName;
+  exchangeIndex: ExchangeIndex;
   fromToken: Token;
   fromTokenDecimalAmount: BigNumber;
   toToken: Token;
@@ -32,6 +27,6 @@ export interface Deal {
 
 export type Path = [Deal, Deal];
 
-export type UsedExchangeNames = {
-  [fixedDecimalAmount: string]: ExchangeName;
+export type UsedExchangeIndexes = {
+  [fixedDecimalAmount: string]: ExchangeIndex;
 };

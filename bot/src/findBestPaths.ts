@@ -1,7 +1,7 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
-import { Exchange, Token, UsedExchangeNames, Path } from '@bot/src/types';
+import { Exchange, Token, UsedExchangeIndexes, Path } from '@bot/src/types';
 
 import findBestDeals from './findBestDeals';
 
@@ -41,10 +41,10 @@ const findBestPaths = async ({
   }
 
   // List exchanges used for each fromTokenDecimalAmount
-  const usedExchangeNames = bestBuyingDeals.reduce<UsedExchangeNames>(
+  const usedExchangeIndexes = bestBuyingDeals.reduce<UsedExchangeIndexes>(
     (acc, bestBuyingDeal) => ({
       ...acc,
-      [bestBuyingDeal.toTokenDecimalAmount.toFixed()]: bestBuyingDeal.exchangeName,
+      [bestBuyingDeal.toTokenDecimalAmount.toFixed()]: bestBuyingDeal.exchangeIndex,
     }),
     {}
   );
@@ -59,7 +59,7 @@ const findBestPaths = async ({
     exchanges,
     slippageAllowancePercent,
     gasPriceWei,
-    usedExchangeNames,
+    usedExchangeIndexes,
   });
 
   if (!bestSellingDeals.length) {

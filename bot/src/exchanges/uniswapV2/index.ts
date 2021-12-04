@@ -2,13 +2,15 @@ import BigNumber from 'bignumber.js';
 
 import uniswapV2RouterContract from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
 
-import { Exchange, ExchangeName } from '@bot/src/types';
+import { Exchange, ExchangeIndex } from '@bot/src/types';
 
 class UniswapV2 implements Exchange {
-  name: ExchangeName;
+  index: ExchangeIndex;
+  name: string;
 
   constructor() {
-    this.name = ExchangeName.UniswapV2;
+    this.index = ExchangeIndex.UniswapV2;
+    this.name = ExchangeIndex[ExchangeIndex.UniswapV2];
   }
 
   getDecimalAmountOutCallContext: Exchange['getDecimalAmountOutCallContext'] = ({

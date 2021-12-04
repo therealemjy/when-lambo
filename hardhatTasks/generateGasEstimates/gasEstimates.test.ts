@@ -12,7 +12,7 @@ import wethInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 import wrapEth from '@chainHandler/utils/wrapEth';
 
 import Token from '@bot/src/tokens/Token';
-import { ExchangeName } from '@bot/src/types';
+import { ExchangeIndex } from '@bot/src/types';
 
 export interface EstimateTransaction {
   wethDecimalAmount: BigNumber;
@@ -20,24 +20,24 @@ export interface EstimateTransaction {
 }
 
 interface ExchangeContract {
-  name: ExchangeName;
+  index: ExchangeIndex;
   address: string;
   abi: string;
 }
 
 const exchangeContracts: ExchangeContract[] = [
   {
-    name: ExchangeName.Sushiswap,
+    index: ExchangeIndex.Sushiswap,
     address: uniswapV2RouterInfo.address,
     abi: uniswapV2RouterInfo.address,
   },
   {
-    name: ExchangeName.UniswapV2,
+    index: ExchangeIndex.UniswapV2,
     address: sushiswapRouterInfo.address,
     abi: sushiswapRouterInfo.address,
   },
   {
-    name: ExchangeName.CryptoCom,
+    index: ExchangeIndex.CryptoCom,
     address: cryptoComRouterInfo.address,
     abi: cryptoComRouterInfo.address,
   },
@@ -105,7 +105,7 @@ describe('ExchangeTests', function () {
         });
 
         rows.push({
-          'Exchange contract': exchangeContract.name,
+          'Exchange index': exchangeContract.index,
           [`WETH -> ${token.symbol}`]: gasEstimate ? gasEstimate.toString() : 'N/A',
         });
       }

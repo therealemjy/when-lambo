@@ -6,6 +6,7 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import config from '@config';
 
+import { ExchangeIndex } from '@bot/src/types';
 import eventEmitter from '@bot/src/bootstrap/eventEmitter';
 import { WETH } from '@bot/src/tokens';
 import { Path } from '@bot/src/types';
@@ -51,8 +52,8 @@ const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: Googl
     const boughtTokens = _convertToHumanReadableAmount(path[0].toTokenDecimalAmount, path[0].toToken.decimals);
     const revenues = _convertToHumanReadableAmount(path[1].toTokenDecimalAmount, path[1].toToken.decimals);
 
-    const bestSellingExchangeName = path[0].exchangeName;
-    const bestBuyingExchangeName = path[1].exchangeName;
+    const bestSellingExchangeName = ExchangeIndex[path[0].exchangeIndex];
+    const bestBuyingExchangeName = ExchangeIndex[path[1].exchangeIndex];
 
     const gasCost = path[0].estimatedGasCost
       .plus(path[1].estimatedGasCost)

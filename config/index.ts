@@ -47,7 +47,7 @@ export interface EnvConfig {
   testProfitableTrade: {
     blockNumber: number;
     wethAmountToBorrow: BigNumber;
-    sellingExchangeIndex: ExchangeIndex; // TODO: do something smarter, so that it is automatically defined based on the ExchangeName type
+    sellingExchangeIndex: ExchangeIndex;
     tradedTokenAddress: string;
     tradedTokenAmountOutMin: BigNumber;
     tradedTokenAmountOutExpected: BigNumber;
