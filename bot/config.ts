@@ -1,11 +1,10 @@
 import dotenv from 'dotenv';
 
 import { Environment, GasEstimates, Strategy } from '@localTypes';
+import env from '@utils/env';
+import formatStrategies from '@utils/formatStrategies';
 
 import swapGasEstimates from '@dist/swapGasEstimates.json';
-
-import env from '../utils/env';
-import formatStrategies from '../utils/formatStrategies';
 
 dotenv.config();
 

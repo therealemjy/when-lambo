@@ -4,7 +4,7 @@
   "tabWidth": 2,
   "importOrder": [
     "./moduleAliases",
-    "^@(localTypes|constants|logger|resources|deployments)",
+    "^@(localTypes|constants|utils|logger|resources|deployments)",
     "^@tasks/(.*)$",
     "^@chainHandler/(.*)$",
     "^@bot/(.*)$",

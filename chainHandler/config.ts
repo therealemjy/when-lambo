@@ -2,9 +2,8 @@ import dotenv from 'dotenv';
 import { ethers, BigNumber } from 'ethers';
 
 import { Environment, ExchangeIndex, Strategy } from '@localTypes';
-
-import env from '../utils/env';
-import formatStrategies from '../utils/formatStrategies';
+import env from '@utils/env';
+import formatStrategies from '@utils/formatStrategies';
 
 dotenv.config();
 

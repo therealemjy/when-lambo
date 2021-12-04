@@ -15,6 +15,7 @@
       "@localTypes": ["./types"],
       "@constants": ["./constants"],
       "@logger": ["./logger"],
+      "@utils/*": ["./utils/*"],
       "@dist/*": ["./dist/*"],
       "@resources/*": ["./resources/*"],
       "@tasks/*": ["./tasks/*"],

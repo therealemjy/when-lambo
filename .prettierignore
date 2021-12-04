@@ -4,8 +4,10 @@ package.json
 dist
 build
 
-artifacts
-cache
 coverage*
 gasReporterOutput.json
 deployments
+chainHandler/artifacts
+chainHandler/cache
+chainHandler/typechain
+bot/dist
