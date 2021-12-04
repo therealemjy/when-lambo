@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 
-import config from '@config';
 import { ExchangeIndex } from '@localTypes';
 import wethInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
@@ -27,8 +26,9 @@ class UniswapLikeExchange implements Exchange {
     signer,
     amountIn,
     toTokenAddress,
+    isProd,
   }) => {
-    if (config.isProd) {
+    if (isProd) {
       throw new Error(
         'estimateGetDecimalAmountOut can only be run in non-production environments, as it sends real transactions to the node! Make sure to only run this method on a test/forked network only with fake ETH.'
       );

@@ -1,10 +1,10 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
+import TypedEmitter from 'typed-emitter';
 
-import config, { Strategy, GasEstimates } from '@config';
-import logger from '@logger';
+import { Strategy, GasEstimates, EnvConfig } from '@config';
 
 import { State } from './bootstrap';
-import eventEmitter from './bootstrap/eventEmitter';
+import { MessageEvents } from './bootstrap/eventEmitter';
 import findBestPaths from './findBestPaths';
 import { WETH } from './tokens';
 import { Exchange } from './types';
@@ -17,6 +17,8 @@ const executeStrategy = async ({
   exchanges,
   gasEstimates,
   state,
+  eventEmitter,
+  config,
 }: {
   blockNumber: string;
   multicall: Multicall;
@@ -24,6 +26,8 @@ const executeStrategy = async ({
   exchanges: Exchange[];
   gasEstimates: GasEstimates;
   state: State;
+  eventEmitter: TypedEmitter<MessageEvents>;
+  config: EnvConfig;
 }) => {
   try {
     const paths = await findBestPaths({
@@ -56,6 +60,8 @@ const blockHandler = async ({
   blockNumber,
   gasEstimates,
   state,
+  eventEmitter,
+  config,
 }: {
   multicall: Multicall;
   strategies: Strategy[];
@@ -63,11 +69,11 @@ const blockHandler = async ({
   blockNumber: string;
   gasEstimates: GasEstimates;
   state: State;
+  eventEmitter: TypedEmitter<MessageEvents>;
+  config: EnvConfig;
 }) => {
   // Record time for perf monitoring
   state.botExecutionMonitoringTick = new Date().getTime();
-
-  logger.log(`New block received. Block # ${blockNumber}`);
 
   // Execute all strategies simultaneously
   const paths = await Promise.all(
@@ -79,6 +85,8 @@ const blockHandler = async ({
         exchanges,
         gasEstimates,
         state,
+        eventEmitter,
+        config,
       })
     )
   );
