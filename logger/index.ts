@@ -7,7 +7,7 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { TRADE_GAS_ESTIMATE_WITHOUT_SWAPS } from '@constants';
 import { ExchangeIndex } from '@localTypes';
 
-import config from '@bot/src/bootstrap/config';
+import config from '@bot/config';
 import eventEmitter from '@bot/src/bootstrap/eventEmitter';
 import { WETH } from '@bot/src/tokens';
 import { Path } from '@bot/src/types';

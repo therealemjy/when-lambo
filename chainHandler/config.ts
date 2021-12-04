@@ -64,7 +64,7 @@ const config: EnvConfig = {
   testAccounts: {
     owner: {
       address: env('TEST_OWNER_ACCOUNT_MAINNET_ADDRESS'),
-      privateKey: env('TEST_OWNER_ACCOUNT_MAINNET_ADDRESS'),
+      privateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
     },
     vault: {
       address: env('TEST_VAULT_ACCOUNT_MAINNET_ADDRESS'),

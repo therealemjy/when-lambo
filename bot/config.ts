@@ -4,8 +4,8 @@ import { Environment, GasEstimates, Strategy } from '@localTypes';
 
 import swapGasEstimates from '@dist/swapGasEstimates.json';
 
-import env from '../../../utils/env';
-import formatStrategies from '../../../utils/formatStrategies';
+import env from '../utils/env';
+import formatStrategies from '../utils/formatStrategies';
 
 dotenv.config();
 
@@ -33,6 +33,7 @@ export interface EnvConfig {
     deals: string;
     errors: string;
   };
+  testOwnerAccountPrivateKey: string;
 }
 
 const strategies: Strategy[] = formatStrategies(
@@ -64,6 +65,7 @@ const config: EnvConfig = {
     errors: env('SLACK_HOOK_URL_ERRORS'),
   },
   strategies,
+  testOwnerAccountPrivateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
 };
 
 export default config;

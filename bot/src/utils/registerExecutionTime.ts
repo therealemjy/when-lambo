@@ -1,7 +1,7 @@
 import logger from '@logger';
 
+import config from '@bot/config';
 import { Services } from '@bot/src/bootstrap';
-import config from '@bot/src/bootstrap/config';
 
 // Only keeps the last 10 executions
 const registerExecutionTime = ({ state }: Services): void => {

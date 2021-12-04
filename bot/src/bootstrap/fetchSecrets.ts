@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 
 import logger from '@logger';
 
-import config from '@chainHandler/config';
+import config from '@bot/config';
 
 export type WLSecrets = {
   ownerAccountPrivateKey: string;
@@ -15,7 +15,7 @@ const fetchSecrets = async (): Promise<WLSecrets> => {
       // but this private key is well known since it's one of the accounts
       // Hardhat uses for tests. DO NOT ever send any funds to this address and
       // do not use it for anything else than obtaining transaction estimates.
-      ownerAccountPrivateKey: config.testAccounts.owner.privateKey,
+      ownerAccountPrivateKey: config.testOwnerAccountPrivateKey,
     };
   }
 

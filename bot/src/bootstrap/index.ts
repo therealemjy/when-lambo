@@ -1,10 +1,11 @@
 import BigNumber from 'bignumber.js';
 import http from 'http';
-import config, { EnvConfig } from 'src/bootstrap/config';
 import TypedEmitter from 'typed-emitter';
 
 import { Strategy } from '@localTypes';
 import logger from '@logger';
+
+import config, { EnvConfig } from '@bot/config';
 
 import exchanges from '../exchanges';
 import UniswapLikeExchange from '../exchanges/UniswapLikeExchange';
@@ -109,7 +110,7 @@ export const bootstrap = async (): Promise<Services> =>
       // Get secrets
       const secrets = await fetchSecrets();
 
-      // Register secrets in global variable
+      // Add secrets to state
       services.state.secrets = secrets;
 
       // Register event listeners
