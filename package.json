@@ -87,9 +87,9 @@
     "@localTypes": "./types",
     "@constants": "./constants",
     "@config": "./config",
+    "@tasks": "./tasks",
     "@utils": "./utils",
     "@resources": "./resources",
-    "@hardhatTasks": "./hardhatTasks",
     "@deployments": "./deployments",
     "@chainHandler": "./chainHandler",
     "@bot": "./bot"

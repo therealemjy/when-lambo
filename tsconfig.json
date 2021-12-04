@@ -16,7 +16,7 @@
       "@constants": ["./constants"],
       "@config": ["./config"],
       "@resources/*": ["./resources/*"],
-      "@hardhatTasks/*": ["./hardhatTasks/*"],
+      "@tasks/*": ["./tasks/*"],
       "@deployments/*": ["./deployments/*"],
       "@chainHandler/*": ["./chainHandler/*"],
       "@bot/*": ["./bot/*"]
@@ -28,7 +28,7 @@
     "./chainHandler/typechain",
     "./chainHandler/deploy",
     "./chainHandler/utils",
-    "./hardhatTasks"
+    "./tasks"
   ],
   "exclude": ["./bot", "./node_modules"],
   "files": ["./hardhat.config.ts"]

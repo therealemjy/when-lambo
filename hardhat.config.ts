@@ -17,7 +17,7 @@ import 'solidity-coverage';
 import config from '@config';
 
 import { OWNER_ACCOUNT_MAINNET_ADDRESS } from './constants';
-import './hardhatTasks';
+import './tasks';
 
 chai.use(chaiAsPromised);
 

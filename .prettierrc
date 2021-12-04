@@ -8,7 +8,7 @@
     "^@constants",
     "^@config",
     "^@resources/(.*)$",
-    "^@hardhatTasks/(.*)$",
+    "^@tasks/(.*)$",
     "^@deployments/(.*)$",
     "^@chainHandler/(.*)$",
     "^@bot/(.*)$",
