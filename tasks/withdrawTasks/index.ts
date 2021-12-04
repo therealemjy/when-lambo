@@ -3,7 +3,6 @@ import { task, types } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 import { LEDGER_OWNER_ACCOUNT_PATH, VAULT_ACCOUNT_MAINNET_ADDRESS } from '@constants';
-
 // TODO: import mainnet info once contract has been deployed on it
 import { address as transactorContractAddress } from '@deployments/localhost/Transactor.json';
 

@@ -1,6 +1,6 @@
 import config from '@config';
 
-import logger from '@bot/src/bootstrap/logger';
+import logger from '@logger';
 import { State } from '@bot/src/bootstrap';
 
 // Only keeps the last 10 executions

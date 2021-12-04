@@ -1,11 +1,10 @@
 import { BigNumber, ContractTransaction, Signer } from 'ethers';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
-import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
-import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json';
-
 // TODO: import mainnet info once contract has been deployed on it
 import { abi as transactorContractAbi } from '@deployments/localhost/Transactor.json';
+import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
+import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import formatNestedBN from '@chainHandler/utils/formatNestedBN';

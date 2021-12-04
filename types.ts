@@ -4,3 +4,9 @@ export enum ExchangeIndex {
   Sushiswap = 1,
   CryptoCom = 2,
 }
+
+export type GasEstimates = {
+  [exchangeIndex: number]: {
+    [tokenAddress: string]: string;
+  };
+};

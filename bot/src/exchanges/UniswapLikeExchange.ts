@@ -1,10 +1,8 @@
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 
-import { ExchangeIndex } from '@localTypes';
-
 import config from '@config';
-
+import { ExchangeIndex } from '@localTypes';
 import wethInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 import { Exchange } from '@bot/src/types';

@@ -1,4 +1,5 @@
-import logger from '@bot/src/bootstrap/logger';
+import logger from '@logger';
+
 import getSpreadsheet from '@bot/src/utils/getSpreadsheet';
 import handleError from '@bot/src/utils/handleError';
 

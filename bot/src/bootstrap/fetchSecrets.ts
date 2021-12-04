@@ -1,8 +1,7 @@
 import AWS from 'aws-sdk';
 
-import config, { env } from '@config';
-
-import logger from '@bot/src/bootstrap/logger';
+import config from '@config';
+import logger from '@logger';
 
 export type WLSecrets = {
   ownerAccountPrivateKey: string;
@@ -15,7 +14,7 @@ const fetchSecrets = async (): Promise<WLSecrets> => {
       // but this private key is well known since it's one of the accounts
       // Hardhat uses for tests. DO NOT ever send any funds to this address and
       // do not use it for anything else than obtaining transaction estimates.
-      ownerAccountPrivateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
+      ownerAccountPrivateKey: config.testAccounts.owner.privateKey,
     };
   }
 

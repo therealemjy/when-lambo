@@ -1,68 +1,36 @@
 import dotenv from 'dotenv';
-import { ethers, BigNumber } from 'ethers';
+import { ethers } from 'ethers';
+import fs from 'fs';
 
-import { ExchangeIndex } from '@localTypes';
+import { SWAP_GAS_ESTIMATES_FILE_PATH } from '@constants';
+import { ExchangeIndex, GasEstimates } from '@localTypes';
 
+import env from './env';
 import formatStrategies from './formatStrategies';
-import { ParsedStrategy, Strategy, Environment } from './types';
+import { ParsedStrategy, EnvConfig, Environment } from './types';
 
 export * from './types';
 
 dotenv.config();
 
-export const env = (name: string): string => {
-  const value = process.env[`${name}`];
+const parsedStrategies: ParsedStrategy[] = JSON.parse(env('STRINGIFIED_STRATEGIES'));
 
-  if (!value) {
-    throw new Error(`Missing: process.env['${name}'].`);
+const getGasEstimates = () => {
+  if (process.env.IS_FETCHING_GAS_ESTIMATES) {
+    return {};
   }
 
-  return value;
+  if (!fs.existsSync(SWAP_GAS_ESTIMATES_FILE_PATH)) {
+    throw new Error(
+      `Gas estimates file not found. It looks like gas estimates have not been fetched yet, please run npm run fetch-gas-estimates then run this command again.`
+    );
+  }
+
+  const fileContent = fs.readFileSync(SWAP_GAS_ESTIMATES_FILE_PATH, 'utf8');
+  return JSON.parse(fileContent);
 };
 
-export interface EnvConfig {
-  environment: Environment;
-  isDev: boolean;
-  isProd: boolean;
-  serverId: string;
-  aws: {
-    mainnetWssRpcUrl: string;
-    accessKeyIdEthNode: string;
-    secretAccessKeyEthNode: string;
-  };
-  slippageAllowancePercent: number;
-  gasLimitMultiplicator: number;
-  gasPriceMultiplicator: number;
-  strategies: Strategy[];
-  googleSpreadSheet: {
-    id: string;
-    clientEmail: string;
-    privateKeyBase64: string;
-  };
-  slackChannelsWebhooks: {
-    deals: string;
-    errors: string;
-  };
-  mainnetForkingRpcUrl: string;
-  testProfitableTrade: {
-    blockNumber: number;
-    wethAmountToBorrow: BigNumber;
-    sellingExchangeIndex: ExchangeIndex;
-    tradedTokenAddress: string;
-    tradedTokenAmountOutMin: BigNumber;
-    tradedTokenAmountOutExpected: BigNumber;
-    buyingExchangeIndex: ExchangeIndex;
-    wethAmountOutMin: BigNumber;
-    wethAmountOutExpected: BigNumber;
-  };
-  testAccountAddresses: {
-    owner: string;
-    vault: string;
-    externalUser: string;
-  };
-}
-
-const parsedStrategies: ParsedStrategy[] = JSON.parse(env('STRINGIFIED_STRATEGIES'));
+const gasEstimates: GasEstimates = getGasEstimates();
 
 const config: EnvConfig = {
   serverId: env('SERVER_ID'),
@@ -77,6 +45,7 @@ const config: EnvConfig = {
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
+  gasEstimates,
   googleSpreadSheet: {
     id: env('GOOGLE_SPREADSHEET_SPREADSHEET_ID'),
     clientEmail: env('GOOGLE_SPREADSHEET_CLIENT_EMAIL'),
@@ -99,10 +68,17 @@ const config: EnvConfig = {
     wethAmountOutMin: ethers.BigNumber.from(env('TEST_PROFITABLE_TRADE_WETH_AMOUNT_OUT_MIN')),
     wethAmountOutExpected: ethers.BigNumber.from(env('TEST_PROFITABLE_TRADE_WETH_AMOUNT_OUT_EXPECTED')),
   },
-  testAccountAddresses: {
-    owner: env('TEST_OWNER_ACCOUNT_MAINNET_ADDRESS'),
-    vault: env('TEST_VAULT_ACCOUNT_MAINNET_ADDRESS'),
-    externalUser: env('TEST_EXTERNAL_USER_ACCOUNT_MAINNET_ADDRESS'),
+  testAccounts: {
+    owner: {
+      address: env('TEST_OWNER_ACCOUNT_MAINNET_ADDRESS'),
+      privateKey: env('TEST_OWNER_ACCOUNT_MAINNET_ADDRESS'),
+    },
+    vault: {
+      address: env('TEST_VAULT_ACCOUNT_MAINNET_ADDRESS'),
+    },
+    externalUser: {
+      address: env('TEST_EXTERNAL_USER_ACCOUNT_MAINNET_ADDRESS'),
+    },
   },
 };
 

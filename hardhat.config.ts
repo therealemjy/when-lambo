@@ -44,15 +44,15 @@ const hardhatConfig: HardhatUserConfig = {
   },
   namedAccounts: {
     ownerAddress: {
-      hardhat: config.testAccountAddresses.owner, // assign the first user as owner
+      hardhat: config.testAccounts.owner.address, // assign the first user as owner
       mainnet: OWNER_ACCOUNT_MAINNET_ADDRESS,
     },
     vaultAddress: {
-      hardhat: config.testAccountAddresses.vault,
+      hardhat: config.testAccounts.vault.address,
       // TODO: add mainnet address
     },
     externalUserAddress: {
-      hardhat: config.testAccountAddresses.externalUser, // assign another account as external user (used in tests only)
+      hardhat: config.testAccounts.externalUser.address, // assign another account as external user (used in tests only)
     },
   },
   paths: {

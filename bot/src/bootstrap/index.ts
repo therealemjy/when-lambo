@@ -1,10 +1,11 @@
 import http from 'http';
+import BigNumber from 'bignumber.js';
+
+import logger from '@logger';
 
 import { registerEventListeners } from './eventEmitter/registerEvents';
 import fetchSecrets from './fetchSecrets';
 import gasPriceWatcher from './gasPriceWatcher';
-import logger from './logger';
-import BigNumber from 'bignumber.js';
 
 export type State = {
   lastMonitoringDateTime: number | null;

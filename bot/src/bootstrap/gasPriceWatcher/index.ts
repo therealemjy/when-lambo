@@ -2,10 +2,10 @@ import axios from 'axios';
 import BigNumber from 'bignumber.js';
 
 import config from '@config';
+import logger from '@logger';
 
 import { State } from '@bot/src/bootstrap';
 import eventEmitter from '@bot/src/bootstrap/eventEmitter';
-import logger from '@bot/src/bootstrap/logger';
 
 class GasPriceWatcher {
   public start(state: State, interval: number) {
