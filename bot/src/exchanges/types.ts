@@ -39,5 +39,4 @@ export interface FormattedGetDecimalAmountOutResult {
   fromTokenDecimalAmount: BigNumber;
   toToken: Token;
   toTokenDecimalAmount: BigNumber;
-  estimatedGas: BigNumber;
 }

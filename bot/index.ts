@@ -45,6 +45,7 @@ const init = async (state: State) => {
             multicall,
             strategies: config.strategies,
             exchanges,
+            gasEstimates: config.gasEstimates,
             state,
             config,
             eventEmitter,

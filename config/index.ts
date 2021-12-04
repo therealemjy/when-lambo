@@ -10,6 +10,7 @@ import formatStrategies from './formatStrategies';
 import { ParsedStrategy, EnvConfig, Environment } from './types';
 
 export * from './types';
+export { GasEstimates } from '@localTypes';
 
 dotenv.config();
 
@@ -21,9 +22,11 @@ const getGasEstimates = () => {
   }
 
   if (!fs.existsSync(SWAP_GAS_ESTIMATES_FILE_PATH)) {
-    throw new Error(
+    console.error(
       `Gas estimates file not found. It looks like gas estimates have not been fetched yet, please run npm run fetch-gas-estimates then run this command again.`
     );
+
+    return {};
   }
 
   const fileContent = fs.readFileSync(SWAP_GAS_ESTIMATES_FILE_PATH, 'utf8');

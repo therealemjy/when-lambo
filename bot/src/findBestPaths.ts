@@ -1,6 +1,8 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import BigNumber from 'bignumber.js';
 
+import { GasEstimates } from '@localTypes';
+
 import { Exchange, Token, UsedExchangeIndexes, Path } from '@bot/src/types';
 
 import findBestDeals from './findBestDeals';
@@ -13,6 +15,7 @@ type FindBestPathsArgs = {
   slippageAllowancePercent: number;
   gasPriceWei: BigNumber;
   exchanges: Exchange[];
+  gasEstimates: GasEstimates;
 };
 
 const findBestPaths = async ({
@@ -23,6 +26,7 @@ const findBestPaths = async ({
   exchanges,
   slippageAllowancePercent,
   gasPriceWei,
+  gasEstimates,
 }: FindBestPathsArgs) => {
   // Find the highest amount of toToken decimals we can buy with each
   // fromTokenDecimalAmount
@@ -34,6 +38,7 @@ const findBestPaths = async ({
     exchanges,
     slippageAllowancePercent,
     gasPriceWei,
+    gasEstimates,
   });
 
   if (!bestBuyingDeals.length) {
@@ -59,6 +64,7 @@ const findBestPaths = async ({
     exchanges,
     slippageAllowancePercent,
     gasPriceWei,
+    gasEstimates,
     usedExchangeIndexes,
   });
 

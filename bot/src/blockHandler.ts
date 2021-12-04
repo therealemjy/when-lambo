@@ -1,20 +1,21 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import TypedEmitter from 'typed-emitter';
 
-import { EnvConfig, Strategy } from '@config';
+import { Strategy, GasEstimates, EnvConfig } from '@config';
 
+import { State } from './bootstrap';
 import { MessageEvents } from './bootstrap/eventEmitter';
 import findBestPaths from './findBestPaths';
 import { WETH } from './tokens';
 import { Exchange } from './types';
 import registerExecutionTime from './utils/registerExecutionTime';
-import { State } from './bootstrap';
 
 const executeStrategy = async ({
   blockNumber,
   multicall,
   strategy,
   exchanges,
+  gasEstimates,
   state,
   eventEmitter,
   config,
@@ -23,6 +24,7 @@ const executeStrategy = async ({
   multicall: Multicall;
   strategy: Strategy;
   exchanges: Exchange[];
+  gasEstimates: GasEstimates;
   state: State;
   eventEmitter: TypedEmitter<MessageEvents>;
   config: EnvConfig;
@@ -39,6 +41,7 @@ const executeStrategy = async ({
       },
       exchanges,
       slippageAllowancePercent: config.slippageAllowancePercent,
+      gasEstimates,
       gasPriceWei: state.currentGasPrices.rapid,
     });
 
@@ -55,6 +58,7 @@ const blockHandler = async ({
   strategies,
   exchanges,
   blockNumber,
+  gasEstimates,
   state,
   eventEmitter,
   config,
@@ -63,6 +67,7 @@ const blockHandler = async ({
   strategies: Strategy[];
   exchanges: Exchange[];
   blockNumber: string;
+  gasEstimates: GasEstimates;
   state: State;
   eventEmitter: TypedEmitter<MessageEvents>;
   config: EnvConfig;
@@ -78,6 +83,7 @@ const blockHandler = async ({
         multicall,
         strategy,
         exchanges,
+        gasEstimates,
         state,
         eventEmitter,
         config,

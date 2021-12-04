@@ -3,6 +3,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 // TODO: import mainnet info once contract has been deployed on it
 import { abi as transactorContractAbi } from '@deployments/localhost/Transactor.json';
+import logger from '@logger';
 import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
 import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json';
 
@@ -58,7 +59,7 @@ const withdrawFromTransactorContract = async (
   }
 
   // Execute trade
-  console.log('Executing transaction...');
+  logger.log('Executing transaction...');
   let receipt: ContractTransaction;
 
   if (tokenSymbol === 'ETH') {
@@ -69,11 +70,11 @@ const withdrawFromTransactorContract = async (
     receipt = await TransactorContract.transferERC20(WETH_MAINNET_ADDRESS, amount, vaultAddress);
   }
 
-  console.log('Transaction successfully executed! Human-readable receipt:');
-  console.log(formatNestedBN(receipt));
+  logger.log('Transaction successfully executed! Human-readable receipt:');
+  logger.log(formatNestedBN(receipt));
 
-  console.log('\nStringified receipt:');
-  console.log(JSON.stringify(receipt));
+  logger.log('\nStringified receipt:');
+  logger.log(JSON.stringify(receipt));
 };
 
 export default withdrawFromTransactorContract;
