@@ -114,7 +114,7 @@ export const bootstrap = async (): Promise<Services> =>
       services.state.secrets = secrets;
 
       // Register event listeners
-      await registerEventListeners();
+      await registerEventListeners(services);
 
       // Pull gas prices every 5 seconds
       await gasPriceWatcher.start(services, (gasPrices) => (services.state.currentGasPrices = gasPrices), 5000);
