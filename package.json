@@ -89,9 +89,7 @@
     "@constants": "./constants",
     "@config": "./config",
     "@logger": "./logger",
-    "@dist": [
-      "./dist"
-    ],
+    "@dist": "./dist",
     "@tasks": "./tasks",
     "@utils": "./utils",
     "@resources": "./resources",
