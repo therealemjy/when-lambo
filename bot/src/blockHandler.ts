@@ -3,6 +3,7 @@ import { Multicall } from '@maxime.julian/ethereum-multicall';
 import config, { Strategy, GasEstimates } from '@config';
 import logger from '@logger';
 
+import { State } from './bootstrap';
 import eventEmitter from './bootstrap/eventEmitter';
 import findBestPaths from './findBestPaths';
 import { WETH } from './tokens';
@@ -15,12 +16,14 @@ const executeStrategy = async ({
   strategy,
   exchanges,
   gasEstimates,
+  state,
 }: {
   blockNumber: string;
   multicall: Multicall;
   strategy: Strategy;
   exchanges: Exchange[];
   gasEstimates: GasEstimates;
+  state: State;
 }) => {
   try {
     const paths = await findBestPaths({
@@ -35,7 +38,7 @@ const executeStrategy = async ({
       exchanges,
       slippageAllowancePercent: config.slippageAllowancePercent,
       gasEstimates,
-      gasPriceWei: global.currentGasPrices.rapid,
+      gasPriceWei: state.currentGasPrices.rapid,
     });
 
     eventEmitter.emit('paths', blockNumber, paths);
@@ -52,15 +55,17 @@ const blockHandler = async ({
   exchanges,
   blockNumber,
   gasEstimates,
+  state,
 }: {
   multicall: Multicall;
   strategies: Strategy[];
   exchanges: Exchange[];
   blockNumber: string;
   gasEstimates: GasEstimates;
+  state: State;
 }) => {
   // Record time for perf monitoring
-  global.botExecutionMonitoringTick = new Date().getTime();
+  state.botExecutionMonitoringTick = new Date().getTime();
 
   logger.log(`New block received. Block # ${blockNumber}`);
 
@@ -73,11 +78,12 @@ const blockHandler = async ({
         strategy,
         exchanges,
         gasEstimates,
+        state,
       })
     )
   );
 
-  registerExecutionTime();
+  registerExecutionTime(state);
 
   return paths.flat();
 };

@@ -9,6 +9,7 @@ import getAwsWSProvider from './src/bootstrap/aws/getProvider';
 import eventEmitter from './src/bootstrap/eventEmitter';
 import exchanges from './src/exchanges';
 import CancelablePromise from './src/utils/cancelablePromise';
+import { State } from './src/bootstrap';
 import handleError from './src/utils/handleError';
 
 // Catch unhandled exceptions
@@ -17,7 +18,7 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-const init = async () => {
+const init = async (state: State) => {
   const start = async () => {
     let isMonitoring = false;
     let cancelablePromise: CancelablePromise | undefined = undefined;
@@ -43,6 +44,7 @@ const init = async () => {
             strategies: config.strategies,
             exchanges,
             gasEstimates: config.gasEstimates,
+            state,
           })
         );
       } catch (err: any) {
@@ -68,9 +70,9 @@ const init = async () => {
 
 (async () => {
   try {
-    await bootstrap();
+    const state = await bootstrap();
 
-    await init();
+    await init(state);
   } catch (err) {
     eventEmitter.emit('error', err);
     process.exit(1);
