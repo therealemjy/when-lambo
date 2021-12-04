@@ -10,6 +10,7 @@ export interface IGetEstimateDecimalAmountOutInput {
   toTokenAddress: string;
   amountIn: EtherBigNumber;
   signer: Signer;
+  isProd: boolean;
 }
 export interface IGetDecimalAmountOutCallContextInput {
   callReference: string;

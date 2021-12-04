@@ -28,15 +28,17 @@ const init = async (state: State) => {
     const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
 
     provider.addListener('block', async (blockNumber: string) => {
+      logger.log(`New block received. Block # ${blockNumber}`);
+
+      // Abort previous execution
+      if (isMonitoring && cancelablePromise) {
+        cancelablePromise.abort();
+      }
+
+      cancelablePromise = new CancelablePromise();
+      isMonitoring = true;
+
       try {
-        // Abort previous execution
-        if (isMonitoring && cancelablePromise) {
-          cancelablePromise.abort();
-        }
-
-        cancelablePromise = new CancelablePromise();
-        isMonitoring = true;
-
         await cancelablePromise.wrap(
           blockHandler({
             blockNumber,
@@ -44,6 +46,8 @@ const init = async (state: State) => {
             strategies: config.strategies,
             exchanges,
             state,
+            config,
+            eventEmitter,
           })
         );
       } catch (err: any) {

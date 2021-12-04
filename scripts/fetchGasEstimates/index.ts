@@ -51,6 +51,7 @@ const fetchGasEstimates = async () => {
         signer: testOwner,
         amountIn: testAmountIn,
         toTokenAddress,
+        isProd: config.isProd,
       });
 
       // Initialize exchange estimates if it has not been done yet

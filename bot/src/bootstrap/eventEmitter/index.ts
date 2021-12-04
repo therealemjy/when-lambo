@@ -3,7 +3,7 @@ import TypedEmitter from 'typed-emitter';
 
 import { Path } from '@bot/src/types';
 
-interface MessageEvents {
+export interface MessageEvents {
   error: (error: unknown) => void;
   paths: (blockNumber: string, paths: Path[]) => void;
 }
