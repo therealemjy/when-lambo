@@ -37,7 +37,6 @@ if (config.isProd) {
 
 const log: typeof console.log = (...args) => bunyanLogger.info(...args);
 const error: typeof console.error = (...args) => bunyanLogger.error(...args);
-const table = console.table;
 
 const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) =>
   amount.dividedBy(10 ** tokenDecimals).toFixed(tokenDecimals);
@@ -73,8 +72,8 @@ const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: Googl
 
     const profitInTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
 
-    // Only log profitable paths in production
-    if (config.isProd && profitDec.isGreaterThan(0)) {
+    // Log paths in Slack and Google Spreadsheet in production
+    if (config.isProd) {
       slackBlocks.push([
         {
           type: 'section',
@@ -137,10 +136,11 @@ const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: Googl
         `${profitPercent}%`,
       ]);
     }
-    // Log all paths in the console in development
+    // Log paths in the console in development
     else if (config.isDev) {
       tableRows.push({
         Timestamp: timestamp,
+        'Block number': blockNumber,
         [`${path[0].fromToken.symbol} borrowed`]: borrowedTokens,
         'Best selling exchange': bestSellingExchangeName,
         [`${path[0].toToken.symbol} bought`]: boughtTokens,
@@ -153,32 +153,26 @@ const paths = async (blockNumber: string, pathsToLog: Path[], spreadsheet: Googl
     }
   }
 
-  // Log paths in console in dev
   if (config.isDev) {
-    table(tableRows);
+    console.table(tableRows);
     return;
   }
 
-  // Send profitable paths to slack in prod
-  if (slackBlocks.length > 0) {
-    sendSlackMessage(
-      {
-        blocks: slackBlocks.flat(),
-      },
-      'deals'
-    ).catch((err) => eventEmitter.emit('error', err));
-  }
+  // Send paths to slack in prod
+  sendSlackMessage(
+    {
+      blocks: slackBlocks.flat(),
+    },
+    'deals'
+  ).catch((err) => eventEmitter.emit('error', err));
 
-  // Then update the Google Spreadsheet document
-  if (worksheetRows.length > 0) {
-    const worksheet = spreadsheet.sheetsByIndex[0];
-    worksheet.addRows(worksheetRows).catch((err) => eventEmitter.emit('error', err));
-  }
+  // And update the Google Spreadsheet document
+  const worksheet = spreadsheet.sheetsByIndex[0];
+  worksheet.addRows(worksheetRows).catch((err) => eventEmitter.emit('error', err));
 };
 
 export default {
   log,
   error,
-  table,
   paths,
 };

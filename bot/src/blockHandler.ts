@@ -36,10 +36,8 @@ const executeStrategy = async (services: Services, { blockNumber, multicall, str
     });
 
     services.eventEmitter.emit('paths', blockNumber, paths);
-    return paths;
   } catch (error: unknown) {
     services.eventEmitter.emit('error', error);
-    return [];
   }
 };
 
