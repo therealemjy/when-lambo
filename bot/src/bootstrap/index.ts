@@ -1,9 +1,10 @@
 import http from 'http';
 
+import logger from '@logger';
+
 import { registerEventListeners } from './eventEmitter/registerEvents';
 import fetchSecrets from './fetchSecrets';
 import gasPriceWatcher from './gasPriceWatcher';
-import logger from './logger';
 
 // We set global variable to their default value
 const setupGlobalStateVariables = () => {

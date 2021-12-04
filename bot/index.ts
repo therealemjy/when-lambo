@@ -2,11 +2,12 @@ import { Multicall } from '@maxime.julian/ethereum-multicall';
 
 import config from '@config';
 
+import logger from '@logger';
+
 import blockHandler from './src/blockHandler';
 import { bootstrap } from './src/bootstrap';
 import getAwsWSProvider from './src/bootstrap/aws/getProvider';
 import eventEmitter from './src/bootstrap/eventEmitter';
-import logger from './src/bootstrap/logger';
 import exchanges from './src/exchanges';
 import handleError from './src/utils/handleError';
 

@@ -2,7 +2,13 @@ import fs from 'fs';
 import hre, { deployments } from 'hardhat';
 import 'hardhat-deploy';
 
+import { GasEstimates } from '@localTypes';
+
+import { DIST_FOLDER_PATH, SWAP_GAS_ESTIMATES_FILE_PATH } from '@constants';
+
 import config from '@config';
+
+import logger from '@logger';
 
 import wrapEth from '@chainHandler/utils/wrapEth';
 
@@ -10,9 +16,6 @@ import exchanges from '@bot/src/exchanges';
 
 // @ts-ignore
 const ethers = hre.ethers;
-
-const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
-const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/swapGasEstimates.json`;
 
 const tokenAddresses = config.strategies.reduce((allTokenAddresses, formattedStrategy) => {
   if (allTokenAddresses.find((tokenAddress) => tokenAddress === formattedStrategy.toToken.address)) {
@@ -22,16 +25,12 @@ const tokenAddresses = config.strategies.reduce((allTokenAddresses, formattedStr
   return [...allTokenAddresses, formattedStrategy.toToken.address];
 }, [] as string[]);
 
-const gasEstimates: {
-  [exchangeIndex: number]: {
-    [tokenAddress: string]: string;
-  };
-} = {};
-
 const setup = deployments.createFixture(() => deployments.fixture());
 
 const fetchGasEstimates = async () => {
-  console.log('Fetching gas estimates...');
+  logger.log('Fetching gas estimates...');
+
+  const gasEstimates: GasEstimates = {};
 
   // Because this script will only ever be run locally on Hardhat's local network, we can use
   // the test owner account as signer
@@ -76,8 +75,8 @@ const fetchGasEstimates = async () => {
   // Write gas estimates inside a JSON file
   fs.writeFileSync(SWAP_GAS_ESTIMATES_FILE_PATH, JSON.stringify(gasEstimates));
 
-  console.log('Gas estimates fetched successfully.');
-  console.log(gasEstimates);
+  logger.log('Gas estimates fetched successfully.');
+  logger.log(gasEstimates);
 };
 
 // Note: we voluntarily don't catch errors so that execution stops if this script fails, as
