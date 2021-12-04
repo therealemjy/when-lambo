@@ -7,18 +7,20 @@ import config from '@config';
 import wrapEth from '@chainHandler/utils/wrapEth';
 
 import exchanges from '@bot/src/exchanges';
-import { Token } from '@bot/src/types';
 
 // @ts-ignore
 const ethers = hre.ethers;
 
-const tokens = config.strategies.reduce((allTokens, formattedStrategy) => {
-  if (allTokens.find((token) => token.address === formattedStrategy.toToken.address)) {
-    return allTokens;
+const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
+const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/swapGasEstimates.json`;
+
+const tokenAddresses = config.strategies.reduce((allTokenAddresses, formattedStrategy) => {
+  if (allTokenAddresses.find((tokenAddress) => tokenAddress === formattedStrategy.toToken.address)) {
+    return allTokenAddresses;
   }
 
-  return [...allTokens, formattedStrategy.toToken];
-}, [] as Token[]);
+  return [...allTokenAddresses, formattedStrategy.toToken.address];
+}, [] as string[]);
 
 const gasEstimates: {
   [exchangeIndex: number]: {
@@ -39,17 +41,12 @@ const fetchGasEstimates = async () => {
 
   for (let e = 0; e < exchanges.length; e++) {
     const exchange = exchanges[e];
-    const exchangeGasEstimates: {
-      [swap: string]: string;
-    } = {};
 
-    for (let i = 0; i < tokens.length; i++) {
-      const token = tokens[i];
+    for (let i = 0; i < tokenAddresses.length; i++) {
+      const toTokenAddress = tokenAddresses[i];
 
       // Reset blockchain state
       await setup();
-
-      throw new Error('EXECUTION SHOULD STOP');
 
       // Wrap ETH to WETH on signer account
       await wrapEth(testOwner, testAmountIn, testOwnerAddress);
@@ -57,7 +54,7 @@ const fetchGasEstimates = async () => {
       const gasEstimate = await exchange.estimateGetDecimalAmountOut({
         signer: testOwner,
         amountIn: testAmountIn,
-        toTokenAddress: token.address,
+        toTokenAddress,
       });
 
       // Initialize exchange estimates if it has not been done yet
@@ -66,17 +63,23 @@ const fetchGasEstimates = async () => {
       }
 
       if (gasEstimate) {
-        gasEstimates[exchange.index][token.address] = gasEstimate.toString();
+        gasEstimates[exchange.index][toTokenAddress] = gasEstimate.toString();
       }
-
-      exchangeGasEstimates[`WETH -> ${token.symbol}`] = gasEstimate ? gasEstimate.toString() : 'N/A';
     }
   }
+
+  // Create dist folder if it does not exist
+  if (!fs.existsSync(DIST_FOLDER_PATH)) {
+    fs.mkdirSync(DIST_FOLDER_PATH);
+  }
+
+  // Write gas estimates inside a JSON file
+  fs.writeFileSync(SWAP_GAS_ESTIMATES_FILE_PATH, JSON.stringify(gasEstimates));
 
   console.log('Gas estimates fetched successfully.');
   console.log(gasEstimates);
 };
 
-// Note: we voluntarily don't catch errors so that the server is automatically stopped if
-// this execution fails
+// Note: we voluntarily don't catch errors so that execution stops if this script fails, as
+// it is crucial for the estimates to have been fetched in order for the bot to work
 fetchGasEstimates().then(() => process.exit(0));
