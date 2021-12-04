@@ -36,8 +36,7 @@ const fetchGasEstimates = async () => {
       // Wrap ETH to WETH on signer account
       await wrapEth(testOwner, testAmountIn, testOwnerAddress);
 
-      // Check balance of owner
-
+      // Fetch estimated gas
       const gasEstimate = await exchange.estimateGetDecimalAmountOut({
         signer: testOwner,
         amountIn: testAmountIn,

@@ -3,18 +3,24 @@ import { ethers } from 'ethers';
 
 import { ExchangeIndex } from '@localTypes';
 
-import uniswapV2RouterInfo from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
 import wethInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 import { Exchange } from '@bot/src/types';
 
-class UniswapV2 implements Exchange {
+export interface ContractInfo {
+  address: string;
+  abi: any[];
+}
+
+class UniswapLikeExchange implements Exchange {
   index: ExchangeIndex;
   name: string;
+  routerContractInfo: ContractInfo;
 
-  constructor() {
-    this.index = ExchangeIndex.UniswapV2;
-    this.name = ExchangeIndex[ExchangeIndex.UniswapV2];
+  constructor({ index, routerContractInfo }: { index: ExchangeIndex; routerContractInfo: ContractInfo }) {
+    this.index = index;
+    this.name = ExchangeIndex[index];
+    this.routerContractInfo = routerContractInfo;
   }
 
   estimateGetDecimalAmountOut: Exchange['estimateGetDecimalAmountOut'] = async ({
@@ -25,7 +31,7 @@ class UniswapV2 implements Exchange {
     const deadline = new Date(new Date().getTime() + 120000).getTime();
     const signerAddress = await signer.getAddress();
     const wethContract = new ethers.Contract(wethInfo.address, wethInfo.abi, signer);
-    const routerContract = new ethers.Contract(uniswapV2RouterInfo.address, uniswapV2RouterInfo.abi, signer);
+    const routerContract = new ethers.Contract(this.routerContractInfo.address, this.routerContractInfo.abi, signer);
 
     let gasUsed: number;
 
@@ -77,8 +83,8 @@ class UniswapV2 implements Exchange {
     return {
       context: {
         reference: callReference,
-        contractAddress: uniswapV2RouterInfo.address,
-        abi: uniswapV2RouterInfo.abi,
+        contractAddress: this.routerContractInfo.address,
+        abi: this.routerContractInfo.abi,
         calls,
       },
       resultsFormatter: (callResult) =>
@@ -96,4 +102,4 @@ class UniswapV2 implements Exchange {
   };
 }
 
-export default UniswapV2;
+export default UniswapLikeExchange;
