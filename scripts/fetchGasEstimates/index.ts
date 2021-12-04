@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js';
+import fs from 'fs';
 import hre, { deployments } from 'hardhat';
 import 'hardhat-deploy';
 
@@ -22,20 +22,20 @@ const tokens = config.strategies.reduce((allTokens, formattedStrategy) => {
 
 const gasEstimates: {
   [exchangeIndex: number]: {
-    [tokenAddress: string]: BigNumber;
+    [tokenAddress: string]: string;
   };
 } = {};
 
 const setup = deployments.createFixture(() => deployments.fixture());
 
 const fetchGasEstimates = async () => {
+  console.log('Fetching gas estimates...');
+
   // Because this script will only ever be run locally on Hardhat's local network, we can use
   // the test owner account as signer
   const testOwner = await ethers.getNamedSigner('ownerAddress');
   const testOwnerAddress = await testOwner.getAddress();
   const testAmountIn = ethers.utils.parseEther('1.0');
-
-  const rows: unknown[] = [];
 
   for (let e = 0; e < exchanges.length; e++) {
     const exchange = exchanges[e];
@@ -48,6 +48,8 @@ const fetchGasEstimates = async () => {
 
       // Reset blockchain state
       await setup();
+
+      throw new Error('EXECUTION SHOULD STOP');
 
       // Wrap ETH to WETH on signer account
       await wrapEth(testOwner, testAmountIn, testOwnerAddress);
@@ -64,25 +66,17 @@ const fetchGasEstimates = async () => {
       }
 
       if (gasEstimate) {
-        gasEstimates[exchange.index][token.address] = gasEstimate;
+        gasEstimates[exchange.index][token.address] = gasEstimate.toString();
       }
 
       exchangeGasEstimates[`WETH -> ${token.symbol}`] = gasEstimate ? gasEstimate.toString() : 'N/A';
     }
-
-    rows.push({
-      'Exchange name': exchange.name,
-      ...exchangeGasEstimates,
-    });
   }
 
-  console.table(rows);
-  console.log('\n');
+  console.log('Gas estimates fetched successfully.');
+  console.log(gasEstimates);
 };
 
-fetchGasEstimates()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+// Note: we voluntarily don't catch errors so that the server is automatically stopped if
+// this execution fails
+fetchGasEstimates().then(() => process.exit(0));
