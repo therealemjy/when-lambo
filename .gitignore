@@ -11,9 +11,10 @@ npm-debug.log*
 
 .env
 
+dist
 coverage
 coverage.json
 
-#Hardhat files
+# Hardhat files
 cache
 artifacts

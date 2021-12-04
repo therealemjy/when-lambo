@@ -58,7 +58,7 @@ describe('contracts/Transactor', function () {
 
       // Send 1 WETH to the contract
       const transferredWethAmount = ONE_ETHER;
-      await wrapEth(ethers, owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
+      await wrapEth(owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
 
       // Check contract received the WETH
       const contractWethBalanceBeforeDestruct = await wethContract.balanceOf(TransactorContract.address);
@@ -159,7 +159,7 @@ describe('contracts/Transactor', function () {
 
       // Transfer 1 WETH to the contract
       const transferredWethAmount = ONE_ETHER;
-      await wrapEth(ethers, owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
+      await wrapEth(owner, ethers.BigNumber.from(transferredWethAmount), TransactorContract.address);
 
       // Check contract received the WETH
       const transactorContractBalance = await wethContract.balanceOf(TransactorContract.address);

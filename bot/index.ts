@@ -6,9 +6,7 @@ import { bootstrap } from './src/bootstrap';
 import getAwsWSProvider from './src/bootstrap/aws/getProvider';
 import eventEmitter from './src/bootstrap/eventEmitter';
 import logger from './src/bootstrap/logger';
-import CryptoComExchange from './src/exchanges/cryptoCom';
-import SushiswapExchange from './src/exchanges/sushiswap';
-import UniswapV2Exchange from './src/exchanges/uniswapV2';
+import exchanges from './src/exchanges';
 import handleError from './src/utils/handleError';
 import CancelablePromise from './src/utils/cancelablePromise';
 
@@ -27,11 +25,6 @@ const init = async () => {
     // const ownerAccount = new ethers.Wallet(secrets.ownerAccountPrivateKey, provider);
     const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
 
-    // Instantiate exchange services
-    const uniswapV2ExchangeService = new UniswapV2Exchange();
-    const sushiswapExchangeService = new SushiswapExchange();
-    const cryptoComExchangeService = new CryptoComExchange();
-
     provider.addListener('block', async (blockNumber: string) => {
       try {
         // Abort previous execution
@@ -47,7 +40,7 @@ const init = async () => {
             blockNumber,
             multicall,
             strategies: config.strategies,
-            exchanges: [uniswapV2ExchangeService, sushiswapExchangeService, cryptoComExchangeService],
+            exchanges,
           })
         );
       } catch (err: any) {
