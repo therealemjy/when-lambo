@@ -1,8 +1,7 @@
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 
-import config from '@config';
-import logger from '@logger';
+import { Services } from '..';
 
 export interface GasPrices {
   rapid: BigNumber;
@@ -12,19 +11,19 @@ export interface GasPrices {
 }
 
 class GasPriceWatcher {
-  public async start(callback: (gasPrices: GasPrices) => void, interval: number) {
+  public async start(services: Services, callback: (gasPrices: GasPrices) => void, interval: number) {
     const fn = async () => {
-      const prices = await this.getPrices();
+      const prices = await this.getPrices(services);
       callback(prices);
     };
 
     await fn();
 
-    logger.log('Gas price watcher started.');
+    services.logger.log('Gas price watcher started.');
     setInterval(fn, interval);
   }
 
-  private async getPrices(): Promise<GasPrices> {
+  private async getPrices(services: Services): Promise<GasPrices> {
     const res = await axios.get<{
       data: {
         rapid: BigNumber;
@@ -38,7 +37,7 @@ class GasPriceWatcher {
       // In order to make sure transactions are mined as fast as possible, we
       // multiply the gas price for rapid transactions by a given
       // multiplicator
-      rapid: new BigNumber(res.data.data.rapid).multipliedBy(config.gasPriceMultiplicator),
+      rapid: new BigNumber(res.data.data.rapid).multipliedBy(services.config.gasPriceMultiplicator),
       fast: new BigNumber(res.data.data.fast),
       standard: new BigNumber(res.data.data.standard),
       slow: new BigNumber(res.data.data.slow),
