@@ -10,12 +10,14 @@ import getTransactorContract from './getTransactorContract';
 export const registerEventListeners = async ({
   signer,
   gasLimitMultiplicator,
+  isProd,
 }: {
   signer: Signer;
   gasLimitMultiplicator: number;
+  isProd: boolean;
 }) => {
   const spreadsheet = await getSpreadsheet();
-  const TransactorContract = getTransactorContract(signer);
+  const TransactorContract = getTransactorContract(signer, isProd);
 
   // Handle paths found
   eventEmitter.on('trade', async (blockNumber, path, gasPriceWei) => {
