@@ -126,6 +126,7 @@ export const bootstrap = async (): Promise<{ services: Services; provider: ether
       await registerEventListeners({
         signer: ownerAccount,
         gasLimitMultiplicator: services.config.gasLimitMultiplicator,
+        isProd: services.config.isProd,
       });
 
       // Pull gas prices every 5 seconds
