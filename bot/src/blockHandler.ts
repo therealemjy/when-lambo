@@ -4,6 +4,7 @@ import { Strategy } from '@localTypes';
 
 import { Services } from './bootstrap';
 import findBestPaths from './findBestPaths';
+import getMostProfitablePath from './getMostProfitablePath';
 import { WETH } from './tokens';
 import registerExecutionTime from './utils/registerExecutionTime';
 
@@ -35,7 +36,16 @@ const executeStrategy = async (services: Services, { blockNumber, multicall, str
       gasPriceWei: services.state.currentGasPrices.rapid,
     });
 
-    services.eventEmitter.emit('paths', blockNumber, paths);
+    // Get the most profitable paths, if any of them is considered profitable
+    const mostProfitablePath = getMostProfitablePath(
+      paths,
+      services.config.gasLimitMultiplicator,
+      services.config.gasCostMaximumThresholdWei
+    );
+
+    if (mostProfitablePath) {
+      services.eventEmitter.emit('trade', blockNumber, mostProfitablePath);
+    }
   } catch (error: unknown) {
     services.eventEmitter.emit('error', error);
   }

@@ -5,7 +5,7 @@ import { Path } from '@bot/src/types';
 
 export interface MessageEvents {
   error: (error: unknown) => void;
-  paths: (blockNumber: string, paths: Path[]) => void;
+  trade: (blockNumber: string, path: Path) => void;
 }
 
 const eventEmitter = new EventEmitter() as TypedEmitter<MessageEvents>;

@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import dotenv from 'dotenv';
 
 import { Environment, GasEstimates, Strategy } from '@localTypes';
@@ -22,6 +23,7 @@ export interface EnvConfig {
   gasLimitMultiplicator: number;
   gasPriceMultiplicator: number;
   gasEstimates: GasEstimates;
+  gasCostMaximumThresholdWei: BigNumber;
   strategies: Strategy[];
   googleSpreadSheet: {
     id: string;
@@ -54,6 +56,7 @@ const config: EnvConfig = {
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
   gasEstimates: swapGasEstimates as GasEstimates,
+  gasCostMaximumThresholdWei: new BigNumber(env('GAS_PRICE_MULTIPLICATOR')),
   googleSpreadSheet: {
     id: env('GOOGLE_SPREADSHEET_SPREADSHEET_ID'),
     clientEmail: env('GOOGLE_SPREADSHEET_CLIENT_EMAIL'),
