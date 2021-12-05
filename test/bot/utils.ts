@@ -24,6 +24,7 @@ const config: EnvConfig = {
   slippageAllowancePercent: 0.5,
   gasLimitMultiplicator: 1.2,
   gasPriceMultiplicator: 1.1,
+  gasCostMaximumThresholdWei: new BigNumber('43000000000000000'),
   gasEstimates: JSON.parse(
     '{"0":{"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942":"109592"},"1":{"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942":"110529"},"2":{"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942":"117014"}}'
   ),

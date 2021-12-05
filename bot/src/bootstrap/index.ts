@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { ethers } from 'ethers';
 import http from 'http';
 import TypedEmitter from 'typed-emitter';
 
@@ -6,13 +7,14 @@ import { Strategy } from '@localTypes';
 import logger from '@logger';
 
 import config, { EnvConfig } from '@bot/config';
+import exchanges from '@bot/src/exchanges';
+import UniswapLikeExchange from '@bot/src/exchanges/UniswapLikeExchange';
 
-import exchanges from '../exchanges';
-import UniswapLikeExchange from '../exchanges/UniswapLikeExchange';
 import eventEmitter, { MessageEvents } from './eventEmitter';
 import { registerEventListeners } from './eventEmitter/registerEvents';
 import fetchSecrets from './fetchSecrets';
 import gasPriceWatcher from './gasPriceWatcher';
+import getAwsWSProvider from './getAwsWSProvider';
 
 export type State = {
   monitoringActivated: boolean;
@@ -106,7 +108,7 @@ const server = http.createServer(function (req, res) {
   }
 });
 
-export const bootstrap = async (): Promise<Services> =>
+export const bootstrap = async (): Promise<{ services: Services; provider: ethers.providers.Web3Provider }> =>
   new Promise((resolve) => {
     server.listen(3000, async () => {
       logger.log('Server started running on port 3000');
@@ -117,13 +119,16 @@ export const bootstrap = async (): Promise<Services> =>
       // Add secrets to state
       services.state.secrets = secrets;
 
+      const provider = getAwsWSProvider();
+      const ownerAccount = new ethers.Wallet(secrets.ownerAccountPrivateKey, provider);
+
       // Register event listeners
-      await registerEventListeners();
+      await registerEventListeners(ownerAccount);
 
       // Pull gas prices every 5 seconds
       await gasPriceWatcher.start(services, (gasPrices) => (services.state.currentGasPrices = gasPrices), 5000);
 
       // We will use this instance of state throughout the bot with dependencies injection, making testing way easier
-      resolve(services);
+      resolve({ services, provider });
     });
   });

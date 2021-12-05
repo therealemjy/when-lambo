@@ -1,8 +1,8 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
+import { ethers } from 'ethers';
 
 import blockHandler from './src/blockHandler';
 import { bootstrap, Services } from './src/bootstrap';
-import getAwsWSProvider from './src/bootstrap/aws/getProvider';
 import eventEmitter from './src/bootstrap/eventEmitter';
 import CancelablePromise from './src/utils/cancelablePromise';
 import handleError from './src/utils/handleError';
@@ -13,13 +13,11 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-const init = async (services: Services) => {
+const init = async ({ services, provider }: { services: Services; provider: ethers.providers.Web3Provider }) => {
   const start = async () => {
     let isMonitoring = false;
     let cancelablePromise: CancelablePromise | undefined = undefined;
 
-    const provider = getAwsWSProvider();
-    // const ownerAccount = new ethers.Wallet(secrets.ownerAccountPrivateKey, provider);
     const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
 
     provider.addListener('block', async (blockNumber: string) => {
@@ -69,9 +67,9 @@ const init = async (services: Services) => {
 
 (async () => {
   try {
-    const services = await bootstrap();
+    const { services, provider } = await bootstrap();
 
-    await init(services);
+    await init({ services, provider });
   } catch (err) {
     eventEmitter.emit('error', err);
     process.exit(1);

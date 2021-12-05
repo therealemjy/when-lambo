@@ -20,6 +20,7 @@ const fetchSecrets = async (): Promise<WLSecrets> => {
   }
 
   // Load the AWS SDK
+  // TODO: move to env variables
   const region = 'us-east-1';
   const secretName = 'arn:aws:secretsmanager:us-east-1:725566919168:secret:prod/secret-O2a6FL';
 
