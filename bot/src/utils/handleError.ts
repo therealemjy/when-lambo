@@ -1,8 +1,8 @@
 import logger from '@logger';
+import * as Sentry from '@sentry/node';
 
 import config from '@bot/config';
 import formatError from '@bot/src/utils/formatError';
-import sendSlackMessage, { formatErrorToSlackBlock } from '@bot/src/utils/sendSlackMessage';
 
 const handleError = (error: unknown, isUncaughtException = false) => {
   // Format the error to a human-readable format and send it to slack
@@ -10,8 +10,11 @@ const handleError = (error: unknown, isUncaughtException = false) => {
   logger.error(isUncaughtException ? 'Uncaught exception:' : 'Emitted error:', formattedError);
 
   if (config.isProd) {
-    const slackBlock = formatErrorToSlackBlock(formattedError, config.serverId);
-    sendSlackMessage(slackBlock, 'errors');
+    Sentry.captureException(error, {
+      tags: {
+        serverId: config.serverId,
+      },
+    });
   }
 };
 

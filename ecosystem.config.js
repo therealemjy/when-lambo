@@ -274,7 +274,6 @@ const baseEnvs = {
   AWS_SECRET_ACCESS_KEY_ETH_NODE: 'cKAWTP1YV7dhJqT1NzDdoRJmOCJLbWXaiW16u1Qb',
   AWS_WSS_RPC_URL: 'wss://nd-omssuug64ravhkl6euczd7ixwq.wss.ethereum.managedblockchain.us-east-1.amazonaws.com',
   SLACK_HOOK_URL_DEALS: '/services/T02KL0NM4JW/B02KL2YR274/uuVWs7PFmmu7HeJFznO0lnbr',
-  SLACK_HOOK_URL_ERRORS: '/services/T02KL0NM4JW/B02MY8HCBH6/emYh5ABeek7BtSgaLAEUlfxo',
   SLIPPAGE_ALLOWANCE_PERCENT: '0.5',
   GAS_LIMIT_MULTIPLICATOR: '1.2',
   GAS_PRICE_MULTIPLICATOR: '1.1',
@@ -284,6 +283,7 @@ const baseEnvs = {
   GOOGLE_SPREADSHEET_SPREADSHEET_ID: '1zHMFP3oMbB8opRr4A4uG6nQrsaSyrw1bNcRy4trkhQw',
   STRATEGY_BORROWED_AMOUNTS_COUNT: 11,
   TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+  SENTRY_DNS_URL: 'https://05abb9f7dda745c382603d61f148eaf7@o1084392.ingest.sentry.io/6094170',
 };
 
 const baseOptions = {

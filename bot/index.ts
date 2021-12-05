@@ -1,11 +1,16 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import { ethers } from 'ethers';
-
+import * as Sentry from '@sentry/node';
 import blockHandler from './src/blockHandler';
 import { bootstrap, Services } from './src/bootstrap';
 import eventEmitter from './src/bootstrap/eventEmitter';
 import CancelablePromise from './src/utils/cancelablePromise';
 import handleError from './src/utils/handleError';
+import botConfig from './config';
+
+Sentry.init({
+  dsn: botConfig.sentryDNS,
+});
 
 // Catch unhandled exceptions
 process.on('uncaughtException', (error) => {

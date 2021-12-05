@@ -32,9 +32,9 @@ export interface EnvConfig {
   };
   slackChannelsWebhooks: {
     deals: string;
-    errors: string;
   };
   testOwnerAccountPrivateKey: string;
+  sentryDNS: string;
 }
 
 const strategies: Strategy[] = formatStrategies(
@@ -64,10 +64,10 @@ const config: EnvConfig = {
   },
   slackChannelsWebhooks: {
     deals: env('SLACK_HOOK_URL_DEALS'),
-    errors: env('SLACK_HOOK_URL_ERRORS'),
   },
   strategies,
   testOwnerAccountPrivateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
+  sentryDNS: env('SENTRY_DNS_URL'),
 };
 
 export default config;
