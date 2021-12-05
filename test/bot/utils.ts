@@ -4,6 +4,8 @@ import TypedEmitter from 'typed-emitter';
 import logger from '@logger';
 import formatStrategies from '@utils/formatStrategies';
 
+import chainHandlerConfig from '@chainHandler/config';
+
 import { EnvConfig } from '@bot/config';
 import { defaultState, Services } from '@bot/src/bootstrap';
 import eventEmitter from '@bot/src/bootstrap/eventEmitter';
@@ -23,11 +25,11 @@ const config: EnvConfig = {
   gasLimitMultiplicator: 1.2,
   gasPriceMultiplicator: 1.1,
   gasEstimates: JSON.parse(
-    '{"0":{"0x6B175474E89094C44Da98b954EedeAC495271d0F":"109592"},"1":{"0x6B175474E89094C44Da98b954EedeAC495271d0F":"110529"},"2":{"0x6B175474E89094C44Da98b954EedeAC495271d0F":"117014"}}'
+    '{"0":{"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942":"109592"},"1":{"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942":"110529"},"2":{"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942":"117014"}}'
   ),
   strategies: formatStrategies(
     JSON.parse(
-      '[{"TRADED_TOKEN_ADDRESS":"0x6B175474E89094C44Da98b954EedeAC495271d0F","TRADED_TOKEN_SYMBOL":"DAI","TRADED_TOKEN_DECIMALS":"18","STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT":"50000000000000000000","STRATEGY_BORROWED_INCREMENT_PERCENT":"10"}]'
+      '[{"TRADED_TOKEN_ADDRESS":"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942","TRADED_TOKEN_SYMBOL":"MANA","TRADED_TOKEN_DECIMALS":"18","STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT":"6300000000000000000","STRATEGY_BORROWED_INCREMENT_PERCENT":"10"}]'
     ),
     5
   ),

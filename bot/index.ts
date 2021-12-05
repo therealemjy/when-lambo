@@ -25,6 +25,12 @@ const init = async (services: Services) => {
     provider.addListener('block', async (blockNumber: string) => {
       services.logger.log(`New block received. Block # ${blockNumber}`);
 
+      if (!services.state.monitoringActivated) {
+        services.logger.log(`--- Block skipped, monitoring not activated ---`);
+
+        return;
+      }
+
       // Abort previous execution
       if (isMonitoring && cancelablePromise) {
         cancelablePromise.abort();

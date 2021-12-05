@@ -5,9 +5,11 @@ import sinon from 'sinon';
 
 import { MULTICALL_CONTRACT_MAINNET_ADDRESS } from '@constants';
 
+import chainHandlerConfig from '@chainHandler/config';
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 
 import blockHandler from '@bot/src/blockHandler';
+import { Path } from '@bot/src/types';
 
 import { getTestServices } from './utils';
 
@@ -20,8 +22,9 @@ const setup = deployments.createFixture(async () => {
 
 describe.only('Bot', function () {
   it('Should find opportunity and call smart contract', async function () {
-    const contract = await setup();
+    await setup();
     const services = getTestServices();
+    const blockNumber = chainHandlerConfig.testProfitableTrade.blockNumber.toString();
 
     const eventEmitterOn = sinon.spy(services.eventEmitter, 'emit');
 
@@ -31,13 +34,22 @@ describe.only('Bot', function () {
       tryAggregate: true,
     });
 
-    await blockHandler(services, { multicall, blockNumber: '10000000000' });
+    await blockHandler(services, { multicall, blockNumber });
 
     const args = eventEmitterOn.lastCall.args;
 
-    expect(args[0]).equal('paths'); // Event name
-    expect(args[1]).equal('10000000000'); // block number
+    expect(args[0]).equal('trade'); // Event name
+    expect(args[1]).equal(blockNumber); // block number
 
-    console.log('eventEmitterOn', args[2]);
+    const paths = args[2];
+
+    // Find the right path with the right exchanges
+    expect(paths[0].exchangeIndex).equal(chainHandlerConfig.testProfitableTrade.sellingExchangeIndex);
+    expect(paths[1].exchangeIndex).equal(chainHandlerConfig.testProfitableTrade.buyingExchangeIndex);
+
+    // trade must be deactivated
+    expect(services.state.monitoringActivated).equal(false);
+
+    // Call function of event emitter with correct arguments
   });
 });

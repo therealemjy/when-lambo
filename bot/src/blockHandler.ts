@@ -44,7 +44,11 @@ const executeStrategy = async (services: Services, { blockNumber, multicall, str
     );
 
     if (mostProfitablePath) {
+      // Handler will take care of the trade
       services.eventEmitter.emit('trade', blockNumber, mostProfitablePath);
+
+      // We deactivate the bot while the trade is ongoing
+      services.state.monitoringActivated = false;
     }
   } catch (error: unknown) {
     services.eventEmitter.emit('error', error);

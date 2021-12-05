@@ -15,6 +15,7 @@ import fetchSecrets from './fetchSecrets';
 import gasPriceWatcher from './gasPriceWatcher';
 
 export type State = {
+  monitoringActivated: boolean;
   lastMonitoringDateTime: number | null;
   secrets:
     | {
@@ -34,6 +35,9 @@ export type State = {
 };
 
 export const defaultState: State = {
+  // safe guard if we found a trade
+  monitoringActivated: true,
+
   // Set to the last date the bot checked prices
   lastMonitoringDateTime: null,
   botExecutionMonitoringTick: 0,
