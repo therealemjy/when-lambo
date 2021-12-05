@@ -7,6 +7,8 @@ import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
+import delay from './delay';
+
 const withdrawFromTransactorContract = async (
   {
     tokenSymbol,
@@ -29,6 +31,16 @@ const withdrawFromTransactorContract = async (
   console.log(`Amount: ${ethers.utils.formatEther(amount)} ${tokenSymbol}`);
   console.log(`From: Transactor contract (${TransactorContract.address})`);
   console.log(`To: vault account (${vaultAddress})\n`);
+
+  for (let t = 0; t < countdownSeconds; t++) {
+    if (t > 0) {
+      process.stdout.clearLine(-1);
+      process.stdout.cursorTo(0);
+    }
+    process.stdout.write(`Seconds before execution: ${countdownSeconds - t}`);
+
+    await delay(1000);
+  }
 
   // Check we have enough funds on the contract
   let contractBalance: BigNumber;
