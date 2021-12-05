@@ -24,6 +24,8 @@
   "dependencies": {
     "@aws/web3-ws-provider": "^1.0.3",
     "@maxime.julian/ethereum-multicall": "^3.0.0",
+    "@sentry/node": "^6.15.0",
+    "@sentry/tracing": "^6.15.0",
     "aws-sdk": "^2.1016.0",
     "axios": "^0.24.0",
     "bignumber.js": "^9.0.1",

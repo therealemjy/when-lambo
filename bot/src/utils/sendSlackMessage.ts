@@ -3,7 +3,6 @@ import * as https from 'https';
 import config from '@bot/config';
 
 const slackChannels = {
-  errors: config.slackChannelsWebhooks.errors,
   deals: config.slackChannelsWebhooks.deals,
 };
 
@@ -46,34 +45,6 @@ function sendSlackMessage(message: unknown, type: keyof typeof slackChannels) {
     postReq.write(body);
     postReq.end();
   });
-}
-
-export function formatErrorToSlackBlock(stringifiedError: string, serverId: string) {
-  return {
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: 'Fuck, something is wrong guys 😳',
-        },
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `Server ID: ${serverId}*`,
-        },
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: '```' + stringifiedError + '```',
-        },
-      },
-    ],
-  };
 }
 
 export default sendSlackMessage;
