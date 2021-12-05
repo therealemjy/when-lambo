@@ -41,10 +41,9 @@ const config: EnvConfig = {
   },
   slackChannelsWebhooks: {
     deals: '',
-    errors: '',
   },
   testOwnerAccountPrivateKey: '',
-  gasCostMaximumThresholdWei: new BigNumber('43000000000000000'),
+  sentryDNS: '',
 };
 
 export const getTestServices = (): Services => {
