@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import TypedEmitter from 'typed-emitter';
 
 import logger from '@logger';
@@ -40,6 +41,7 @@ const config: EnvConfig = {
     errors: '',
   },
   testOwnerAccountPrivateKey: '',
+  gasCostMaximumThresholdWei: new BigNumber('43000000000000000'),
 };
 
 export const getTestServices = (): Services => {

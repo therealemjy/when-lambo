@@ -33,6 +33,11 @@ describe.only('Bot', function () {
 
     await blockHandler(services, { multicall, blockNumber: '10000000000' });
 
-    expect(eventEmitterOn).equal(1);
+    const args = eventEmitterOn.lastCall.args;
+
+    expect(args[0]).equal('paths'); // Event name
+    expect(args[1]).equal('10000000000'); // block number
+
+    console.log('eventEmitterOn', args[2]);
   });
 });
