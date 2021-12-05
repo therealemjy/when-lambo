@@ -33,7 +33,7 @@ export type State = {
   };
 };
 
-const defaultState: State = {
+export const defaultState: State = {
   // Set to the last date the bot checked prices
   lastMonitoringDateTime: null,
   botExecutionMonitoringTick: 0,
