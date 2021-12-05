@@ -262,10 +262,10 @@ describe('contracts/Transactor', function () {
           currentBlockNumber + 1,
           config.testProfitableTrade.wethAmountToBorrow,
           config.testProfitableTrade.sellingExchangeIndex,
-          config.testProfitableTrade.wethAmountOutMin,
-          config.testProfitableTrade.buyingExchangeIndex,
           config.testProfitableTrade.tradedTokenAddress,
           config.testProfitableTrade.tradedTokenAmountOutMin,
+          config.testProfitableTrade.buyingExchangeIndex,
+          config.testProfitableTrade.wethAmountOutMin,
           BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
         )
       ).to.be.revertedWith('Owner only');
@@ -282,10 +282,10 @@ describe('contracts/Transactor', function () {
           currentBlockNumber,
           config.testProfitableTrade.wethAmountToBorrow,
           config.testProfitableTrade.sellingExchangeIndex,
-          config.testProfitableTrade.wethAmountOutMin,
-          config.testProfitableTrade.buyingExchangeIndex,
           config.testProfitableTrade.tradedTokenAddress,
           config.testProfitableTrade.tradedTokenAmountOutMin,
+          config.testProfitableTrade.buyingExchangeIndex,
+          config.testProfitableTrade.wethAmountOutMin,
           BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
         )
       ).to.be.revertedWith('Trade expired');
@@ -308,10 +308,10 @@ describe('contracts/Transactor', function () {
           currentBlockNumber + 1,
           config.testProfitableTrade.wethAmountToBorrow,
           config.testProfitableTrade.sellingExchangeIndex,
-          config.testProfitableTrade.wethAmountOutMin,
-          config.testProfitableTrade.buyingExchangeIndex,
           config.testProfitableTrade.tradedTokenAddress,
           config.testProfitableTrade.tradedTokenAmountOutMin,
+          config.testProfitableTrade.buyingExchangeIndex,
+          config.testProfitableTrade.wethAmountOutMin,
           BigNumber.from(new Date(new Date().getTime() + 120000).getTime()) // Set a deadline to 2 minutes from now
         )
       )

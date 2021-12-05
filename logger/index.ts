@@ -4,7 +4,7 @@ import RotatingFileStream from 'bunyan-rotating-file-stream';
 import 'console.table';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
-import { TRADE_GAS_ESTIMATE_WITHOUT_SWAPS } from '@constants';
+import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 import { ExchangeIndex } from '@localTypes';
 
 import config from '@bot/config';
@@ -41,34 +41,41 @@ const error: typeof console.error = (...args) => bunyanLogger.error(...args);
 const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) =>
   amount.dividedBy(10 ** tokenDecimals).toFixed(tokenDecimals);
 
-const path = async (blockNumber: string, pathToLog: Path, spreadsheet: GoogleSpreadsheet) => {
-  const timestamp = formatTimestamp(pathToLog[0].timestamp);
-  const borrowedTokens = _convertToHumanReadableAmount(
-    pathToLog[0].fromTokenDecimalAmount,
-    pathToLog[0].fromToken.decimals
-  );
-  const boughtTokens = _convertToHumanReadableAmount(pathToLog[0].toTokenDecimalAmount, pathToLog[0].toToken.decimals);
-  const revenues = _convertToHumanReadableAmount(pathToLog[1].toTokenDecimalAmount, pathToLog[1].toToken.decimals);
+const transaction = async ({
+  blockNumber,
+  path,
+  transactionHash,
+  spreadsheet,
+}: {
+  blockNumber: string;
+  path: Path;
+  transactionHash: string;
+  spreadsheet: GoogleSpreadsheet;
+}) => {
+  const timestamp = formatTimestamp(path[0].timestamp);
+  const borrowedTokens = _convertToHumanReadableAmount(path[0].fromTokenDecimalAmount, path[0].fromToken.decimals);
+  const boughtTokens = _convertToHumanReadableAmount(path[0].toTokenDecimalAmount, path[0].toToken.decimals);
+  const revenues = _convertToHumanReadableAmount(path[1].toTokenDecimalAmount, path[1].toToken.decimals);
 
-  const bestSellingExchangeName = ExchangeIndex[pathToLog[0].exchangeIndex];
-  const bestBuyingExchangeName = ExchangeIndex[pathToLog[1].exchangeIndex];
+  const bestSellingExchangeName = ExchangeIndex[path[0].exchangeIndex];
+  const bestBuyingExchangeName = ExchangeIndex[path[1].exchangeIndex];
 
-  const gasCost = pathToLog[0].estimatedGasCost
-    .plus(pathToLog[1].estimatedGasCost)
+  const gasCost = path[0].gasCostEstimate
+    .plus(path[1].gasCostEstimate)
     // Add estimated gas to trade with Transactor (without accounting for the swap themselves)
-    .plus(TRADE_GAS_ESTIMATE_WITHOUT_SWAPS)
+    .plus(TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
     // Add gasLimit margin
     .multipliedBy(config.gasLimitMultiplicator);
   const gasCostWETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);
 
   const [profitDec, profitPercent] = calculateProfit({
-    revenueDec: pathToLog[1].toTokenDecimalAmount,
+    revenueDec: path[1].toTokenDecimalAmount,
     // Add gas cost to expense. Note that this logic only works because we
     // start and end the path with WETH
-    expenseDec: pathToLog[0].fromTokenDecimalAmount.plus(gasCost),
+    expenseDec: path[0].fromTokenDecimalAmount.plus(gasCost),
   });
 
-  const profitInTokens = _convertToHumanReadableAmount(profitDec, pathToLog[0].fromToken.decimals);
+  const profitInTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
 
   // Log paths in Slack and Google Spreadsheet in production
   if (config.isProd) {
@@ -78,11 +85,19 @@ const path = async (blockNumber: string, pathToLog: Path, spreadsheet: GoogleSpr
         fields: [
           {
             type: 'mrkdwn',
+            text: `*Transaction hash:*\n${transactionHash}`,
+          },
+          {
+            type: 'mrkdwn',
+            text: `*Block number:*\n${blockNumber}`,
+          },
+          {
+            type: 'mrkdwn',
             text: `*Timestamp:*\n${timestamp}`,
           },
           {
             type: 'mrkdwn',
-            text: `*${pathToLog[0].fromToken.symbol} borrowed:*\n${borrowedTokens}`,
+            text: `*${path[0].fromToken.symbol} borrowed:*\n${borrowedTokens}`,
           },
           {
             type: 'mrkdwn',
@@ -90,7 +105,7 @@ const path = async (blockNumber: string, pathToLog: Path, spreadsheet: GoogleSpr
           },
           {
             type: 'mrkdwn',
-            text: `*${pathToLog[0].toToken.symbol} bought:*\n${boughtTokens}`,
+            text: `*${path[0].toToken.symbol} bought:*\n${boughtTokens}`,
           },
           {
             type: 'mrkdwn',
@@ -98,7 +113,7 @@ const path = async (blockNumber: string, pathToLog: Path, spreadsheet: GoogleSpr
           },
           {
             type: 'mrkdwn',
-            text: `*${pathToLog[0].fromToken.symbol} bought back:*\n${revenues}`,
+            text: `*${path[0].fromToken.symbol} bought back:*\n${revenues}`,
           },
           {
             type: 'mrkdwn',
@@ -106,7 +121,7 @@ const path = async (blockNumber: string, pathToLog: Path, spreadsheet: GoogleSpr
           },
           {
             type: 'mrkdwn',
-            text: `*Profit (in ${pathToLog[0].fromToken.symbol}):*\n${profitInTokens}`,
+            text: `*Profit (in ${path[0].fromToken.symbol}):*\n${profitInTokens}`,
           },
           {
             type: 'mrkdwn',
@@ -133,7 +148,7 @@ const path = async (blockNumber: string, pathToLog: Path, spreadsheet: GoogleSpr
       blockNumber,
       +borrowedTokens,
       bestSellingExchangeName,
-      pathToLog[0].toToken.symbol,
+      path[0].toToken.symbol,
       +boughtTokens,
       bestBuyingExchangeName,
       +revenues,
@@ -152,13 +167,13 @@ const path = async (blockNumber: string, pathToLog: Path, spreadsheet: GoogleSpr
     const tableRow = {
       Timestamp: timestamp,
       'Block number': blockNumber,
-      [`${pathToLog[0].fromToken.symbol} borrowed`]: borrowedTokens,
+      [`${path[0].fromToken.symbol} borrowed`]: borrowedTokens,
       'Best selling exchange': bestSellingExchangeName,
-      [`${pathToLog[0].toToken.symbol} bought`]: boughtTokens,
+      [`${path[0].toToken.symbol} bought`]: boughtTokens,
       'Best buying exchange': bestBuyingExchangeName,
-      [`${pathToLog[0].fromToken.symbol} bought back`]: revenues,
+      [`${path[0].fromToken.symbol} bought back`]: revenues,
       'Gas cost (in WETH)': gasCostWETH,
-      [`Profit (in ${pathToLog[0].fromToken.symbol})`]: profitInTokens,
+      [`Profit (in ${path[0].fromToken.symbol})`]: profitInTokens,
       'Profit (%)': profitPercent + '%',
     };
 
@@ -169,5 +184,5 @@ const path = async (blockNumber: string, pathToLog: Path, spreadsheet: GoogleSpr
 export default {
   log,
   error,
-  path,
+  transaction,
 };

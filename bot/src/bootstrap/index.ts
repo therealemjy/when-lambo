@@ -123,7 +123,10 @@ export const bootstrap = async (): Promise<{ services: Services; provider: ether
       const ownerAccount = new ethers.Wallet(secrets.ownerAccountPrivateKey, provider);
 
       // Register event listeners
-      await registerEventListeners(ownerAccount);
+      await registerEventListeners({
+        signer: ownerAccount,
+        gasLimitMultiplicator: services.config.gasLimitMultiplicator,
+      });
 
       // Pull gas prices every 5 seconds
       await gasPriceWatcher.start(services, (gasPrices) => (services.state.currentGasPrices = gasPrices), 5000);

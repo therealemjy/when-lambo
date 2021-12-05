@@ -16,7 +16,7 @@ const getConvertedDealGasCost = (deal: Deal) => {
   if (deal.toToken.address === WETH.address) {
     // Since the traded token is in WETH, we can directly return the
     // estimated gas cost as it's already expressed in wei
-    return deal.estimatedGasCost;
+    return deal.gasCostEstimate;
   }
 
   // Otherwise we convert the gas cost in the currency of the traded token
@@ -24,7 +24,7 @@ const getConvertedDealGasCost = (deal: Deal) => {
     .dividedBy(deal.fromTokenDecimalAmount) // In this case, we know fromTokenDecimalAmount is expressed in wei
     .toFixed(0);
 
-  return deal.estimatedGasCost.multipliedBy(fromTokenDecimalPriceInToTokenDecimals);
+  return deal.gasCostEstimate.multipliedBy(fromTokenDecimalPriceInToTokenDecimals);
 };
 
 const findBestDeals = async ({
@@ -110,9 +110,9 @@ const findBestDeals = async ({
       const refTokenAddress = fromToken.address === wethAddress ? toToken.address : fromToken.address;
 
       // TODO: add safe guard that logs an error in case the estimate wasn't found
-      const gasEstimate = gasEstimates[exchange.index][refTokenAddress];
+      const gasEstimate = new BigNumber(gasEstimates[exchange.index][refTokenAddress]);
 
-      const deal = {
+      const deal: Deal = {
         timestamp: new Date(),
         exchangeIndex: exchange.index,
         fromToken,
@@ -120,7 +120,8 @@ const findBestDeals = async ({
         toToken,
         toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
         slippageAllowancePercent,
-        estimatedGasCost: gasPriceWei.multipliedBy(gasEstimate),
+        gasEstimate,
+        gasCostEstimate: gasPriceWei.multipliedBy(gasEstimate),
       };
 
       const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()];

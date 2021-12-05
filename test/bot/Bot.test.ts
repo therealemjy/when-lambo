@@ -20,7 +20,7 @@ const setup = deployments.createFixture(async () => {
   return { TransactorContract };
 });
 
-describe.only('Bot', function () {
+describe('Bot', function () {
   it('Should find opportunity and call smart contract', async function () {
     await setup();
     const services = getTestServices();

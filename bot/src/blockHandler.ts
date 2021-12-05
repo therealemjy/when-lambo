@@ -21,6 +21,8 @@ type BlockHandlerArgs = {
 
 const executeStrategy = async (services: Services, { blockNumber, multicall, strategy }: ExecuteStrategyArgs) => {
   try {
+    const gasPriceWei = services.state.currentGasPrices.rapid;
+
     const paths = await findBestPaths({
       multicall,
       fromTokenDecimalAmounts: strategy.borrowedWethAmounts,
@@ -33,22 +35,21 @@ const executeStrategy = async (services: Services, { blockNumber, multicall, str
       exchanges: services.exchanges,
       slippageAllowancePercent: services.config.slippageAllowancePercent,
       gasEstimates: services.config.gasEstimates,
-      gasPriceWei: services.state.currentGasPrices.rapid,
+      gasPriceWei,
     });
 
     // Get the most profitable paths, if any of them is considered profitable
-    const mostProfitablePath = getMostProfitablePath(
+    const mostProfitablePath = getMostProfitablePath({
       paths,
-      services.config.gasLimitMultiplicator,
-      services.config.gasCostMaximumThresholdWei
-    );
+      gasPriceWei,
+      gasLimitMultiplicator: services.config.gasLimitMultiplicator,
+      gasCostMaximumThresholdWei: services.config.gasCostMaximumThresholdWei,
+    });
 
     if (mostProfitablePath) {
-      // Handler will take care of the trade
-      services.eventEmitter.emit('trade', blockNumber, mostProfitablePath);
-
       // We deactivate the bot while the trade is ongoing
       services.state.monitoringActivated = false;
+      services.eventEmitter.emit('trade', blockNumber, mostProfitablePath, gasPriceWei);
     }
   } catch (error: unknown) {
     services.eventEmitter.emit('error', error);
