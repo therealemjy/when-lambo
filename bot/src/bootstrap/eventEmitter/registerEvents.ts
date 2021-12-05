@@ -9,8 +9,10 @@ export const registerEventListeners = async () => {
   const spreadsheet = await getSpreadsheet();
 
   // Handle paths found
-  eventEmitter.on('paths', (blockNumber, paths) => {
-    logger.paths(blockNumber, paths, spreadsheet);
+  eventEmitter.on('trade', (blockNumber, path) => {
+    // TODO: execute trade
+
+    logger.path(blockNumber, path, spreadsheet);
   });
 
   // Handle errors
