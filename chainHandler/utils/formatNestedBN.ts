@@ -9,7 +9,7 @@ const formatNestedBN = (source: any): any =>
     if (value?._isBigNumber) {
       value = value.toString();
     } else if (value instanceof BigNumber) {
-      value = value.toFixed();
+      value = value.toFixed(0);
     } else if (typeof value === 'object' && value && !(value instanceof Date)) {
       value = formatNestedBN(value);
     }

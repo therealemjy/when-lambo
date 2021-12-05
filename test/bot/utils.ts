@@ -1,10 +1,7 @@
 import BigNumber from 'bignumber.js';
-import TypedEmitter from 'typed-emitter';
 
 import logger from '@logger';
 import formatStrategies from '@utils/formatStrategies';
-
-import chainHandlerConfig from '@chainHandler/config';
 
 import { EnvConfig } from '@bot/config';
 import { defaultState, Services } from '@bot/src/bootstrap';
@@ -24,15 +21,15 @@ const config: EnvConfig = {
   slippageAllowancePercent: 0.5,
   gasLimitMultiplicator: 1.2,
   gasPriceMultiplicator: 1.1,
-  gasCostMaximumThresholdWei: new BigNumber('43000000000000000'),
+  gasCostMaximumThresholdWei: new BigNumber('63000000000000000'),
   gasEstimates: JSON.parse(
-    '{"0":{"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942":"109592"},"1":{"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942":"110529"},"2":{"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942":"117014"}}'
+    '{"0":{"0x0f5d2fb29fb7d3cfee444a200298f468908cc942":"109592"},"1":{"0x0f5d2fb29fb7d3cfee444a200298f468908cc942":"110529"},"2":{"0x0f5d2fb29fb7d3cfee444a200298f468908cc942":"117014"}}'
   ),
   strategies: formatStrategies(
     JSON.parse(
-      '[{"TRADED_TOKEN_ADDRESS":"0x0F5D2fB29fb7d3CFeE444a200298f468908cC942","TRADED_TOKEN_SYMBOL":"MANA","TRADED_TOKEN_DECIMALS":"18","STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT":"6300000000000000000","STRATEGY_BORROWED_INCREMENT_PERCENT":"10"}]'
+      '[{"TRADED_TOKEN_ADDRESS":"0x0f5d2fb29fb7d3cfee444a200298f468908cc942","TRADED_TOKEN_SYMBOL":"MANA","TRADED_TOKEN_DECIMALS":"18","STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT":"4050000000000000000","STRATEGY_BORROWED_INCREMENT_PERCENT":"10"}]'
     ),
-    5
+    11
   ),
   googleSpreadSheet: {
     id: '',
@@ -48,7 +45,15 @@ const config: EnvConfig = {
 
 export const getTestServices = (): Services => {
   const services: Services = {
-    state: defaultState,
+    state: {
+      ...defaultState,
+      currentGasPrices: {
+        rapid: new BigNumber('106777915208'), // 106
+        fast: new BigNumber('106777915208'), // 140Gwei
+        standard: new BigNumber('106777915208'), // 140Gwei
+        slow: new BigNumber('106777915208'), // 140Gwei
+      },
+    },
     config,
     logger,
     exchanges,

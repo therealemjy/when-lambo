@@ -9,6 +9,7 @@ import wethMainnetContractInfo from '@resources/thirdPartyContracts/mainnet/weth
 
 import config from '@chainHandler/config';
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
+import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 import wrapEth from '@chainHandler/utils/wrapEth';
 
 const setup = deployments.createFixture(async () => {
@@ -19,6 +20,19 @@ const setup = deployments.createFixture(async () => {
 });
 
 const ONE_ETHER = ethers.utils.parseEther('1');
+
+console.log('TRANSACTOR');
+console.log(
+  formatNestedBN([
+    config.testProfitableTrade.blockNumber,
+    config.testProfitableTrade.wethAmountToBorrow,
+    config.testProfitableTrade.sellingExchangeIndex,
+    config.testProfitableTrade.tradedTokenAddress,
+    config.testProfitableTrade.tradedTokenAmountOutMin,
+    config.testProfitableTrade.buyingExchangeIndex,
+    config.testProfitableTrade.wethAmountOutMin,
+  ])
+);
 
 describe('contracts/Transactor', function () {
   describe('destruct', function () {

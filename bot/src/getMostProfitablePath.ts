@@ -2,6 +2,8 @@ import BigNumber from 'bignumber.js';
 
 import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 
+import formatNestedBN from '@chainHandler/utils/formatNestedBN';
+
 import { Path } from '@bot/src/types';
 import calculateProfit from '@bot/src/utils/calculateProfit';
 

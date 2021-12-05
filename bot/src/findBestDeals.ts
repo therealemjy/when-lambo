@@ -61,7 +61,7 @@ const findBestDeals = async ({
         // ourselves by buying from an exchange and selling to the same exchange
         // in the same path.
         fromTokenDecimalAmounts.filter(
-          (fromTokenDecimalAmount) => usedExchangeIndexes[fromTokenDecimalAmount.toFixed()] !== exchange.index
+          (fromTokenDecimalAmount) => usedExchangeIndexes[fromTokenDecimalAmount.toFixed(0)] !== exchange.index
         );
 
     const { context, resultsFormatter } = exchange.getDecimalAmountOutCallContext({
@@ -124,12 +124,12 @@ const findBestDeals = async ({
         gasCostEstimate: gasPriceWei.multipliedBy(gasEstimate),
       };
 
-      const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()];
+      const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toFixed(0)];
 
       // If no best deal has been determined for the current
       // fromTokenDecimalAmount yet, we assign this deal as the current best
       if (!currentBestDeal) {
-        bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()] = deal;
+        bestDeals[formattedResult.fromTokenDecimalAmount.toFixed(0)] = deal;
         return;
       }
 
@@ -145,7 +145,7 @@ const findBestDeals = async ({
       // If the deal is better than the current best deal, we assign is as the
       // new best deal
       if (dealRevenuesMinusGas.isGreaterThan(currentBestDealRevenuesMinusGas)) {
-        bestDeals[formattedResult.fromTokenDecimalAmount.toFixed()] = deal;
+        bestDeals[formattedResult.fromTokenDecimalAmount.toFixed(0)] = deal;
       }
     });
   });

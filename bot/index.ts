@@ -25,7 +25,7 @@ const init = async ({ services, provider }: { services: Services; provider: ethe
 
     const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
 
-    provider.addListener('block', async (blockNumber: string) => {
+    provider.addListener('block', async (blockNumber: number) => {
       services.logger.log(`New block received. Block # ${blockNumber}`);
 
       if (!services.state.monitoringActivated) {

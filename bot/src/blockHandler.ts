@@ -9,14 +9,14 @@ import { WETH } from './tokens';
 import registerExecutionTime from './utils/registerExecutionTime';
 
 type ExecuteStrategyArgs = {
-  blockNumber: string;
+  blockNumber: number;
   multicall: Multicall;
   strategy: Strategy;
 };
 
 type BlockHandlerArgs = {
   multicall: Multicall;
-  blockNumber: string;
+  blockNumber: number;
 };
 
 const executeStrategy = async (services: Services, { blockNumber, multicall, strategy }: ExecuteStrategyArgs) => {

@@ -47,7 +47,7 @@ const transaction = async ({
   transactionHash,
   spreadsheet,
 }: {
-  blockNumber: string;
+  blockNumber: number;
   path: Path;
   transactionHash: string;
   spreadsheet: GoogleSpreadsheet;

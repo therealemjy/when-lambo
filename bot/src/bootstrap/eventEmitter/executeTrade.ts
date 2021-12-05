@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { ethers } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
@@ -16,7 +17,7 @@ const executeTrade = async ({
   spreadsheet,
   TransactorContract,
 }: {
-  blockNumber: string;
+  blockNumber: number;
   path: Path;
   gasPriceWei: BigNumber;
   gasLimitMultiplicator: number;
@@ -26,16 +27,18 @@ const executeTrade = async ({
   logger.log('Sending trade transaction...');
 
   const expectedBlockNumber = blockNumber + 1;
+
   const wethAmountToBorrow = path[0].fromTokenDecimalAmount;
   const sellingExchangeIndex = path[0].exchangeIndex;
-  const tradeTokenAddress = path[0].toToken.address;
+  const tradedTokenAddress = path[0].toToken.address;
   const tradedTokenAmountOutMin = path[0].toTokenDecimalAmount;
+
   const buyingExchangeIndex = path[1].exchangeIndex;
   const wethAmountOutMin = path[1].toTokenDecimalAmount;
-  // Set a deadline that's 1 minute from now. This is mostly irrelevant anyway since we need
+  // Set a deadline that's 1 hour from now. This is mostly irrelevant anyway since we need
   // our transaction to be executed in much less time than that (the contract has an internal
   // safe guard anyway to make sure the transaction is only mined for a given block number)
-  const deadline = new Date(new Date().getTime() + 60000).getTime();
+  const deadline = new Date(new Date().getTime() + 3600000).getTime();
 
   // Add up gas estimates to obtain the expected gas needed to execute the transaction, then
   // multiple by the gas limit multiplicator we defined to obtain the gas limt
@@ -46,19 +49,21 @@ const executeTrade = async ({
 
   const transaction = await TransactorContract.trade(
     expectedBlockNumber,
-    wethAmountToBorrow.toFixed(),
+    ethers.BigNumber.from(wethAmountToBorrow.toFixed(0)),
     sellingExchangeIndex,
-    tradeTokenAddress,
-    tradedTokenAmountOutMin.toFixed(),
+    tradedTokenAddress,
+    ethers.BigNumber.from(tradedTokenAmountOutMin.toFixed(0)),
     buyingExchangeIndex,
-    wethAmountOutMin.toFixed(),
+    ethers.BigNumber.from(wethAmountOutMin.toFixed(0)),
     deadline,
-    { gasPrice: gasPriceWei.toFixed(), gasLimit: gasLimit.toFixed() }
+    { gasPrice: gasPriceWei.toFixed(0), gasLimit: gasLimit.toFixed(0) }
   );
 
   logger.log(`Transaction sent! Hash: ${transaction.hash}`);
 
   await logger.transaction({ blockNumber, path, transactionHash: transaction.hash, spreadsheet });
+
+  return transaction;
 };
 
 export default executeTrade;

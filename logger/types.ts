@@ -1,6 +1,6 @@
 export type WorksheetRow = [
   string, // Timestamp
-  string, // Block number
+  number, // Block number
   number, // WETH borrowed
   string, // Best selling exchange
   string, // Token

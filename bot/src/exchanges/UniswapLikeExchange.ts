@@ -77,7 +77,7 @@ class UniswapLikeExchange implements Exchange {
     toToken,
   }) => {
     const calls = fromTokenDecimalAmounts.map((fromTokenDecimalAmount) => {
-      const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed();
+      const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed(0);
 
       return {
         reference: `getAmountsOut-${fixedFromTokenDecimalAmount}`,

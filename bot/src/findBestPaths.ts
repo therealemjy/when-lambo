@@ -49,7 +49,7 @@ const findBestPaths = async ({
   const usedExchangeIndexes = bestBuyingDeals.reduce<UsedExchangeIndexes>(
     (acc, bestBuyingDeal) => ({
       ...acc,
-      [bestBuyingDeal.toTokenDecimalAmount.toFixed()]: bestBuyingDeal.exchangeIndex,
+      [bestBuyingDeal.toTokenDecimalAmount.toFixed(0)]: bestBuyingDeal.exchangeIndex,
     }),
     {}
   );

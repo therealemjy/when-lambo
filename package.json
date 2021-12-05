@@ -71,6 +71,7 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.5.1",
     "google-spreadsheet": "^3.2.0",
+    "hardhat": "^2.7.0",
     "hardhat-deploy": "^0.9.10",
     "hardhat-gas-reporter": "^1.0.4",
     "module-alias": "^2.2.2",

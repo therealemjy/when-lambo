@@ -9,6 +9,8 @@ import './interfaces/IDyDxSoloMargin.sol';
 import './interfaces/IUniswapV2Router.sol';
 import './libraries/DyDx.sol';
 
+import 'hardhat/console.sol';
+
 enum Exchange {
   UniswapV2,
   Sushiswap,
@@ -114,13 +116,21 @@ contract Transactor is Owner, IDyDxCallee {
   ) internal returns (uint256 toTokenAmountOut) {
     IUniswapV2Router exchange = getExchange(exchangeIndex);
 
+    console.log('APPROVED TOKEN %s', fromToken);
+    console.log('APPROVED AMOUNT %s', fromTokenAmountIn);
+
     // Allow the exchange to withdraw the amount of fromToken we want to exchange
     IERC20(fromToken).approve(address(exchange), fromTokenAmountIn);
+
+    console.log('APPROVED?');
 
     // Swap all the fromTokens to toTokens
     address[] memory path = new address[](2);
     path[0] = fromToken;
     path[1] = toToken;
+
+    console.log('path[0] %s', path[0]);
+    console.log('path[1] %s', path[1]);
 
     uint256 toTokenAmountReceived = exchange.swapExactTokensForTokens(
       fromTokenAmountIn,
@@ -129,6 +139,8 @@ contract Transactor is Owner, IDyDxCallee {
       address(this),
       deadline
     )[1];
+
+    console.log('toTokenAmountReceived %s', toTokenAmountReceived);
 
     return toTokenAmountReceived;
   }
@@ -147,6 +159,8 @@ contract Transactor is Owner, IDyDxCallee {
   ) external owned {
     // Make sure trade does not execute if a new block was mined since the transaction has been sent
     require(expectedBlockNumber == block.number, 'Trade expired');
+
+    console.log('1');
 
     /*
       The first step is to initiate a flashloan with DyDx.
@@ -172,6 +186,8 @@ contract Transactor is Owner, IDyDxCallee {
     // Give DyDx permission to withdraw amount to repay. This amount
     // will only be withdrawn after we've executed our trade.
     weth.approve(address(dydxSoloMargin), wethAmountToRepay);
+
+    console.log('2');
 
     Actions.ActionArgs[] memory operations = new Actions.ActionArgs[](3);
 
@@ -240,6 +256,8 @@ contract Transactor is Owner, IDyDxCallee {
     Account.Info[] memory accountInfos = new Account.Info[](1);
     accountInfos[0] = Account.Info({owner: address(this), number: 1});
 
+    console.log('3');
+
     dydxSoloMargin.operate(accountInfos, operations);
   }
 
@@ -252,11 +270,17 @@ contract Transactor is Owner, IDyDxCallee {
     Account.Info memory accountInfo,
     bytes memory data
   ) external override {
+    console.log('4');
+
     // Make sure the call comes from DyDx' solo margin contract
     assert(msg.sender == address(dydxSoloMargin));
 
+    console.log('5');
+
     // Decode the passed variables from the data object
     CallFunctionData memory tradeData = abi.decode(data, (CallFunctionData));
+
+    console.log('6');
 
     // Sell all the borrowed WETH for as much tradedToken as possible
     uint256 tradedTokenAmountOut = swap(
@@ -268,6 +292,8 @@ contract Transactor is Owner, IDyDxCallee {
       tradeData.deadline
     );
 
+    console.log('7 %s', tradedTokenAmountOut);
+
     // Sell all the tradedToken obtained for as much WETH as possible
     uint256 wethAmountOut = swap(
       tradeData.tradedToken,
@@ -277,6 +303,7 @@ contract Transactor is Owner, IDyDxCallee {
       tradeData.wethAmountOutMin, // Minimum WETH amount out for this deal to be profitable
       tradeData.deadline
     );
+    console.log('8');
 
     emit SuccessfulTrade(
       tradeData.tradedToken,
@@ -286,6 +313,8 @@ contract Transactor is Owner, IDyDxCallee {
       tradeData.buyingExchangeIndex,
       wethAmountOut
     );
+
+    console.log('9');
 
     // After that DyDx will withdraw the amount of WETH we borrowed from them (+ 2 wei fee) and the
     // profit (in WETH) will be left on the contract
