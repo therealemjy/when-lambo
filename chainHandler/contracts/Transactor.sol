@@ -137,10 +137,10 @@ contract Transactor is Owner, IDyDxCallee {
     uint256 expectedBlockNumber,
     uint256 _wethAmountToBorrow,
     Exchange _sellingExchangeIndex,
-    uint256 _wethAmountOutMin,
-    Exchange _buyingExchangeIndex,
     address _tradedToken,
     uint256 _tradedTokenAmountOutMin,
+    Exchange _buyingExchangeIndex,
+    uint256 _wethAmountOutMin,
     // Although the deadline does not really apply in our case since our trade is
     // only valid for one block, we still need to provide one to the exchanges
     uint256 _deadline

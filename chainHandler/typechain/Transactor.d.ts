@@ -27,7 +27,7 @@ interface TransactorInterface extends ethers.utils.Interface {
     "getExchange(uint8)": FunctionFragment;
     "owner()": FunctionFragment;
     "setOwner(address)": FunctionFragment;
-    "trade(uint256,uint256,uint8,uint256,uint8,address,uint256,uint256)": FunctionFragment;
+    "trade(uint256,uint256,uint8,address,uint256,uint8,uint256,uint256)": FunctionFragment;
     "transferERC20(address,uint256,address)": FunctionFragment;
     "transferETH(uint256,address)": FunctionFragment;
   };
@@ -49,9 +49,9 @@ interface TransactorInterface extends ethers.utils.Interface {
       BigNumberish,
       BigNumberish,
       BigNumberish,
-      BigNumberish,
-      BigNumberish,
       string,
+      BigNumberish,
+      BigNumberish,
       BigNumberish,
       BigNumberish
     ]
@@ -176,10 +176,10 @@ export class Transactor extends BaseContract {
       expectedBlockNumber: BigNumberish,
       _wethAmountToBorrow: BigNumberish,
       _sellingExchangeIndex: BigNumberish,
-      _wethAmountOutMin: BigNumberish,
-      _buyingExchangeIndex: BigNumberish,
       _tradedToken: string,
       _tradedTokenAmountOutMin: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _wethAmountOutMin: BigNumberish,
       _deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -226,10 +226,10 @@ export class Transactor extends BaseContract {
     expectedBlockNumber: BigNumberish,
     _wethAmountToBorrow: BigNumberish,
     _sellingExchangeIndex: BigNumberish,
-    _wethAmountOutMin: BigNumberish,
-    _buyingExchangeIndex: BigNumberish,
     _tradedToken: string,
     _tradedTokenAmountOutMin: BigNumberish,
+    _buyingExchangeIndex: BigNumberish,
+    _wethAmountOutMin: BigNumberish,
     _deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -270,10 +270,10 @@ export class Transactor extends BaseContract {
       expectedBlockNumber: BigNumberish,
       _wethAmountToBorrow: BigNumberish,
       _sellingExchangeIndex: BigNumberish,
-      _wethAmountOutMin: BigNumberish,
-      _buyingExchangeIndex: BigNumberish,
       _tradedToken: string,
       _tradedTokenAmountOutMin: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _wethAmountOutMin: BigNumberish,
       _deadline: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -361,10 +361,10 @@ export class Transactor extends BaseContract {
       expectedBlockNumber: BigNumberish,
       _wethAmountToBorrow: BigNumberish,
       _sellingExchangeIndex: BigNumberish,
-      _wethAmountOutMin: BigNumberish,
-      _buyingExchangeIndex: BigNumberish,
       _tradedToken: string,
       _tradedTokenAmountOutMin: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _wethAmountOutMin: BigNumberish,
       _deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -412,10 +412,10 @@ export class Transactor extends BaseContract {
       expectedBlockNumber: BigNumberish,
       _wethAmountToBorrow: BigNumberish,
       _sellingExchangeIndex: BigNumberish,
-      _wethAmountOutMin: BigNumberish,
-      _buyingExchangeIndex: BigNumberish,
       _tradedToken: string,
       _tradedTokenAmountOutMin: BigNumberish,
+      _buyingExchangeIndex: BigNumberish,
+      _wethAmountOutMin: BigNumberish,
       _deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

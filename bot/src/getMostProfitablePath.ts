@@ -1,13 +1,23 @@
 import BigNumber from 'bignumber.js';
 
-import { TRADE_GAS_ESTIMATE_WITHOUT_SWAPS } from '@constants';
+import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 
 import { Path } from '@bot/src/types';
 import calculateProfit from '@bot/src/utils/calculateProfit';
 
 // Go through paths and find the most profitable (if any of them is considered
 // profitable according to the rules)
-const getMostProfitablePath = (paths: Path[], gasLimitMultiplicator: number, gasCostMaximumThresholdWei: BigNumber) => {
+const getMostProfitablePath = ({
+  paths,
+  gasPriceWei,
+  gasLimitMultiplicator,
+  gasCostMaximumThresholdWei,
+}: {
+  paths: Path[];
+  gasPriceWei: BigNumber;
+  gasLimitMultiplicator: number;
+  gasCostMaximumThresholdWei: BigNumber;
+}) => {
   const res = paths.reduce<
     | {
         profitWethAmount: BigNumber;
@@ -15,10 +25,12 @@ const getMostProfitablePath = (paths: Path[], gasLimitMultiplicator: number, gas
       }
     | undefined
   >((mostProfitablePath, path) => {
-    const totalGasCost = path[0].estimatedGasCost
-      .plus(path[1].estimatedGasCost)
+    const tradeWithoutSwapsGasCostEstimate = gasPriceWei.multipliedBy(TRADE_WITHOUT_SWAPS_GAS_ESTIMATE);
+
+    const totalGasCost = path[0].gasCostEstimate
+      .plus(path[1].gasCostEstimate)
       // Add estimated gas to trade with Transactor (without accounting for the swap themselves)
-      .plus(TRADE_GAS_ESTIMATE_WITHOUT_SWAPS)
+      .plus(tradeWithoutSwapsGasCostEstimate)
       // Add gasLimit margin
       .multipliedBy(gasLimitMultiplicator);
 

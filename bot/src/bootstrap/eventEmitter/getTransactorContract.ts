@@ -1,11 +1,14 @@
 import { ethers, Signer } from 'ethers';
 
-// TODO: import mainnet info once contract has been deployed on it
-import transactorContractInfo from '@deployments/localhost/Transactor.json';
+import hardhatTransactorContractInfo from '@deployments/localhost/Transactor.json';
+// TODO: import real mainnet contract info once it's been deployed
+import mainnetTransactorContractInfo from '@deployments/localhost/Transactor.json';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 
-const getTransactorContract = (signer: Signer) =>
-  new ethers.Contract(transactorContractInfo.address, transactorContractInfo.abi, signer) as ITransactorContract;
+const getTransactorContract = (signer: Signer, isProd: boolean) => {
+  const contractInfo = isProd ? mainnetTransactorContractInfo : hardhatTransactorContractInfo;
+  return new ethers.Contract(contractInfo.address, contractInfo.abi, signer) as ITransactorContract;
+};
 
 export default getTransactorContract;

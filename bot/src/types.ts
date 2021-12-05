@@ -18,7 +18,8 @@ export interface Deal {
   toToken: Token;
   toTokenDecimalAmount: BigNumber;
   slippageAllowancePercent: number;
-  estimatedGasCost: BigNumber;
+  gasEstimate: BigNumber;
+  gasCostEstimate: BigNumber;
 }
 
 export type Path = [Deal, Deal];
