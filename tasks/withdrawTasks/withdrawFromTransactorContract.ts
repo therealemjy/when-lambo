@@ -1,8 +1,6 @@
 import { BigNumber, ContractTransaction, Signer } from 'ethers';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
-// TODO: import mainnet info once contract has been deployed on it
-import { abi as transactorContractAbi } from '@deployments/localhost/Transactor.json';
 import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
 import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json';
 
@@ -11,42 +9,35 @@ import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
 const withdrawFromTransactorContract = async (
   {
-    signer,
     tokenSymbol,
     amount,
-    transactorContractAddress,
+    countdownSeconds,
   }: {
-    signer: Signer;
     tokenSymbol: 'ETH' | 'WETH';
     amount: BigNumber;
-    transactorContractAddress: string;
+    countdownSeconds: number;
   },
   { ethers, getNamedAccounts }: HardhatRuntimeEnvironment
 ) => {
-  const signerAddress = await signer.getAddress();
+  // Get Transactor contract, signed with owner account
   const { ownerAddress, vaultAddress } = await getNamedAccounts();
+  const ownerSigner = await ethers.getSigner(ownerAddress);
+  const TransactorContract: ITransactorContract = await ethers.getContract('Transactor', ownerSigner);
 
-  // Check ownerAddress corresponds to address of owner retrieved from ledger
-  if (signerAddress !== ownerAddress) {
-    throw new Error(
-      `Wrong signer. The signer address needed is ${ownerAddress}, but the one provided was ${signerAddress}`
-    );
-  }
-
-  const TransactorContract = new ethers.Contract(
-    transactorContractAddress,
-    transactorContractAbi,
-    signer
-  ) as ITransactorContract;
+  // Display transaction information
+  console.log('Review and confirm the next transaction. Press ctrl + c to cancel.\n');
+  console.log(`Amount: ${ethers.utils.formatEther(amount)} ${tokenSymbol}`);
+  console.log(`From: Transactor contract (${TransactorContract.address})`);
+  console.log(`To: vault account (${vaultAddress})\n`);
 
   // Check we have enough funds on the contract
   let contractBalance: BigNumber;
 
   if (tokenSymbol === 'ETH') {
-    contractBalance = await ethers.provider.getBalance(transactorContractAddress);
+    contractBalance = await ethers.provider.getBalance(TransactorContract.address);
   } else {
-    const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, signer);
-    contractBalance = await wethContract.balanceOf(transactorContractAddress);
+    const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, TransactorContract.signer);
+    contractBalance = await wethContract.balanceOf(TransactorContract.address);
   }
 
   if (contractBalance.lt(amount)) {

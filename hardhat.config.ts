@@ -37,6 +37,7 @@ const hardhatConfig: HardhatUserConfig = {
           chainHandlerConfig.environment === 'test' ? chainHandlerConfig.testProfitableTrade.blockNumber : undefined,
       },
     },
+    // TODO: add mainnet network
   },
   gasReporter: {
     enabled: true,
@@ -44,7 +45,7 @@ const hardhatConfig: HardhatUserConfig = {
   },
   namedAccounts: {
     ownerAddress: {
-      hardhat: chainHandlerConfig.testAccounts.owner.address, // assign the first user as owner
+      hardhat: chainHandlerConfig.testAccounts.owner.address,
       mainnet: OWNER_ACCOUNT_MAINNET_ADDRESS,
     },
     vaultAddress: {
