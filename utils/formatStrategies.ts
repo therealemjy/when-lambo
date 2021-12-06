@@ -4,7 +4,7 @@ import { ParsedStrategy } from '@localTypes';
 
 const strategyToWeiAmounts = (baseWei: string, incrementPercent: number, incrementAmount: number): BigNumber[] => {
   const strategy = Array.from(Array(incrementAmount).keys()) as unknown as BigNumber[];
-  const middleIndex = Math.round(strategy.length / 2);
+  const middleIndex = Math.floor((strategy.length - 1) / 2);
 
   strategy.forEach((_, index) => {
     strategy[index] = new BigNumber(baseWei);

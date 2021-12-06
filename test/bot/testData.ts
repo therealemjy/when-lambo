@@ -50,29 +50,25 @@ const config: EnvConfig = {
         STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
       },
     ],
-    11
+    10
   ),
 };
 
-const mockServices = (): Services => {
-  const services: Services = {
-    state: {
-      ...defaultState,
-      currentGasPrices: {
-        rapid: new BigNumber('100000000000'), // 100 Gwei
-        fast: new BigNumber('80000000000'), // 80 Gwei
-        standard: new BigNumber('60000000000'), // 60 Gwei
-        slow: new BigNumber('40000000000'), // 40 Gwei
-      },
+export const EXPECTED_REVENUE_WETH = '568270094198623164';
+
+export const mockedServices: Services = {
+  state: {
+    ...defaultState,
+    currentGasPrices: {
+      rapid: new BigNumber('100000000000'), // 100 Gwei
+      fast: new BigNumber('80000000000'), // 80 Gwei
+      standard: new BigNumber('60000000000'), // 60 Gwei
+      slow: new BigNumber('40000000000'), // 40 Gwei
     },
-    config,
-    logger,
-    exchanges,
-    eventEmitter,
-    strategies: config.strategies,
-  };
-
-  return services;
+  },
+  config,
+  logger,
+  exchanges,
+  eventEmitter,
+  strategies: config.strategies,
 };
-
-export default mockServices;

@@ -1,14 +1,18 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
+import { expect } from 'chai';
+import { BigNumber } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { ethers, deployments } from 'hardhat';
 
 import { MULTICALL_CONTRACT_MAINNET_ADDRESS } from '@constants';
+import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
+import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 
 import blockHandler from '@bot/src/blockHandler';
 
-import mockServices from './utils/mockServices';
+import { mockedServices, EXPECTED_REVENUE_WETH } from './testData';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);
@@ -17,10 +21,15 @@ const setup = deployments.createFixture(async () => {
   return { TransactorContract };
 });
 
+const getContractWethBalance = async (contract: ITransactorContract): Promise<BigNumber> => {
+  const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, contract.signer);
+  return wethContract.balanceOf(contract.address);
+};
+
 describe.only('Bot', function () {
-  it('Should find opportunity and call smart contract', async function () {
+  // End-to-end test
+  it('should find opportunity, execute trade and yield profit', async function () {
     const { TransactorContract } = await setup();
-    const mockedServices = mockServices();
     const fakeSpreadsheet = new GoogleSpreadsheet(mockedServices.config.googleSpreadSheet.id);
 
     const multicall = new Multicall({
@@ -31,13 +40,31 @@ describe.only('Bot', function () {
 
     const currentBlockNumber = await ethers.provider.getBlockNumber();
 
+    const ownerEthBalanceBeforeTrade = await TransactorContract.signer.getBalance();
+    const transactorContractBalanceWethBeforeTrade = await getContractWethBalance(TransactorContract);
+
     await blockHandler(mockedServices, {
       multicall,
       blockNumber: currentBlockNumber,
       TransactorContract,
       spreadsheet: fakeSpreadsheet,
     });
-  });
 
-  // TODO: test safe guards are working (see profitable trade rules)
+    const ownerEthBalanceAfterTrade = await TransactorContract.signer.getBalance();
+    const transactorContractBalanceWethAfterTrade = await getContractWethBalance(TransactorContract);
+
+    // Check profit accumulated on Transactor contact
+    const revenueWeth = transactorContractBalanceWethAfterTrade.sub(transactorContractBalanceWethBeforeTrade);
+    expect(revenueWeth.toString()).to.equal(EXPECTED_REVENUE_WETH);
+
+    // Check gas cost was under the maximum threshold configured
+    const gasCostEth = ownerEthBalanceAfterTrade.sub(ownerEthBalanceBeforeTrade);
+    expect(gasCostEth.lte(BigNumber.from(mockedServices.config.gasCostMaximumThresholdWei.toFixed()))).to.equal(true);
+
+    // Check profit is at least equal or higher than gas cost
+    // Note: gas cost is expressed in ETH and revenue is expressed in WETH, but since 1 ETH = 1 WETH we
+    // don't need to do apply any conversion to make calculations between the two
+    const profitWeth = revenueWeth.sub(gasCostEth);
+    expect(profitWeth.gte(gasCostEth)).to.equal(true);
+  });
 });

@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import { ethers } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
@@ -41,7 +40,7 @@ const executeTrade = async ({
   const deadline = new Date(new Date().getTime() + 3600000).getTime();
 
   // Add up gas estimates to obtain the expected gas needed to execute the transaction, then
-  // multiple by the gas limit multiplicator we defined to obtain the gas limt
+  // multiple by the gas limit multiplicator we defined to obtain the gas limit
   const gasLimit = path[0].gasEstimate
     .plus(path[1].gasEstimate)
     .plus(TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
@@ -49,21 +48,18 @@ const executeTrade = async ({
 
   const transaction = await TransactorContract.trade(
     expectedBlockNumber,
-    ethers.BigNumber.from(wethAmountToBorrow.toFixed(0)),
+    wethAmountToBorrow.toFixed(0),
     sellingExchangeIndex,
     tradedTokenAddress,
-    ethers.BigNumber.from(tradedTokenAmountOutMin.toFixed(0)),
+    tradedTokenAmountOutMin.toFixed(0),
     buyingExchangeIndex,
-    ethers.BigNumber.from(wethAmountOutMin.toFixed(0)),
+    wethAmountOutMin.toFixed(0),
     deadline,
     { gasPrice: gasPriceWei.toFixed(0), gasLimit: gasLimit.toFixed(0) }
   );
 
   logger.log(`Transaction sent! Hash: ${transaction.hash}`);
-
   await logger.transaction({ blockNumber, path, transactionHash: transaction.hash, spreadsheet });
-
-  return transaction;
 };
 
 export default executeTrade;

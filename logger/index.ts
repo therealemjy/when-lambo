@@ -161,9 +161,8 @@ const transaction = async ({
     const worksheet = spreadsheet.sheetsByIndex[0];
     worksheet.addRow(worksheetRow).catch((err) => eventEmitter.emit('error', err));
   }
-
   // Log paths in the console in development
-  if (config.isDev) {
+  else if (!config.isProd) {
     const tableRow = {
       Timestamp: timestamp,
       'Block number': blockNumber,
@@ -172,12 +171,12 @@ const transaction = async ({
       [`${path[0].toToken.symbol} bought`]: boughtTokens,
       'Best buying exchange': bestBuyingExchangeName,
       [`${path[0].fromToken.symbol} bought back`]: revenues,
-      'Gas cost (in WETH)': gasCostWETH,
+      'Gas cost (in ETH)': gasCostWETH,
       [`Profit (in ${path[0].fromToken.symbol})`]: profitInTokens,
       'Profit (%)': profitPercent + '%',
     };
 
-    console.table(tableRow);
+    console.table([tableRow]);
   }
 };
 
