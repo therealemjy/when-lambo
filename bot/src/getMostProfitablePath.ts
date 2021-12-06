@@ -2,8 +2,6 @@ import BigNumber from 'bignumber.js';
 
 import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 
-import formatNestedBN from '@chainHandler/utils/formatNestedBN';
-
 import { Path } from '@bot/src/types';
 import calculateProfit from '@bot/src/utils/calculateProfit';
 
@@ -45,7 +43,7 @@ const getMostProfitablePath = ({
 
     /*
       Rules for a trade to be counted as profitable:
-      1) Trade musts yield a profit that's equal or superior the total gas cost of the transaction
+      1) Trade musts yield a profit that's equal or superior to the total gas cost of the transaction
       2) Total gas cost of the transaction can only go up to a given ETH maximum (see config for the actual value)
     */
     const isMostProfitable = !mostProfitablePath || mostProfitablePath.profitWethAmount.lt(profitWethAmount);

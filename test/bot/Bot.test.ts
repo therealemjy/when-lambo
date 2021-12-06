@@ -1,4 +1,5 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
+import BigNumber from 'bignumber.js';
 import { expect } from 'chai';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { ethers, deployments } from 'hardhat';
@@ -12,6 +13,7 @@ import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
 import blockHandler from '@bot/src/blockHandler';
 import executeTrade from '@bot/src/bootstrap/eventEmitter/executeTrade';
+import { Path } from '@bot/src/types';
 
 import { getTestServices } from './utils';
 
@@ -27,9 +29,6 @@ describe.only('Bot', function () {
     const { TransactorContract } = await setup();
     const services = getTestServices();
 
-    console.log('SERVICES');
-    const blockNumber = await ethers.provider.getBlockNumber();
-
     const eventEmitterOnSpy = sinon.spy(services.eventEmitter, 'emit');
 
     const multicall = new Multicall({
@@ -38,37 +37,36 @@ describe.only('Bot', function () {
       tryAggregate: true,
     });
 
-    await blockHandler(services, { multicall, blockNumber });
+    const currentBlockNumber = await ethers.provider.getBlockNumber();
+    await blockHandler(services, { multicall, blockNumber: currentBlockNumber });
 
-    console.log('BLOCKHANDLER');
-
-    const args = eventEmitterOnSpy.lastCall.args;
+    const [eventName, blockNumber, path, gasPriceWei] = eventEmitterOnSpy.lastCall.args as [
+      string,
+      number,
+      Path,
+      BigNumber
+    ];
 
     // We test that the event emitter is called with the correct arguments
-    expect(args[0]).equal('trade'); // Event name
-    expect(args[1]).equal(blockNumber); // block number
+    expect(eventName).equal('trade');
+    expect(blockNumber).equal(currentBlockNumber);
 
-    const path = args[2]; // best path
     expect(path.length).equal(2);
-
-    expect(args[3].isEqualTo(services.state.currentGasPrices.rapid)).equal(true); // current gas price
-
-    // We check the if the deal path is correct
     expect(path[0].exchangeIndex).equal(chainHandlerConfig.testProfitableTrade.sellingExchangeIndex);
     expect(path[1].exchangeIndex).equal(chainHandlerConfig.testProfitableTrade.buyingExchangeIndex);
+    // TODO: check other props of the deals contained in the path
 
-    console.log('PATH');
-    console.log(formatNestedBN(path));
+    expect(gasPriceWei.isEqualTo(services.state.currentGasPrices.rapid)).equal(true); // current gas price
 
-    // Bot must be deactivated because a deal was found
+    // Check bot was deactivated, since it found a tradable opportunity
     expect(services.state.monitoringActivated).equal(false);
 
-    // // Call function of event emitter with correct arguments
+    // Simulate trade execution
     const spreadsheet = new GoogleSpreadsheet(services.config.googleSpreadSheet.id);
     const transaction = await executeTrade({
-      blockNumber: args[1],
+      blockNumber,
       path,
-      gasPriceWei: args[3],
+      gasPriceWei,
       gasLimitMultiplicator: services.config.gasLimitMultiplicator,
       spreadsheet,
       TransactorContract,
