@@ -1,25 +1,36 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
+import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { Strategy } from '@localTypes';
 
+import { Transactor as ITransactorContract } from '@chainHandler/typechain';
+
 import { Services } from './bootstrap';
+import executeTrade from './executeTrade';
 import findBestPaths from './findBestPaths';
 import getMostProfitablePath from './getMostProfitablePath';
 import { WETH } from './tokens';
 import registerExecutionTime from './utils/registerExecutionTime';
 
 type ExecuteStrategyArgs = {
+  strategy: Strategy;
   blockNumber: number;
   multicall: Multicall;
-  strategy: Strategy;
+  spreadsheet: GoogleSpreadsheet;
+  TransactorContract: ITransactorContract;
 };
 
 type BlockHandlerArgs = {
-  multicall: Multicall;
   blockNumber: number;
+  multicall: Multicall;
+  spreadsheet: GoogleSpreadsheet;
+  TransactorContract: ITransactorContract;
 };
 
-const executeStrategy = async (services: Services, { blockNumber, multicall, strategy }: ExecuteStrategyArgs) => {
+const executeStrategy = async (
+  services: Services,
+  { blockNumber, multicall, strategy, TransactorContract, spreadsheet }: ExecuteStrategyArgs
+) => {
   try {
     const gasPriceWei = services.state.currentGasPrices.rapid;
 
@@ -38,7 +49,7 @@ const executeStrategy = async (services: Services, { blockNumber, multicall, str
       gasPriceWei,
     });
 
-    // Get the most profitable paths, if any of them is considered profitable
+    // Get the most profitable path, if any of them is considered profitable
     const mostProfitablePath = getMostProfitablePath({
       paths,
       gasPriceWei,
@@ -47,16 +58,27 @@ const executeStrategy = async (services: Services, { blockNumber, multicall, str
     });
 
     if (mostProfitablePath) {
-      // We deactivate the bot while the trade is ongoing
+      // Deactivate the bot completely
       services.state.monitoringActivated = false;
-      services.eventEmitter.emit('trade', blockNumber, mostProfitablePath, gasPriceWei);
+
+      await executeTrade({
+        blockNumber,
+        path: mostProfitablePath,
+        gasPriceWei,
+        gasLimitMultiplicator: services.config.gasLimitMultiplicator,
+        spreadsheet,
+        TransactorContract,
+      });
     }
   } catch (error: unknown) {
     services.eventEmitter.emit('error', error);
   }
 };
 
-const blockHandler = async (services: Services, { multicall, blockNumber }: BlockHandlerArgs) => {
+const blockHandler = async (
+  services: Services,
+  { multicall, blockNumber, TransactorContract, spreadsheet }: BlockHandlerArgs
+) => {
   // Record time for perf monitoring
   services.state.botExecutionMonitoringTick = new Date().getTime();
 
@@ -67,6 +89,8 @@ const blockHandler = async (services: Services, { multicall, blockNumber }: Bloc
         blockNumber,
         multicall,
         strategy,
+        TransactorContract,
+        spreadsheet,
       })
     )
   );

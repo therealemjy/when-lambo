@@ -8,7 +8,7 @@ import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 import { ExchangeIndex } from '@localTypes';
 
 import config from '@bot/config';
-import eventEmitter from '@bot/src/bootstrap/eventEmitter';
+import eventEmitter from '@bot/src/eventEmitter';
 import { WETH } from '@bot/src/tokens';
 import { Path } from '@bot/src/types';
 import calculateProfit from '@bot/src/utils/calculateProfit';

@@ -1,9 +1,13 @@
+import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import { ethers } from 'ethers';
 import * as Sentry from '@sentry/node';
+
+import { Transactor as ITransactorContract } from '@chainHandler/typechain';
+
 import blockHandler from './src/blockHandler';
 import { bootstrap, Services } from './src/bootstrap';
-import eventEmitter from './src/bootstrap/eventEmitter';
+import eventEmitter from './src/eventEmitter';
 import CancelablePromise from './src/utils/cancelablePromise';
 import handleError from './src/utils/handleError';
 import botConfig from './config';
@@ -18,19 +22,31 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-const init = async ({ services, provider }: { services: Services; provider: ethers.providers.Web3Provider }) => {
+// Handle errors
+eventEmitter.on('error', handleError);
+
+const init = async ({
+  services,
+  provider,
+  TransactorContract,
+  spreadsheet,
+  multicall,
+}: {
+  services: Services;
+  provider: ethers.providers.Web3Provider;
+  TransactorContract: ITransactorContract;
+  spreadsheet: GoogleSpreadsheet;
+  multicall: Multicall;
+}) => {
   const start = async () => {
     let isMonitoring = false;
     let cancelablePromise: CancelablePromise | undefined = undefined;
-
-    const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
 
     provider.addListener('block', async (blockNumber: number) => {
       services.logger.log(`New block received. Block # ${blockNumber}`);
 
       if (!services.state.monitoringActivated) {
         services.logger.log(`--- Block skipped, monitoring not activated ---`);
-
         return;
       }
 
@@ -47,6 +63,8 @@ const init = async ({ services, provider }: { services: Services; provider: ethe
           blockHandler(services, {
             blockNumber,
             multicall,
+            TransactorContract,
+            spreadsheet,
           })
         );
       } catch (err: any) {
@@ -72,9 +90,8 @@ const init = async ({ services, provider }: { services: Services; provider: ethe
 
 (async () => {
   try {
-    const { services, provider } = await bootstrap();
-
-    await init({ services, provider });
+    const res = await bootstrap();
+    await init(res);
   } catch (err) {
     eventEmitter.emit('error', err);
     process.exit(1);
