@@ -26,7 +26,7 @@ const getContractWethBalance = async (contract: ITransactorContract): Promise<Bi
   return wethContract.balanceOf(contract.address);
 };
 
-describe.only('Bot', function () {
+describe('Bot', function () {
   // End-to-end test
   it('should find opportunity, execute trade and yield profit', async function () {
     const { TransactorContract } = await setup();
