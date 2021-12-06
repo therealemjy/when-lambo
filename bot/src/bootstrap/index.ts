@@ -120,6 +120,7 @@ export const bootstrap = async (): Promise<{
       const secrets = await fetchSecrets();
       const ownerAccount = new ethers.Wallet(secrets.ownerAccountPrivateKey, provider);
       const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
+      // TODO: get contract using Hardhat (?)
       const TransactorContract = getTransactorContract(ownerAccount, services.config.isProd);
 
       // Get Google Spreadsheet

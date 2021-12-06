@@ -13,8 +13,23 @@ const config: EnvConfig = {
   isDev: true,
   isProd: false,
   serverId: 'test',
+  googleSpreadSheet: {
+    id: 'fake-id',
+    clientEmail: 'fake-client-email',
+    privateKeyBase64: 'fake-private-key-base-64',
+  },
+  slackChannelsWebhooks: {
+    deals: 'fake-channel-webhook',
+  },
+  testOwnerAccountPrivateKey: 'fake-private-key',
+  sentryDNS: 'fake-sentry-dns',
+  aws: {
+    mainnetWssRpcUrl: 'fake-mainnet-wss-rpc-url',
+    accessKeyIdEthNode: 'fake-access-key-id-eth-node',
+    secretAccessKeyEthNode: 'fake-secret-access-key-eth-node',
+  },
   slippageAllowancePercent: 0.5,
-  gasLimitMultiplicator: 1.2,
+  gasLimitMultiplicator: 1.3, // TODO: check why using any value lower than that makes the contract call fail
   gasPriceMultiplicator: 1.1,
   gasCostMaximumThresholdWei: new BigNumber('63000000000000000'),
   gasEstimates: {
@@ -37,21 +52,6 @@ const config: EnvConfig = {
     ],
     11
   ),
-  googleSpreadSheet: {
-    id: 'fake-id',
-    clientEmail: 'fake-client-email',
-    privateKeyBase64: 'fake-private-key-base-64',
-  },
-  slackChannelsWebhooks: {
-    deals: 'fake-channel-webhook',
-  },
-  testOwnerAccountPrivateKey: 'fake-private-key',
-  sentryDNS: 'fake-sentry-dns',
-  aws: {
-    mainnetWssRpcUrl: 'fake-mainnet-wss-rpc-url',
-    accessKeyIdEthNode: 'fake-access-key-id-eth-node',
-    secretAccessKeyEthNode: 'fake-secret-access-key-eth-node',
-  },
 };
 
 const mockServices = (): Services => {

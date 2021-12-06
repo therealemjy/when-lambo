@@ -8,7 +8,7 @@
   "scripts": {
     "tsc": "npm run bot:tsc && tsc --noEmit",
     "lint": "eslint .",
-    "test": "NODE_ENV=test hardhat test",
+    "test": "NODE_ENV=test hardhat test | ./node_modules/.bin/bunyan",
     "format": "npm-run-all format:*",
     "format:json": "prettier --write \"**/*.json\"",
     "format:ts": "prettier --write \"**/*.ts\"",

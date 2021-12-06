@@ -38,4 +38,6 @@ describe.only('Bot', function () {
       spreadsheet: fakeSpreadsheet,
     });
   });
+
+  // TODO: test safe guards are working (see profitable trade rules)
 });
