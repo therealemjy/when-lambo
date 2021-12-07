@@ -27,7 +27,6 @@ const getContractWethBalance = async (contract: ITransactorContract): Promise<Bi
 };
 
 describe('blockhandler', function () {
-  // End-to-end test
   it('should find opportunity, execute trade and yield profit', async function () {
     const { TransactorContract } = await setup();
     const fakeSpreadsheet = new GoogleSpreadsheet(mockedServices.config.googleSpreadSheet.id);

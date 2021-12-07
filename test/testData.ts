@@ -34,11 +34,20 @@ const config: EnvConfig = {
   gasCostMaximumThresholdWei: new BigNumber('63000000000000000'),
   gasEstimates: {
     // Uniswap V2
-    '0': { '0x0f5d2fb29fb7d3cfee444a200298f468908cc942': '109592' },
+    '0': {
+      '0x0f5d2fb29fb7d3cfee444a200298f468908cc942': '109592',
+      '0x6b175474e89094c44da98b954eedeac495271d0f': '109592',
+    },
     // Sushiswap
-    '1': { '0x0f5d2fb29fb7d3cfee444a200298f468908cc942': '110529' },
+    '1': {
+      '0x0f5d2fb29fb7d3cfee444a200298f468908cc942': '110529',
+      '0x6b175474e89094c44da98b954eedeac495271d0f': '110529',
+    },
     // CryptoCom
-    '2': { '0x0f5d2fb29fb7d3cfee444a200298f468908cc942': '117014' },
+    '2': {
+      '0x0f5d2fb29fb7d3cfee444a200298f468908cc942': '117014',
+      '0x6b175474e89094c44da98b954eedeac495271d0f': '117014',
+    },
   },
   strategies: formatStrategies(
     [
@@ -47,6 +56,13 @@ const config: EnvConfig = {
         TRADED_TOKEN_SYMBOL: 'MANA',
         TRADED_TOKEN_DECIMALS: '18',
         STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '4050000000000000000',
+        STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+      },
+      {
+        TRADED_TOKEN_ADDRESS: '0x6b175474e89094c44da98b954eedeac495271d0f',
+        TRADED_TOKEN_SYMBOL: 'DAI',
+        TRADED_TOKEN_DECIMALS: '18',
+        STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '40000000000000000000',
         STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
       },
     ],
