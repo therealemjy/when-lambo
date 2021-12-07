@@ -1,5 +1,6 @@
-import logger from '@logger';
 import * as Sentry from '@sentry/node';
+
+import logger from '@logger';
 
 import config from '@bot/config';
 import formatError from '@bot/src/utils/formatError';

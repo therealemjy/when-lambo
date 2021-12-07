@@ -12,7 +12,7 @@ import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 
 import blockHandler from '@bot/src/blockHandler';
 
-import { mockedServices, EXPECTED_REVENUE_WETH } from './testData';
+import { mockedServices, EXPECTED_REVENUE_WETH } from '../testData';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);
@@ -26,7 +26,7 @@ const getContractWethBalance = async (contract: ITransactorContract): Promise<Bi
   return wethContract.balanceOf(contract.address);
 };
 
-describe('Bot', function () {
+describe('blockhandler', function () {
   // End-to-end test
   it('should find opportunity, execute trade and yield profit', async function () {
     const { TransactorContract } = await setup();
