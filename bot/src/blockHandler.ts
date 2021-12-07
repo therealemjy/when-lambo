@@ -59,8 +59,6 @@ const executeStrategy = async (
 
     let transactionHash: string | undefined = undefined;
 
-    console.log('services.config.isDev', services.config.isDev);
-
     // Only execute trades in production
     if (mostProfitablePath && !services.config.isDev) {
       // Deactivate the bot completely

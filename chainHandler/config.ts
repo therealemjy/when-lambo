@@ -12,6 +12,7 @@ export interface EnvConfig {
   isDev: boolean;
   isProd: boolean;
   strategies: Strategy[];
+  mainnetRpcUrl: string;
   mainnetForkingRpcUrl: string;
   testProfitableTrade: {
     blockNumber: number;
@@ -27,7 +28,6 @@ export interface EnvConfig {
   testAccounts: {
     owner: {
       address: string;
-      privateKey: string;
     };
     vault: {
       address: string;
@@ -48,6 +48,7 @@ const config: EnvConfig = {
   isProd: (process.env.NODE_ENV as Environment) === 'production',
   isDev: (process.env.NODE_ENV as Environment) === 'development',
   strategies,
+  mainnetRpcUrl: env('MAINNET_RPC_URL'),
   mainnetForkingRpcUrl: env('MAINNET_FORKING_RPC_URL'),
   testProfitableTrade: {
     blockNumber: +env('TEST_PROFITABLE_TRADE_BLOCK_NUMBER'),
@@ -63,7 +64,6 @@ const config: EnvConfig = {
   testAccounts: {
     owner: {
       address: env('TEST_OWNER_ACCOUNT_MAINNET_ADDRESS'),
-      privateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
     },
     vault: {
       address: env('TEST_VAULT_ACCOUNT_MAINNET_ADDRESS'),
