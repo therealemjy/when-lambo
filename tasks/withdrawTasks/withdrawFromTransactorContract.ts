@@ -9,15 +9,20 @@ import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
 import delay from './delay';
 
+const TRANSFER_ERC20_GAS_LIMIT = 69000; // Average gas used: 52831
+const TRANSFER_ETH_GAS_LIMIT = 45000; // Average gas used: 33584
+
 const withdrawFromTransactorContract = async (
   {
     tokenSymbol,
     amount,
     countdownSeconds,
+    gasPrice,
   }: {
     tokenSymbol: 'ETH' | 'WETH';
     amount: BigNumber;
     countdownSeconds: number;
+    gasPrice: BigNumber;
   },
   { ethers, getNamedAccounts }: HardhatRuntimeEnvironment
 ) => {
@@ -65,11 +70,15 @@ const withdrawFromTransactorContract = async (
   let receipt: ContractTransaction;
 
   if (tokenSymbol === 'ETH') {
-    // TODO: define gas price and gas limit
-    receipt = await TransactorContract.transferETH(amount, vaultAddress);
+    receipt = await TransactorContract.transferETH(amount, vaultAddress, {
+      gasPrice,
+      gasLimit: TRANSFER_ETH_GAS_LIMIT,
+    });
   } else {
-    // TODO: define gas price and gas limit
-    receipt = await TransactorContract.transferERC20(WETH_MAINNET_ADDRESS, amount, vaultAddress);
+    receipt = await TransactorContract.transferERC20(WETH_MAINNET_ADDRESS, amount, vaultAddress, {
+      gasPrice,
+      gasLimit: TRANSFER_ERC20_GAS_LIMIT,
+    });
   }
 
   console.log('Transaction successfully executed! Human-readable receipt:');

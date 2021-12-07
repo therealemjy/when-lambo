@@ -14,6 +14,8 @@ import wrapEth from '@chainHandler/utils/wrapEth';
 const HRE = { ethers, getNamedAccounts } as HardhatRuntimeEnvironment;
 const ONE_ETHER = ethers.utils.parseEther('1');
 
+const TEST_GAS_PRICE = ethers.BigNumber.from('50000000000'); // 50 Gwei
+
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);
   const TransactorContract: ITransactorContract = await ethers.getContract('Transactor');
@@ -44,6 +46,7 @@ describe('tasks/withdrawFromTransactorContract', function () {
             tokenSymbol,
             amount: ONE_ETHER,
             countdownSeconds: 0,
+            gasPrice: TEST_GAS_PRICE,
           },
           HRE
         )
@@ -72,6 +75,7 @@ describe('tasks/withdrawFromTransactorContract', function () {
           tokenSymbol,
           amount: ONE_ETHER,
           countdownSeconds: 0,
+          gasPrice: TEST_GAS_PRICE,
         },
         HRE
       );
