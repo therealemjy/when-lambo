@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { ethers, deployments } from 'hardhat';
+import sinon from 'sinon';
 
 import { MULTICALL_CONTRACT_MAINNET_ADDRESS } from '@constants';
 import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
@@ -26,10 +27,17 @@ const getContractWethBalance = async (contract: ITransactorContract): Promise<Bi
   return wethContract.balanceOf(contract.address);
 };
 
-describe('blockhandler', function () {
+describe.only('blockhandler', function () {
   it('should find opportunity, execute trade and yield profit', async function () {
     const { TransactorContract } = await setup();
-    const fakeSpreadsheet = new GoogleSpreadsheet(mockedServices.config.googleSpreadSheet.id);
+
+    const fakeWorksheet = {
+      addRow: () => new Promise((resolve) => resolve(undefined)),
+    };
+
+    const fakeSpreadsheet = {
+      sheetsByIndex: [fakeWorksheet],
+    } as unknown as GoogleSpreadsheet;
 
     const multicall = new Multicall({
       multicallCustomContractAddress: MULTICALL_CONTRACT_MAINNET_ADDRESS,

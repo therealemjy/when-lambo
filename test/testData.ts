@@ -9,8 +9,8 @@ import eventEmitter from '@bot/src/eventEmitter';
 import exchanges from '@bot/src/exchanges';
 
 const config: EnvConfig = {
-  environment: 'production',
-  isDev: true,
+  environment: 'test',
+  isDev: false,
   isProd: false,
   serverId: 'test',
   googleSpreadSheet: {

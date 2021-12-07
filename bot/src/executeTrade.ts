@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 import logger from '@logger';
@@ -13,18 +12,14 @@ const executeTrade = async ({
   path,
   gasPriceWei,
   gasLimitMultiplicator,
-  spreadsheet,
   TransactorContract,
 }: {
   blockNumber: number;
   path: Path;
   gasPriceWei: BigNumber;
   gasLimitMultiplicator: number;
-  spreadsheet: GoogleSpreadsheet;
   TransactorContract: ITransactorContract;
 }) => {
-  logger.log('Sending trade transaction...');
-
   const expectedBlockNumber = blockNumber + 1;
 
   const wethAmountToBorrow = path[0].fromTokenDecimalAmount;
@@ -46,7 +41,7 @@ const executeTrade = async ({
     .plus(TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
     .multipliedBy(gasLimitMultiplicator);
 
-  const transaction = await TransactorContract.trade(
+  const args: Parameters<ITransactorContract['trade']> = [
     expectedBlockNumber,
     wethAmountToBorrow.toFixed(0),
     sellingExchangeIndex,
@@ -55,11 +50,15 @@ const executeTrade = async ({
     buyingExchangeIndex,
     wethAmountOutMin.toFixed(0),
     deadline,
-    { gasPrice: gasPriceWei.toFixed(0), gasLimit: gasLimit.toFixed(0) }
-  );
+    { gasPrice: gasPriceWei.toFixed(0), gasLimit: gasLimit.toFixed(0) },
+  ];
+
+  logger.log('Sending trade transaction...', args);
+
+  const transaction = await TransactorContract.trade(...args);
 
   logger.log(`Transaction sent! Hash: ${transaction.hash}`);
-  await logger.transaction({ blockNumber, path, transactionHash: transaction.hash, spreadsheet });
+  return transaction;
 };
 
 export default executeTrade;

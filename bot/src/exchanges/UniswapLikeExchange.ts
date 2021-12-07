@@ -30,7 +30,7 @@ class UniswapLikeExchange implements Exchange {
   }) => {
     if (isProd) {
       throw new Error(
-        'estimateGetDecimalAmountOut can only be run in non-production environments, as it sends real transactions to the node! Make sure to only run this method on a test/forked network only with fake ETH.'
+        'estimateGetDecimalAmountOut can only be run in non-production environments, as it sends real transactions to the node! Make sure to only run this method on a test/forked network only using fake ETH.'
       );
     }
 

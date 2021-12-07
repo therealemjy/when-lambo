@@ -44,13 +44,13 @@ const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number)
 const transaction = async ({
   blockNumber,
   path,
-  transactionHash,
   spreadsheet,
+  transactionHash = 'None',
 }: {
   blockNumber: number;
   path: Path;
-  transactionHash: string;
   spreadsheet: GoogleSpreadsheet;
+  transactionHash?: string;
 }) => {
   const timestamp = formatTimestamp(path[0].timestamp);
   const borrowedTokens = _convertToHumanReadableAmount(path[0].fromTokenDecimalAmount, path[0].fromToken.decimals);
@@ -78,7 +78,7 @@ const transaction = async ({
   const profitInTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
 
   // Log paths in Slack and Google Spreadsheet in production
-  if (config.isProd) {
+  if (!config.isDev) {
     const slackBlock = [
       {
         type: 'section',
@@ -117,7 +117,7 @@ const transaction = async ({
           },
           {
             type: 'mrkdwn',
-            text: `*Gas cost (in wei):*\n${gasCost}`,
+            text: `*Gas cost (in ETH):*\n${gasCost}`,
           },
           {
             type: 'mrkdwn',
@@ -134,17 +134,9 @@ const transaction = async ({
       },
     ];
 
-    // Send path to Slack
-    sendSlackMessage(
-      {
-        blocks: slackBlock.flat(),
-      },
-      'deals'
-    ).catch((err) => eventEmitter.emit('error', err));
-
-    // Add row
     const worksheetRow: WorksheetRow = [
       timestamp,
+      transactionHash,
       blockNumber,
       +borrowedTokens,
       bestSellingExchangeName,
@@ -159,7 +151,25 @@ const transaction = async ({
 
     // And update the Google Spreadsheet document
     const worksheet = spreadsheet.sheetsByIndex[0];
-    worksheet.addRow(worksheetRow).catch((err) => eventEmitter.emit('error', err));
+
+    const res = await Promise.allSettled([
+      // Send path to Slack
+      sendSlackMessage(
+        {
+          blocks: slackBlock.flat(),
+        },
+        'deals'
+      ),
+      // Add row
+      worksheet.addRow(worksheetRow),
+    ]);
+
+    // Log eventual errors
+    res.forEach((result) => {
+      if (result.status === 'rejected') {
+        eventEmitter.emit('error', result.reason);
+      }
+    });
   }
   // Log paths in the console in development
   else {

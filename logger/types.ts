@@ -1,5 +1,6 @@
 export type WorksheetRow = [
   string, // Timestamp
+  string, // Transaction hash
   number, // Block number
   number, // WETH borrowed
   string, // Best selling exchange

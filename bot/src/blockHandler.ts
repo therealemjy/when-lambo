@@ -57,18 +57,28 @@ const executeStrategy = async (
       gasCostMaximumThresholdWei: services.config.gasCostMaximumThresholdWei,
     });
 
-    if (mostProfitablePath) {
+    let transactionHash: string | undefined = undefined;
+
+    console.log('services.config.isDev', services.config.isDev);
+
+    // Only execute trades in production
+    if (mostProfitablePath && !services.config.isDev) {
       // Deactivate the bot completely
       services.state.monitoringActivated = false;
 
-      await executeTrade({
+      const transaction = await executeTrade({
         blockNumber,
         path: mostProfitablePath,
         gasPriceWei,
         gasLimitMultiplicator: services.config.gasLimitMultiplicator,
-        spreadsheet,
         TransactorContract,
       });
+
+      transactionHash = transaction.hash;
+    }
+
+    if (mostProfitablePath) {
+      await services.logger.transaction({ blockNumber, path: mostProfitablePath, transactionHash, spreadsheet });
     }
   } catch (error: unknown) {
     services.eventEmitter.emit('error', error);
@@ -83,7 +93,7 @@ const blockHandler = async (
   services.state.botExecutionMonitoringTick = new Date().getTime();
 
   // Execute all strategies simultaneously
-  await Promise.all(
+  const res = await Promise.allSettled(
     services.strategies.map((strategy) =>
       executeStrategy(services, {
         blockNumber,
@@ -94,6 +104,13 @@ const blockHandler = async (
       })
     )
   );
+
+  // Log eventual errors
+  res.forEach((result) => {
+    if (result.status === 'rejected') {
+      services.eventEmitter.emit('error', result.reason);
+    }
+  });
 
   registerExecutionTime(services);
 };

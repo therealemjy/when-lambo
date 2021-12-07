@@ -32,6 +32,7 @@ function sendSlackMessage(message: unknown, type: keyof typeof slackChannels) {
       });
 
       res.on('end', () => {
+        // TODO: handle errors
         resolve({
           body: chunks.join(''),
           statusCode: res.statusCode,
