@@ -162,7 +162,7 @@ const transaction = async ({
     worksheet.addRow(worksheetRow).catch((err) => eventEmitter.emit('error', err));
   }
   // Log paths in the console in development
-  else if (!config.isProd) {
+  else {
     const tableRow = {
       Timestamp: timestamp,
       'Block number': blockNumber,
