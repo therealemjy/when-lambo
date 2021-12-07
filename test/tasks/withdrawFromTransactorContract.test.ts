@@ -11,9 +11,8 @@ import withdrawFromTransactorContract from '@tasks/withdrawTasks/withdrawFromTra
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import wrapEth from '@chainHandler/utils/wrapEth';
 
-const HRE = { ethers, getNamedAccounts } as HardhatRuntimeEnvironment;
+const hre = { ethers, getNamedAccounts } as HardhatRuntimeEnvironment;
 const ONE_ETHER = ethers.utils.parseEther('1');
-
 const TEST_GAS_PRICE = ethers.BigNumber.from('50000000000'); // 50 Gwei
 
 const setup = deployments.createFixture(async () => {
@@ -48,7 +47,7 @@ describe('tasks/withdrawFromTransactorContract', function () {
             countdownSeconds: 0,
             gasPrice: TEST_GAS_PRICE,
           },
-          HRE
+          hre
         )
       ).to.be.rejectedWith(`Insufficient funds on contract. Current balance: 0.0 ${tokenSymbol}`);
     });
@@ -77,7 +76,7 @@ describe('tasks/withdrawFromTransactorContract', function () {
           countdownSeconds: 0,
           gasPrice: TEST_GAS_PRICE,
         },
-        HRE
+        hre
       );
 
       const vaultBalanceAfterWithdrawal = await getAccountBalance(vault, tokenSymbol);
