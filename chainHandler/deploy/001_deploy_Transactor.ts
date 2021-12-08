@@ -12,10 +12,6 @@ const deployFunc: DeployFunction = async function ({
   getNamedAccounts,
   ethers,
 }: HardhatRuntimeEnvironment) {
-  // Set these manually before doing any deployment
-  const maxPriorityFeePerGas = ethers.BigNumber.from('2000000000');
-  const maxFeePerGas = ethers.BigNumber.from('10000000000');
-
   const { ownerAddress } = await getNamedAccounts();
 
   await deploy('Transactor', {
@@ -28,8 +24,9 @@ const deployFunc: DeployFunction = async function ({
       CRYPTO_COM_ROUTER_MAINNET_ADDRESS,
     ],
     gasLimit: ethers.BigNumber.from('1780000'), // Roughly 30% more than the actual gas needed for the deployment (1362533)
-    maxPriorityFeePerGas,
-    maxFeePerGas,
+    // Set these manually before doing any deployment to mainnet or rinkeby
+    // maxPriorityFeePerGas: ethers.BigNumber.from('2000000000'),
+    // maxFeePerGas: ethers.BigNumber.from('10000000000'),
     log: true,
   });
 };
