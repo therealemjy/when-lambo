@@ -14,6 +14,16 @@ const deployFunc: DeployFunction = async function ({
 }: HardhatRuntimeEnvironment) {
   const { ownerAddress } = await getNamedAccounts();
 
+  const gasNecessary = ethers.BigNumber.from('1362533');
+  const gasLimit = ethers.BigNumber.from('1780000');
+
+  const baseFee = ethers.BigNumber.from('72000000000');
+  const maxPriorityFeePerGas = ethers.BigNumber.from('1500000000');
+  const maxFeePerGas = baseFee.add(maxPriorityFeePerGas);
+
+  console.log('Estimated cost', ethers.utils.formatUnits(gasNecessary.mul(maxFeePerGas), 'ether'));
+  console.log('Max cost', ethers.utils.formatUnits(gasLimit.mul(maxFeePerGas), 'ether'));
+
   await deploy('Transactor', {
     from: ownerAddress,
     args: [
@@ -23,10 +33,10 @@ const deployFunc: DeployFunction = async function ({
       SUSHISWAP_ROUTER_MAINNET_ADDRESS,
       CRYPTO_COM_ROUTER_MAINNET_ADDRESS,
     ],
-    gasLimit: ethers.BigNumber.from('1780000'), // Roughly 30% more than the actual gas needed for the deployment (1362533)
+    gasLimit, // Roughly 30% more than the actual gas needed for the deployment (1362533)
     // Set these manually before doing any deployment to mainnet or rinkeby
-    // maxPriorityFeePerGas: ethers.BigNumber.from('2000000000'),
-    // maxFeePerGas: ethers.BigNumber.from('10000000000'),
+    maxPriorityFeePerGas,
+    maxFeePerGas,
     log: true,
   });
 };
