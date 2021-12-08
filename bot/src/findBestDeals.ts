@@ -14,15 +14,15 @@ import { WETH } from './tokens';
 // for or from WETH decimals.
 const getConvertedDealGasCost = (deal: Deal) => {
   if (deal.toToken.address === WETH.address) {
-    // Since the traded token is in WETH, we can directly return the
-    // estimated gas cost as it's already expressed in wei
+    // Since the traded token is in WETH, we can directly return the estimated
+    // gas cost as it's already expressed in wei
     return deal.gasCostEstimate;
   }
 
-  // Otherwise we convert the gas cost in the currency of the traded token.
-  // In this case, we know fromTokenDecimalAmount is expressed in wei
-  // TODO: check
+  // Otherwise we convert the gas cost in the currency of the traded token. In
+  // this case, we know fromTokenDecimalAmount is expressed in wei
   const fromTokenDecimalPriceInToTokenDecimals = deal.toTokenDecimalAmount.div(deal.fromTokenDecimalAmount);
+
   return deal.gasCostEstimate.mul(fromTokenDecimalPriceInToTokenDecimals);
 };
 
@@ -99,16 +99,24 @@ const findBestDeals = async ({
       // calculated with the most pessimistic outcome (given our slippage
       // allowance). If we still yield a profit despite this, then we consider
       // the opportunity safe.
-      const pessimisticToTokenDecimalAmount = formattedResult.toTokenDecimalAmount.mul(
-        (100 - slippageAllowancePercent) / 100
-      );
+      const pessimisticToTokenDecimalAmount = formattedResult.toTokenDecimalAmount
+        // We want to be able to use up to two decimals places when expressing,
+        // but since BigNumber does not support decimal numbers then we
+        // transform slippageAllowancePercent into an integer by multiplying it
+        // by 100, then transform it back to it's original value by dividing it
+        // by 100 (we end up dividing by 10000 since we're applying a
+        // percentage)
+        .mul((100 - slippageAllowancePercent) * 100)
+        .div(10000);
 
-      // Get estimated gas necessary to execute the swap.
-      // In the gas estimates file, the traded token is used as a reference for each gas estimate, which
-      // is why here we use the address of the token that's not WETH as a reference.
+      // Get estimated gas necessary to execute the swap. In the gas estimates
+      // file, the traded token is used as a reference for each gas estimate,
+      // which is why here we use the address of the token that's not WETH as a
+      // reference.
       const refTokenAddress = fromToken.address === wethAddress ? toToken.address : fromToken.address;
 
-      // TODO: add safe guard that logs an error in case the estimate wasn't found
+      // TODO: add safe guard that logs an error in case the estimate wasn't
+      // found
       const gasEstimate = BigNumber.from(gasEstimates[exchange.index][refTokenAddress]);
 
       const deal: Deal = {

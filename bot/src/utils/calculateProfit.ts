@@ -6,10 +6,10 @@ const calculateProfit = ({
 }: {
   revenueDec: BigNumber;
   expenseDec: BigNumber;
-}): [BigNumber, string] => {
+}): [BigNumber, number] => {
   const profitDec = revenueDec.sub(expenseDec);
-  // TODO: check
-  const profitPercent = profitDec.div(revenueDec).mul(100).toString();
+  // Express the percentage with 2 decimal places
+  const profitPercent = profitDec.mul(10000).div(revenueDec).toNumber() / 100;
 
   return [profitDec, profitPercent];
 };

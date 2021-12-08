@@ -44,8 +44,7 @@ const log: typeof console.log = (...args) => {
 const error: typeof console.error = (...args) => bunyanLogger.error(...args);
 
 const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) =>
-  // TODO: check
-  amount.div(10 ** tokenDecimals).toString();
+  amount.div(`${10 ** tokenDecimals}`).toString();
 
 const transaction = async ({
   blockNumber,
@@ -71,7 +70,9 @@ const transaction = async ({
     // Add estimated gas to trade with Transactor (without accounting for the swap themselves)
     .add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
     // Add gasLimit margin
-    .mul(config.gasLimitMultiplicator);
+    .mul(config.gasLimitMultiplicator * 100)
+    .div(100);
+
   const gasCostWETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);
 
   const [profitDec, profitPercent] = calculateProfit({

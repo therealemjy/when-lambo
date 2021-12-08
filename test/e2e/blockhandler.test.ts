@@ -3,7 +3,6 @@ import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { ethers, deployments } from 'hardhat';
-import sinon from 'sinon';
 
 import { MULTICALL_CONTRACT_MAINNET_ADDRESS } from '@constants';
 import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
@@ -27,7 +26,7 @@ const getContractWethBalance = async (contract: ITransactorContract): Promise<Bi
   return wethContract.balanceOf(contract.address);
 };
 
-describe.only('blockhandler', function () {
+describe('blockhandler', function () {
   it('should find opportunity, execute trade and yield profit', async function () {
     const { TransactorContract } = await setup();
 

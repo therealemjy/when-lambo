@@ -39,7 +39,12 @@ const executeTrade = async ({
   const gasLimit = path[0].gasEstimate
     .add(path[1].gasEstimate)
     .add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
-    .mul(gasLimitMultiplicator);
+    // Add gasLimit margin. gasLimitMultiplicator being a decimal number
+    // (which BigNumber does not support) with up to 2 decimal place, we
+    // transform it into an integer, then back to its original value by first
+    // multiplying it by 100, before dividing it by 100
+    .mul(gasLimitMultiplicator * 100)
+    .div(100);
 
   const args: Parameters<ITransactorContract['trade']> = [
     expectedBlockNumber,

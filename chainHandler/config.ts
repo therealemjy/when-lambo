@@ -71,8 +71,6 @@ const strategies: Strategy[] = formatStrategies(
   +env('STRATEGY_BORROWED_AMOUNTS_COUNT')
 );
 
-console.log('strategies', strategies);
-
 const mainnetAccounts = {
   owner: {
     address: OWNER_ACCOUNT_MAINNET_ADDRESS,

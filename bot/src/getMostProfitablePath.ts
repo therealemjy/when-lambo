@@ -29,10 +29,15 @@ const getMostProfitablePath = ({
 
     const totalGasCost = path[0].gasCostEstimate
       .add(path[1].gasCostEstimate)
-      // Add estimated gas to trade with Transactor (without accounting for the swap themselves)
+      // Add estimated gas to trade with Transactor (without accounting for the
+      // swap themselves)
       .add(tradeWithoutSwapsGasCostEstimate)
-      // Add gasLimit margin
-      .mul(gasLimitMultiplicator);
+      // Add gasLimit margin. gasLimitMultiplicator being a decimal number
+      // (which BigNumber does not support) with up to 2 decimal place, we
+      // transform it into an integer, then back to its original value by first
+      // multiplying it by 100, before dividing it by 100
+      .mul(gasLimitMultiplicator * 100)
+      .div(100);
 
     const [profitWethAmount] = calculateProfit({
       revenueDec: path[1].toTokenDecimalAmount,
@@ -43,8 +48,10 @@ const getMostProfitablePath = ({
 
     /*
       Rules for a trade to be counted as profitable:
-      1) Trade musts yield a profit that's equal or superior to the total gas cost of the transaction
-      2) Total gas cost of the transaction can only go up to a given ETH maximum (see config for the actual value)
+      1) Trade musts yield a profit that's equal or superior to the total gas
+         cost of the transaction
+      2) Total gas cost of the transaction can only go up to a given ETH maximum
+         (see config for the actual value)
     */
     const isMostProfitable = !mostProfitablePath || mostProfitablePath.profitWethAmount.lt(profitWethAmount);
 
