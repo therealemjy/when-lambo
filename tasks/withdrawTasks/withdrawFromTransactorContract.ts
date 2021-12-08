@@ -31,22 +31,6 @@ const withdrawFromTransactorContract = async (
   const ownerSigner = await ethers.getSigner(ownerAddress);
   const TransactorContract: ITransactorContract = await ethers.getContract('Transactor', ownerSigner);
 
-  // Display transaction information
-  console.log('Review and confirm the next transaction. Press ctrl + c to cancel.\n');
-  console.log(`Amount: ${ethers.utils.formatEther(amount)} ${tokenSymbol}`);
-  console.log(`From: Transactor contract (${TransactorContract.address})`);
-  console.log(`To: vault account (${vaultAddress})\n`);
-
-  for (let t = 0; t < countdownSeconds; t++) {
-    if (t > 0) {
-      process.stdout.clearLine(-1);
-      process.stdout.cursorTo(0);
-    }
-    process.stdout.write(`Seconds before execution: ${countdownSeconds - t}`);
-
-    await delay(1000);
-  }
-
   // Check we have enough funds on the contract
   let contractBalance: BigNumber;
 
@@ -63,6 +47,22 @@ const withdrawFromTransactorContract = async (
         contractBalance.toString()
       )} ${tokenSymbol}`
     );
+  }
+
+  // Display transaction information
+  console.log('Review and confirm the next transaction. Press ctrl + c to cancel.\n');
+  console.log(`Amount: ${ethers.utils.formatEther(amount)} ${tokenSymbol}`);
+  console.log(`From: Transactor contract (${TransactorContract.address})`);
+  console.log(`To: vault account (${vaultAddress})\n`);
+
+  for (let t = 0; t < countdownSeconds; t++) {
+    if (t > 0) {
+      process.stdout.clearLine(-1);
+      process.stdout.cursorTo(0);
+    }
+    process.stdout.write(`Seconds before execution: ${countdownSeconds - t}`);
+
+    await delay(1000);
   }
 
   // Execute trade
