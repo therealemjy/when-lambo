@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { ethers, BigNumber } from 'ethers';
 
+import { OWNER_ACCOUNT_MAINNET_ADDRESS, VAULT_ACCOUNT_MAINNET_ADDRESS } from '@constants';
 import { Environment, ExchangeIndex, Strategy } from '@localTypes';
 import env from '@utils/env';
 import formatStrategies from '@utils/formatStrategies';
@@ -12,8 +13,48 @@ export interface EnvConfig {
   isDev: boolean;
   isProd: boolean;
   strategies: Strategy[];
+  networks: {
+    hardhat: {
+      rpcUrl: string;
+      blockNumber: number;
+      accounts: {
+        owner: {
+          address: string;
+        };
+        vault: {
+          address: string;
+        };
+        externalUser: {
+          address: string;
+        };
+      };
+    };
+    rinkeby: {
+      rpcUrl: string;
+      accounts: {
+        owner: {
+          address: string;
+          privateKey: string;
+        };
+        vault: {
+          address: string;
+        };
+      };
+    };
+    mainnet: {
+      rpcUrl: string;
+      accounts: {
+        owner: {
+          address: string;
+          privateKey: string;
+        };
+        vault: {
+          address: string;
+        };
+      };
+    };
+  };
   testProfitableTrade: {
-    blockNumber: number;
     wethAmountToBorrow: BigNumber;
     sellingExchangeIndex: ExchangeIndex;
     tradedTokenAddress: string;
@@ -23,22 +64,6 @@ export interface EnvConfig {
     wethAmountOutMin: BigNumber;
     wethAmountOutExpected: BigNumber;
   };
-  rpcUrls: {
-    mainnet: string;
-    mainnetFork: string;
-    rinkeby: string;
-  };
-  testAccounts: {
-    owner: {
-      address: string;
-    };
-    vault: {
-      address: string;
-    };
-    externalUser: {
-      address: string;
-    };
-  };
 }
 
 const strategies: Strategy[] = formatStrategies(
@@ -46,18 +71,49 @@ const strategies: Strategy[] = formatStrategies(
   +env('STRATEGY_BORROWED_AMOUNTS_COUNT')
 );
 
+const mainnetAccounts = {
+  owner: {
+    address: OWNER_ACCOUNT_MAINNET_ADDRESS,
+    privateKey: env('OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
+  },
+  vault: {
+    address: VAULT_ACCOUNT_MAINNET_ADDRESS,
+  },
+};
+
 const config: EnvConfig = {
   environment: (process.env.NODE_ENV as Environment) || 'development',
   isProd: (process.env.NODE_ENV as Environment) === 'production',
   isDev: (process.env.NODE_ENV as Environment) === 'development',
   strategies,
-  rpcUrls: {
-    mainnet: env('MAINNET_RPC_URL'),
-    mainnetFork: env('MAINNET_FORKING_RPC_URL'),
-    rinkeby: env('RINKEBY_RPC_URL'),
+  networks: {
+    hardhat: {
+      rpcUrl: env('MAINNET_FORKING_RPC_URL'),
+      blockNumber: +env('TEST_PROFITABLE_TRADE_BLOCK_NUMBER'),
+      accounts: {
+        owner: {
+          address: env('TEST_OWNER_ACCOUNT_MAINNET_ADDRESS'),
+        },
+        vault: {
+          address: env('TEST_VAULT_ACCOUNT_MAINNET_ADDRESS'),
+        },
+        externalUser: {
+          address: env('TEST_EXTERNAL_USER_ACCOUNT_MAINNET_ADDRESS'),
+        },
+      },
+    },
+    // We use rinkeby as a staging environment, on which we used the same accounts
+    // as on mainnet
+    rinkeby: {
+      rpcUrl: env('RINKEBY_RPC_URL'),
+      accounts: mainnetAccounts,
+    },
+    mainnet: {
+      rpcUrl: env('MAINNET_RPC_URL'),
+      accounts: mainnetAccounts,
+    },
   },
   testProfitableTrade: {
-    blockNumber: +env('TEST_PROFITABLE_TRADE_BLOCK_NUMBER'),
     wethAmountToBorrow: ethers.BigNumber.from(env('TEST_PROFITABLE_TRADE_WETH_AMOUNT_TO_BORROW')),
     sellingExchangeIndex: +env('TEST_PROFITABLE_TRADE_SELLING_EXCHANGE_INDEX') as ExchangeIndex,
     tradedTokenAddress: env('TEST_PROFITABLE_TRADE_TRADED_TOKEN_ADDRESS'),
@@ -66,17 +122,6 @@ const config: EnvConfig = {
     buyingExchangeIndex: +env('TEST_PROFITABLE_TRADE_BUYING_EXCHANGE_INDEX') as ExchangeIndex,
     wethAmountOutMin: ethers.BigNumber.from(env('TEST_PROFITABLE_TRADE_WETH_AMOUNT_OUT_MIN')),
     wethAmountOutExpected: ethers.BigNumber.from(env('TEST_PROFITABLE_TRADE_WETH_AMOUNT_OUT_EXPECTED')),
-  },
-  testAccounts: {
-    owner: {
-      address: env('TEST_OWNER_ACCOUNT_MAINNET_ADDRESS'),
-    },
-    vault: {
-      address: env('TEST_VAULT_ACCOUNT_MAINNET_ADDRESS'),
-    },
-    externalUser: {
-      address: env('TEST_EXTERNAL_USER_ACCOUNT_MAINNET_ADDRESS'),
-    },
   },
 };
 

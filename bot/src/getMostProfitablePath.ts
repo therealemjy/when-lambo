@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
+import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 
 import { Path } from '@bot/src/types';
 import calculateProfit from '@bot/src/utils/calculateProfit';
@@ -25,7 +25,7 @@ const getMostProfitablePath = ({
       }
     | undefined
   >((mostProfitablePath, path) => {
-    const tradeWithoutSwapsGasCostEstimate = gasPriceWei.multipliedBy(TRADE_WITHOUT_SWAPS_GAS_ESTIMATE);
+    const tradeWithoutSwapsGasCostEstimate = gasPriceWei.multipliedBy(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE);
 
     const totalGasCost = path[0].gasCostEstimate
       .plus(path[1].gasCostEstimate)

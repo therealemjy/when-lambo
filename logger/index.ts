@@ -4,7 +4,7 @@ import RotatingFileStream from 'bunyan-rotating-file-stream';
 import 'console.table';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
-import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
+import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 import { ExchangeIndex } from '@localTypes';
 
 import config from '@bot/config';
@@ -63,7 +63,7 @@ const transaction = async ({
   const gasCost = path[0].gasCostEstimate
     .plus(path[1].gasCostEstimate)
     // Add estimated gas to trade with Transactor (without accounting for the swap themselves)
-    .plus(TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
+    .plus(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
     // Add gasLimit margin
     .multipliedBy(config.gasLimitMultiplicator);
   const gasCostWETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);

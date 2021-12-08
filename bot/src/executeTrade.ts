@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import { TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
+import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 import logger from '@logger';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
@@ -38,7 +38,7 @@ const executeTrade = async ({
   // multiple by the gas limit multiplicator we defined to obtain the gas limit
   const gasLimit = path[0].gasEstimate
     .plus(path[1].gasEstimate)
-    .plus(TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
+    .plus(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
     .multipliedBy(gasLimitMultiplicator);
 
   const args: Parameters<ITransactorContract['trade']> = [

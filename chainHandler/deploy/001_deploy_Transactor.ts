@@ -7,10 +7,11 @@ import { address as SUSHISWAP_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPar
 import { address as UNISWAP_V2_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
 import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
 
-const deployFunc: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployments, getNamedAccounts } = hre;
-  const { deploy } = deployments;
-
+const deployFunc: DeployFunction = async function ({
+  deployments: { deploy },
+  getNamedAccounts,
+  ethers,
+}: HardhatRuntimeEnvironment) {
   const { ownerAddress } = await getNamedAccounts();
 
   await deploy('Transactor', {
@@ -23,6 +24,7 @@ const deployFunc: DeployFunction = async function (hre: HardhatRuntimeEnvironmen
       SUSHISWAP_ROUTER_MAINNET_ADDRESS,
       CRYPTO_COM_ROUTER_MAINNET_ADDRESS,
     ],
+    gasLimit: ethers.BigNumber.from('1780000'),
   });
 };
 

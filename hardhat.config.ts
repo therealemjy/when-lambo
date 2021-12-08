@@ -15,7 +15,6 @@ import 'module-alias/register';
 import 'solidity-coverage';
 
 import chainHandlerConfig from './chainHandler/config';
-import { OWNER_ACCOUNT_MAINNET_ADDRESS } from './constants';
 import './tasks';
 
 chai.use(chaiAsPromised);
@@ -32,16 +31,18 @@ const hardhatConfig: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        url: chainHandlerConfig.rpcUrls.mainnetFork,
+        url: chainHandlerConfig.networks.hardhat.rpcUrl,
         blockNumber:
-          chainHandlerConfig.environment === 'test' ? chainHandlerConfig.testProfitableTrade.blockNumber : undefined,
+          chainHandlerConfig.environment === 'test' ? chainHandlerConfig.networks.hardhat.blockNumber : undefined,
       },
     },
     rinkeby: {
-      url: chainHandlerConfig.rpcUrls.rinkeby,
+      url: chainHandlerConfig.networks.rinkeby.rpcUrl,
+      accounts: [chainHandlerConfig.networks.rinkeby.accounts.owner.privateKey],
     },
     mainnet: {
-      url: chainHandlerConfig.rpcUrls.mainnet,
+      url: chainHandlerConfig.networks.mainnet.rpcUrl,
+      accounts: [chainHandlerConfig.networks.mainnet.accounts.owner.privateKey],
     },
   },
   gasReporter: {
@@ -50,16 +51,18 @@ const hardhatConfig: HardhatUserConfig = {
   },
   namedAccounts: {
     ownerAddress: {
-      hardhat: chainHandlerConfig.testAccounts.owner.address,
-      rinkeby: `ledger://${OWNER_ACCOUNT_MAINNET_ADDRESS}`,
-      mainnet: `ledger://${OWNER_ACCOUNT_MAINNET_ADDRESS}`,
+      hardhat: chainHandlerConfig.networks.hardhat.accounts.owner.address,
+      rinkeby: chainHandlerConfig.networks.rinkeby.accounts.owner.address,
+      mainnet: chainHandlerConfig.networks.mainnet.accounts.owner.address,
     },
     vaultAddress: {
-      hardhat: chainHandlerConfig.testAccounts.vault.address,
-      // TODO: add mainnet address
+      hardhat: chainHandlerConfig.networks.hardhat.accounts.vault.address,
+      rinkeby: chainHandlerConfig.networks.rinkeby.accounts.vault.address,
+      mainnet: chainHandlerConfig.networks.mainnet.accounts.vault.address,
     },
+    // assign another account as external user (used in tests only)
     externalUserAddress: {
-      hardhat: chainHandlerConfig.testAccounts.externalUser.address, // assign another account as external user (used in tests only)
+      hardhat: chainHandlerConfig.networks.hardhat.accounts.externalUser.address,
     },
   },
   paths: {
