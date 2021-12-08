@@ -1,5 +1,5 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'ethers';
 
 import { GasEstimates } from '@localTypes';
 
@@ -49,7 +49,7 @@ const findBestPaths = async ({
   const usedExchangeIndexes = bestBuyingDeals.reduce<UsedExchangeIndexes>(
     (acc, bestBuyingDeal) => ({
       ...acc,
-      [bestBuyingDeal.toTokenDecimalAmount.toFixed(0)]: bestBuyingDeal.exchangeIndex,
+      [bestBuyingDeal.toTokenDecimalAmount.toString()]: bestBuyingDeal.exchangeIndex,
     }),
     {}
   );
@@ -76,7 +76,7 @@ const findBestPaths = async ({
   const bestPaths = bestBuyingDeals.reduce<Path[]>((paths, bestBuyingDeal) => {
     // Find corresponding best selling deal
     const correspondingBestSellingDeal = bestSellingDeals.find((bestSellingDeal) =>
-      bestSellingDeal.fromTokenDecimalAmount.isEqualTo(bestBuyingDeal.toTokenDecimalAmount)
+      bestSellingDeal.fromTokenDecimalAmount.eq(bestBuyingDeal.toTokenDecimalAmount)
     );
 
     if (!correspondingBestSellingDeal) {

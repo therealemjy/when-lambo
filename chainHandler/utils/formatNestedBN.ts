@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'ethers';
 
 // This is a util used in dev only, to make nested BigNumber values inside an
 // object human-readable
@@ -9,7 +9,7 @@ const formatNestedBN = (source: any): any =>
     if (value?._isBigNumber) {
       value = value.toString();
     } else if (value instanceof BigNumber) {
-      value = value.toFixed(0);
+      value = value.toString();
     } else if (typeof value === 'object' && value && !(value instanceof Date)) {
       value = formatNestedBN(value);
     }

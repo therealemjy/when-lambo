@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Signer } from 'ethers';
+import { BigNumber, Signer } from 'ethers';
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
@@ -13,7 +13,7 @@ import wrapEth from '@chainHandler/utils/wrapEth';
 
 const hre = { ethers, getNamedAccounts } as HardhatRuntimeEnvironment;
 const ONE_ETHER = ethers.utils.parseEther('1');
-const TEST_GAS_PRICE = ethers.BigNumber.from('50000000000'); // 50 Gwei
+const TEST_GAS_PRICE = BigNumber.from('50000000000'); // 50 Gwei
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);

@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'ethers';
 
 import logger from '@logger';
 import formatStrategies from '@utils/formatStrategies';
@@ -31,7 +31,7 @@ const config: EnvConfig = {
   slippageAllowancePercent: 0.5,
   gasLimitMultiplicator: 1.3, // TODO: check why using any value lower than that makes the contract call fail
   gasPriceMultiplicator: 1.1,
-  gasCostMaximumThresholdWei: new BigNumber('63000000000000000'),
+  gasCostMaximumThresholdWei: BigNumber.from('63000000000000000'),
   gasEstimates: {
     // Uniswap V2
     '0': {
@@ -76,10 +76,10 @@ export const mockedServices: Services = {
   state: {
     ...defaultState,
     currentGasPrices: {
-      rapid: new BigNumber('100000000000'), // 100 Gwei
-      fast: new BigNumber('80000000000'), // 80 Gwei
-      standard: new BigNumber('60000000000'), // 60 Gwei
-      slow: new BigNumber('40000000000'), // 40 Gwei
+      rapid: BigNumber.from('100000000000'), // 100 Gwei
+      fast: BigNumber.from('80000000000'), // 80 Gwei
+      standard: BigNumber.from('60000000000'), // 60 Gwei
+      slow: BigNumber.from('40000000000'), // 40 Gwei
     },
   },
   config,

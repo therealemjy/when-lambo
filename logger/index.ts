@@ -1,7 +1,7 @@
-import BigNumber from 'bignumber.js';
 import Bunyan from 'bunyan';
 import RotatingFileStream from 'bunyan-rotating-file-stream';
 import 'console.table';
+import { BigNumber } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
@@ -44,7 +44,8 @@ const log: typeof console.log = (...args) => {
 const error: typeof console.error = (...args) => bunyanLogger.error(...args);
 
 const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) =>
-  amount.dividedBy(10 ** tokenDecimals).toFixed(tokenDecimals);
+  // TODO: check
+  amount.div(10 ** tokenDecimals).toString();
 
 const transaction = async ({
   blockNumber,
@@ -66,18 +67,18 @@ const transaction = async ({
   const bestBuyingExchangeName = ExchangeIndex[path[1].exchangeIndex];
 
   const gasCost = path[0].gasCostEstimate
-    .plus(path[1].gasCostEstimate)
+    .add(path[1].gasCostEstimate)
     // Add estimated gas to trade with Transactor (without accounting for the swap themselves)
-    .plus(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
+    .add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
     // Add gasLimit margin
-    .multipliedBy(config.gasLimitMultiplicator);
+    .mul(config.gasLimitMultiplicator);
   const gasCostWETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);
 
   const [profitDec, profitPercent] = calculateProfit({
     revenueDec: path[1].toTokenDecimalAmount,
     // Add gas cost to expense. Note that this logic only works because we
     // start and end the path with WETH
-    expenseDec: path[0].fromTokenDecimalAmount.plus(gasCost),
+    expenseDec: path[0].fromTokenDecimalAmount.add(gasCost),
   });
 
   const profitInTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);

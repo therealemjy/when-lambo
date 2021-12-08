@@ -1,5 +1,5 @@
 import axios from 'axios';
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'ethers';
 
 import { Services } from '..';
 
@@ -37,10 +37,10 @@ class GasPriceWatcher {
       // In order to make sure transactions are mined as fast as possible, we
       // multiply the gas price for rapid transactions by a given
       // multiplicator
-      rapid: new BigNumber(res.data.data.rapid).multipliedBy(services.config.gasPriceMultiplicator),
-      fast: new BigNumber(res.data.data.fast),
-      standard: new BigNumber(res.data.data.standard),
-      slow: new BigNumber(res.data.data.slow),
+      rapid: BigNumber.from(res.data.data.rapid).mul(services.config.gasPriceMultiplicator),
+      fast: BigNumber.from(res.data.data.fast),
+      standard: BigNumber.from(res.data.data.standard),
+      slow: BigNumber.from(res.data.data.slow),
     };
   }
 }

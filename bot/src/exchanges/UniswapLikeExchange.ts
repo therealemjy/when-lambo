@@ -1,5 +1,4 @@
-import BigNumber from 'bignumber.js';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 
 import { ExchangeIndex } from '@localTypes';
 import wethInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
@@ -76,15 +75,11 @@ class UniswapLikeExchange implements Exchange {
     fromToken,
     toToken,
   }) => {
-    const calls = fromTokenDecimalAmounts.map((fromTokenDecimalAmount) => {
-      const fixedFromTokenDecimalAmount = fromTokenDecimalAmount.toFixed(0);
-
-      return {
-        reference: `getAmountsOut-${fixedFromTokenDecimalAmount}`,
-        methodName: 'getAmountsOut',
-        methodParameters: [fixedFromTokenDecimalAmount, [fromToken.address, toToken.address]],
-      };
-    });
+    const calls = fromTokenDecimalAmounts.map((fromTokenDecimalAmount) => ({
+      reference: `getAmountsOut-${fromTokenDecimalAmount.toString()}`,
+      methodName: 'getAmountsOut',
+      methodParameters: [fromTokenDecimalAmount, [fromToken.address, toToken.address]],
+    }));
 
     return {
       context: {
@@ -99,9 +94,9 @@ class UniswapLikeExchange implements Exchange {
           .filter((callReturnContext) => callReturnContext.success && callReturnContext.returnValues.length >= 2)
           .map((callReturnContext) => ({
             fromToken,
-            fromTokenDecimalAmount: new BigNumber(callReturnContext.methodParameters[0]),
+            fromTokenDecimalAmount: BigNumber.from(callReturnContext.methodParameters[0]),
             toToken,
-            toTokenDecimalAmount: new BigNumber(callReturnContext.returnValues[1].hex),
+            toTokenDecimalAmount: BigNumber.from(callReturnContext.returnValues[1].hex),
           })),
     };
   };

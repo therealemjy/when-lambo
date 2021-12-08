@@ -1,5 +1,4 @@
-import BigNumber from 'bignumber.js';
-import { ContractTransaction } from 'ethers';
+import { ContractTransaction, BigNumber } from 'ethers';
 
 import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 import logger from '@logger';
@@ -38,20 +37,20 @@ const executeTrade = async ({
   // Add up gas estimates to obtain the expected gas needed to execute the transaction, then
   // multiple by the gas limit multiplicator we defined to obtain the gas limit
   const gasLimit = path[0].gasEstimate
-    .plus(path[1].gasEstimate)
-    .plus(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
-    .multipliedBy(gasLimitMultiplicator);
+    .add(path[1].gasEstimate)
+    .add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
+    .mul(gasLimitMultiplicator);
 
   const args: Parameters<ITransactorContract['trade']> = [
     expectedBlockNumber,
-    wethAmountToBorrow.toFixed(0),
+    wethAmountToBorrow,
     sellingExchangeIndex,
     tradedTokenAddress,
-    tradedTokenAmountOutMin.toFixed(0),
+    tradedTokenAmountOutMin,
     buyingExchangeIndex,
-    wethAmountOutMin.toFixed(0),
+    wethAmountOutMin,
     deadline,
-    { gasPrice: gasPriceWei.toFixed(0), gasLimit: gasLimit.toFixed(0) },
+    { gasPrice: gasPriceWei, gasLimit },
   ];
 
   logger.log('Sending trade transaction...', args);

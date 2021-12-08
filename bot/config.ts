@@ -1,5 +1,5 @@
-import BigNumber from 'bignumber.js';
 import dotenv from 'dotenv';
+import { BigNumber } from 'ethers';
 
 import { Environment, GasEstimates, Strategy } from '@localTypes';
 import env from '@utils/env';
@@ -56,7 +56,7 @@ const config: EnvConfig = {
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
   gasEstimates: swapGasEstimates as GasEstimates,
-  gasCostMaximumThresholdWei: new BigNumber(env('GAS_COST_MAXIMUM_THRESHOLD_WEI')),
+  gasCostMaximumThresholdWei: BigNumber.from(env('GAS_COST_MAXIMUM_THRESHOLD_WEI')),
   googleSpreadSheet: {
     id: env('GOOGLE_SPREADSHEET_SPREADSHEET_ID'),
     clientEmail: env('GOOGLE_SPREADSHEET_CLIENT_EMAIL'),

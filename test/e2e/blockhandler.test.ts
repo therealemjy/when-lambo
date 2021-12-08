@@ -27,7 +27,7 @@ const getContractWethBalance = async (contract: ITransactorContract): Promise<Bi
   return wethContract.balanceOf(contract.address);
 };
 
-describe('blockhandler', function () {
+describe.only('blockhandler', function () {
   it('should find opportunity, execute trade and yield profit', async function () {
     const { TransactorContract } = await setup();
 
@@ -66,7 +66,7 @@ describe('blockhandler', function () {
 
     // Check gas cost was under the maximum threshold configured
     const gasCostEth = ownerEthBalanceAfterTrade.sub(ownerEthBalanceBeforeTrade);
-    expect(gasCostEth.lte(BigNumber.from(mockedServices.config.gasCostMaximumThresholdWei.toFixed()))).to.equal(true);
+    expect(gasCostEth.lte(mockedServices.config.gasCostMaximumThresholdWei)).to.equal(true);
 
     // Check profit is at least equal or higher than gas cost
     // Note: gas cost is expressed in ETH and revenue is expressed in WETH, but since 1 ETH = 1 WETH we

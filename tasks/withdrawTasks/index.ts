@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { task, types } from 'hardhat/config';
 
 import withdrawFromTransactorContract from './withdrawFromTransactorContract';
@@ -11,9 +12,9 @@ task('withdrawETH', 'Withdraw ETH from Transactor contract to vault account')
     withdrawFromTransactorContract(
       {
         tokenSymbol: 'ETH',
-        amount: hre.ethers.BigNumber.from(wei),
+        amount: BigNumber.from(wei),
         countdownSeconds: COUNTDOWN_SECONDS,
-        gasPrice: hre.ethers.BigNumber.from(gasprice),
+        gasPrice: BigNumber.from(gasprice),
       },
       hre
     )
@@ -26,9 +27,9 @@ task('withdrawWETH', 'Withdraw WETH from Transactor contract to vault account')
     withdrawFromTransactorContract(
       {
         tokenSymbol: 'WETH',
-        amount: hre.ethers.BigNumber.from(wei),
+        amount: BigNumber.from(wei),
         countdownSeconds: COUNTDOWN_SECONDS,
-        gasPrice: hre.ethers.BigNumber.from(gasprice),
+        gasPrice: BigNumber.from(gasprice),
       },
       hre
     )

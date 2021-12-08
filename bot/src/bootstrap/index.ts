@@ -1,6 +1,5 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import BigNumber from 'bignumber.js';
-import { ethers } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import http from 'http';
 import TypedEmitter from 'typed-emitter';
@@ -42,10 +41,10 @@ export const defaultState: State = {
   botExecutionMonitoringTick: 0,
   perfMonitoringRecords: [],
   currentGasPrices: {
-    rapid: new BigNumber(0),
-    fast: new BigNumber(0),
-    standard: new BigNumber(0),
-    slow: new BigNumber(0),
+    rapid: BigNumber.from(0),
+    fast: BigNumber.from(0),
+    standard: BigNumber.from(0),
+    slow: BigNumber.from(0),
   },
 };
 

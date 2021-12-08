@@ -1,32 +1,45 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'ethers';
 
 import { ParsedStrategy } from '@localTypes';
 
-const strategyToWeiAmounts = (baseWei: string, incrementPercent: number, incrementAmount: number): BigNumber[] => {
-  const strategy = Array.from(Array(incrementAmount).keys()) as unknown as BigNumber[];
-  const middleIndex = Math.floor((strategy.length - 1) / 2);
+/*
+  The amounts returned are calculated as follows:
+  incrementsCount represents how many amounts we want to calculate, using
+  baseAmount as a reference by making it the value located in the middle of
+  the array of amounts returned. Each value is incremented or decremented by
+  p * incrementPercentage, where p depends on the position of the amount in
+  the array returned.
+  For example, calling this function with the arguments:
+  baseAmount = 10,
+  incrementPercentage = 10,
+  incrementsCount = 5
+  will output:
+  [8, 9, baseAmount (10), 11, 12];
+*/
+const strategyToWeiAmounts = (
+  baseAmount: BigNumber,
+  incrementPercentage: number,
+  incrementsCount: number
+): BigNumber[] => {
+  const amounts: BigNumber[] = [];
+  const baseIndex = Math.floor((incrementsCount - 1) / 2);
 
-  strategy.forEach((_, index) => {
-    strategy[index] = new BigNumber(baseWei);
+  for (let index = 0; index < incrementsCount; index++) {
+    const percentage =
+      index < baseIndex
+        ? 100 - (baseIndex - index) * incrementPercentage
+        : 100 + (index - baseIndex) * incrementPercentage;
 
-    // If middle value we set the base value
-    if (index === middleIndex) {
-      return;
-    }
+    amounts[index] = baseAmount.mul(percentage).div(100);
+  }
 
-    const positionFromBase = index - middleIndex;
-    const percent = (incrementPercent * positionFromBase) / 100 + 1;
-
-    strategy[index] = new BigNumber(strategy[index].multipliedBy(percent).toFixed(0));
-  });
-
-  return strategy;
+  return amounts;
 };
 
 const formatStrategies = (parsedStrategies: ParsedStrategy[], borrowedAmountsCount: number) =>
   parsedStrategies.map((parsedStrategy: ParsedStrategy) => ({
     borrowedWethAmounts: strategyToWeiAmounts(
-      parsedStrategy.STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT,
+      BigNumber.from(parsedStrategy.STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT),
       +parsedStrategy.STRATEGY_BORROWED_INCREMENT_PERCENT,
       borrowedAmountsCount
     ),

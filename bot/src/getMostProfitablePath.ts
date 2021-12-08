@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'ethers';
 
 import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 
@@ -25,20 +25,20 @@ const getMostProfitablePath = ({
       }
     | undefined
   >((mostProfitablePath, path) => {
-    const tradeWithoutSwapsGasCostEstimate = gasPriceWei.multipliedBy(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE);
+    const tradeWithoutSwapsGasCostEstimate = gasPriceWei.mul(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE);
 
     const totalGasCost = path[0].gasCostEstimate
-      .plus(path[1].gasCostEstimate)
+      .add(path[1].gasCostEstimate)
       // Add estimated gas to trade with Transactor (without accounting for the swap themselves)
-      .plus(tradeWithoutSwapsGasCostEstimate)
+      .add(tradeWithoutSwapsGasCostEstimate)
       // Add gasLimit margin
-      .multipliedBy(gasLimitMultiplicator);
+      .mul(gasLimitMultiplicator);
 
     const [profitWethAmount] = calculateProfit({
       revenueDec: path[1].toTokenDecimalAmount,
       // Add gas cost to expense. Note that this logic only works because we
       // start and end the path with WETH
-      expenseDec: path[0].fromTokenDecimalAmount.plus(totalGasCost),
+      expenseDec: path[0].fromTokenDecimalAmount.add(totalGasCost),
     });
 
     /*

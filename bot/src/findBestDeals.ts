@@ -1,6 +1,6 @@
 import { ContractCallContext } from '@maxime.julian/ethereum-multicall';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'ethers';
 
 import { GasEstimates } from '@localTypes';
 import { address as wethAddress } from '@resources/thirdPartyContracts/mainnet/weth.json';
@@ -19,12 +19,11 @@ const getConvertedDealGasCost = (deal: Deal) => {
     return deal.gasCostEstimate;
   }
 
-  // Otherwise we convert the gas cost in the currency of the traded token
-  const fromTokenDecimalPriceInToTokenDecimals = deal.toTokenDecimalAmount
-    .dividedBy(deal.fromTokenDecimalAmount) // In this case, we know fromTokenDecimalAmount is expressed in wei
-    .toFixed(0);
-
-  return deal.gasCostEstimate.multipliedBy(fromTokenDecimalPriceInToTokenDecimals);
+  // Otherwise we convert the gas cost in the currency of the traded token.
+  // In this case, we know fromTokenDecimalAmount is expressed in wei
+  // TODO: check
+  const fromTokenDecimalPriceInToTokenDecimals = deal.toTokenDecimalAmount.div(deal.fromTokenDecimalAmount);
+  return deal.gasCostEstimate.mul(fromTokenDecimalPriceInToTokenDecimals);
 };
 
 const findBestDeals = async ({
@@ -61,7 +60,7 @@ const findBestDeals = async ({
         // ourselves by buying from an exchange and selling to the same exchange
         // in the same path.
         fromTokenDecimalAmounts.filter(
-          (fromTokenDecimalAmount) => usedExchangeIndexes[fromTokenDecimalAmount.toFixed(0)] !== exchange.index
+          (fromTokenDecimalAmount) => usedExchangeIndexes[fromTokenDecimalAmount.toString()] !== exchange.index
         );
 
     const { context, resultsFormatter } = exchange.getDecimalAmountOutCallContext({
@@ -100,8 +99,8 @@ const findBestDeals = async ({
       // calculated with the most pessimistic outcome (given our slippage
       // allowance). If we still yield a profit despite this, then we consider
       // the opportunity safe.
-      const pessimisticToTokenDecimalAmount = new BigNumber(
-        formattedResult.toTokenDecimalAmount.multipliedBy((100 - slippageAllowancePercent) / 100).toFixed(0)
+      const pessimisticToTokenDecimalAmount = formattedResult.toTokenDecimalAmount.mul(
+        (100 - slippageAllowancePercent) / 100
       );
 
       // Get estimated gas necessary to execute the swap.
@@ -110,7 +109,7 @@ const findBestDeals = async ({
       const refTokenAddress = fromToken.address === wethAddress ? toToken.address : fromToken.address;
 
       // TODO: add safe guard that logs an error in case the estimate wasn't found
-      const gasEstimate = new BigNumber(gasEstimates[exchange.index][refTokenAddress]);
+      const gasEstimate = BigNumber.from(gasEstimates[exchange.index][refTokenAddress]);
 
       const deal: Deal = {
         timestamp: new Date(),
@@ -121,15 +120,15 @@ const findBestDeals = async ({
         toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
         slippageAllowancePercent,
         gasEstimate,
-        gasCostEstimate: gasPriceWei.multipliedBy(gasEstimate),
+        gasCostEstimate: gasPriceWei.mul(gasEstimate),
       };
 
-      const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toFixed(0)];
+      const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toString()];
 
       // If no best deal has been determined for the current
       // fromTokenDecimalAmount yet, we assign this deal as the current best
       if (!currentBestDeal) {
-        bestDeals[formattedResult.fromTokenDecimalAmount.toFixed(0)] = deal;
+        bestDeals[formattedResult.fromTokenDecimalAmount.toString()] = deal;
         return;
       }
 
@@ -137,15 +136,15 @@ const findBestDeals = async ({
       // deal by first calculating its price in the currency of the traded
       // token, then deducting it from the total amount of decimals received
       // from the swap
-      const dealRevenuesMinusGas = pessimisticToTokenDecimalAmount.minus(getConvertedDealGasCost(deal));
-      const currentBestDealRevenuesMinusGas = currentBestDeal.toTokenDecimalAmount.minus(
+      const dealRevenuesMinusGas = pessimisticToTokenDecimalAmount.sub(getConvertedDealGasCost(deal));
+      const currentBestDealRevenuesMinusGas = currentBestDeal.toTokenDecimalAmount.sub(
         getConvertedDealGasCost(currentBestDeal)
       );
 
       // If the deal is better than the current best deal, we assign is as the
       // new best deal
-      if (dealRevenuesMinusGas.isGreaterThan(currentBestDealRevenuesMinusGas)) {
-        bestDeals[formattedResult.fromTokenDecimalAmount.toFixed(0)] = deal;
+      if (dealRevenuesMinusGas.gt(currentBestDealRevenuesMinusGas)) {
+        bestDeals[formattedResult.fromTokenDecimalAmount.toString()] = deal;
       }
     });
   });

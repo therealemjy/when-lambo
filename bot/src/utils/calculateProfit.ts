@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'ethers';
 
 const calculateProfit = ({
   revenueDec,
@@ -7,8 +7,9 @@ const calculateProfit = ({
   revenueDec: BigNumber;
   expenseDec: BigNumber;
 }): [BigNumber, string] => {
-  const profitDec = revenueDec.minus(expenseDec);
-  const profitPercent = profitDec.dividedBy(revenueDec.toFixed(0)).multipliedBy(100).toFixed(2);
+  const profitDec = revenueDec.sub(expenseDec);
+  // TODO: check
+  const profitPercent = profitDec.div(revenueDec).mul(100).toString();
 
   return [profitDec, profitPercent];
 };
