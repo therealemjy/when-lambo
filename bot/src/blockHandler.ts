@@ -1,9 +1,11 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
+import { ContractTransaction } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { Strategy } from '@localTypes';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
+import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
 import { Services } from './bootstrap';
 import executeTrade from './executeTrade';
@@ -57,26 +59,40 @@ const executeStrategy = async (
       gasCostMaximumThresholdWei: services.config.gasCostMaximumThresholdWei,
     });
 
-    let transactionHash: string | undefined = undefined;
+    let transaction: ContractTransaction | undefined = undefined;
 
-    // Only execute trades in production
+    // Execute trade, in production and test environments only
     if (mostProfitablePath && !services.config.isDev) {
       // Deactivate the bot completely
       services.state.monitoringActivated = false;
 
-      const transaction = await executeTrade({
+      transaction = await executeTrade({
         blockNumber,
         path: mostProfitablePath,
         gasPriceWei,
         gasLimitMultiplicator: services.config.gasLimitMultiplicator,
         TransactorContract,
       });
-
-      transactionHash = transaction.hash;
     }
 
+    // Log trade
     if (mostProfitablePath) {
-      await services.logger.transaction({ blockNumber, path: mostProfitablePath, transactionHash, spreadsheet });
+      await services.logger.transaction({
+        blockNumber,
+        path: mostProfitablePath,
+        transactionHash: transaction?.hash,
+        spreadsheet,
+      });
+    }
+
+    // Watch transaction
+    if (transaction) {
+      services.logger.log('Watching pending transaction...');
+      const receipt = await transaction.wait();
+      services.logger.log('Trade successfully executed! Human-readable receipt:');
+      services.logger.log(formatNestedBN(receipt));
+      services.logger.log('Stringified receipt:');
+      services.logger.log(JSON.stringify(receipt));
     }
   } catch (error: unknown) {
     services.eventEmitter.emit('error', error);

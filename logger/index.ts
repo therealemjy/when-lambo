@@ -35,7 +35,12 @@ if (config.isProd) {
   });
 }
 
-const log: typeof console.log = (...args) => bunyanLogger.info(...args);
+const log: typeof console.log = (...args) => {
+  if (config.environment !== 'test') {
+    bunyanLogger.info(...args);
+  }
+};
+
 const error: typeof console.error = (...args) => bunyanLogger.error(...args);
 
 const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) =>

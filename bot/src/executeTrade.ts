@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { ContractTransaction } from 'ethers';
 
 import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 import logger from '@logger';
@@ -19,7 +20,7 @@ const executeTrade = async ({
   gasPriceWei: BigNumber;
   gasLimitMultiplicator: number;
   TransactorContract: ITransactorContract;
-}) => {
+}): Promise<ContractTransaction> => {
   const expectedBlockNumber = blockNumber + 1;
 
   const wethAmountToBorrow = path[0].fromTokenDecimalAmount;
@@ -54,10 +55,9 @@ const executeTrade = async ({
   ];
 
   logger.log('Sending trade transaction...', args);
-
   const transaction = await TransactorContract.trade(...args);
+  logger.log(`Transaction sent. Hash: ${transaction.hash}`);
 
-  logger.log(`Transaction sent! Hash: ${transaction.hash}`);
   return transaction;
 };
 
