@@ -32,13 +32,16 @@ const hardhatConfig: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        url: chainHandlerConfig.mainnetForkingRpcUrl || '',
+        url: chainHandlerConfig.rpcUrls.mainnetFork,
         blockNumber:
           chainHandlerConfig.environment === 'test' ? chainHandlerConfig.testProfitableTrade.blockNumber : undefined,
       },
     },
+    rinkeby: {
+      url: chainHandlerConfig.rpcUrls.rinkeby,
+    },
     mainnet: {
-      url: chainHandlerConfig.mainnetRpcUrl,
+      url: chainHandlerConfig.rpcUrls.mainnet,
     },
   },
   gasReporter: {
@@ -48,6 +51,7 @@ const hardhatConfig: HardhatUserConfig = {
   namedAccounts: {
     ownerAddress: {
       hardhat: chainHandlerConfig.testAccounts.owner.address,
+      rinkeby: `ledger://${OWNER_ACCOUNT_MAINNET_ADDRESS}`,
       mainnet: `ledger://${OWNER_ACCOUNT_MAINNET_ADDRESS}`,
     },
     vaultAddress: {

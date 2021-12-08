@@ -16,7 +16,6 @@ const deployFunc: DeployFunction = async function (hre: HardhatRuntimeEnvironmen
   await deploy('Transactor', {
     from: ownerAddress,
     log: true,
-    autoMine: true, // speed up deployment on local network (ganache, hardhat), no effect on live networks
     args: [
       WETH_MAINNET_ADDRESS,
       DYDX_SOLO_MAINNET_ADDRESS,

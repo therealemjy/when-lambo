@@ -12,8 +12,6 @@ export interface EnvConfig {
   isDev: boolean;
   isProd: boolean;
   strategies: Strategy[];
-  mainnetRpcUrl: string;
-  mainnetForkingRpcUrl: string;
   testProfitableTrade: {
     blockNumber: number;
     wethAmountToBorrow: BigNumber;
@@ -24,6 +22,11 @@ export interface EnvConfig {
     buyingExchangeIndex: ExchangeIndex;
     wethAmountOutMin: BigNumber;
     wethAmountOutExpected: BigNumber;
+  };
+  rpcUrls: {
+    mainnet: string;
+    mainnetFork: string;
+    rinkeby: string;
   };
   testAccounts: {
     owner: {
@@ -48,8 +51,11 @@ const config: EnvConfig = {
   isProd: (process.env.NODE_ENV as Environment) === 'production',
   isDev: (process.env.NODE_ENV as Environment) === 'development',
   strategies,
-  mainnetRpcUrl: env('MAINNET_RPC_URL'),
-  mainnetForkingRpcUrl: env('MAINNET_FORKING_RPC_URL'),
+  rpcUrls: {
+    mainnet: env('MAINNET_RPC_URL'),
+    mainnetFork: env('MAINNET_FORKING_RPC_URL'),
+    rinkeby: env('RINKEBY_RPC_URL'),
+  },
   testProfitableTrade: {
     blockNumber: +env('TEST_PROFITABLE_TRADE_BLOCK_NUMBER'),
     wethAmountToBorrow: ethers.BigNumber.from(env('TEST_PROFITABLE_TRADE_WETH_AMOUNT_TO_BORROW')),
