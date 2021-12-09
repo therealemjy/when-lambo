@@ -21,7 +21,7 @@
     "baseUrl": "./",
     "types": ["@types/node"],
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "../dist",
     "paths": {
       "@localTypes": ["../types"],
       "@constants": ["../constants"],
@@ -35,6 +35,5 @@
       "@bot/*": ["../bot/*"]
     },
     "lib": ["es2020"]
-  },
-  "exclude": ["./dist"]
+  }
 }

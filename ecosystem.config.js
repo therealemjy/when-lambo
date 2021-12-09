@@ -74,7 +74,7 @@ module.exports = {
   apps: [
     {
       name: 'when-lambo-bot',
-      script: './bot/dist/index.js',
+      script: './dist/index.js',
       wait_ready: false,
       watch: false,
       env_one: {
