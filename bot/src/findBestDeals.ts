@@ -2,12 +2,10 @@ import { ContractCallContext } from '@maxime.julian/ethereum-multicall';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import { BigNumber } from 'ethers';
 
-import { GasEstimates } from '@localTypes';
-import { address as wethAddress } from '@resources/thirdPartyContracts/mainnet/weth.json';
-
-import { Exchange, ResultsFormatter, Token, Deal, UsedExchangeIndexes } from '@bot/src/types';
+import { GasEstimates, Token } from '@localTypes';
 
 import { WETH } from './tokens';
+import { Exchange, ResultsFormatter, Deal, UsedExchangeIndexes } from './types';
 
 // Get the gas cost of a deal, in the currency (in decimals) of the traded
 // token. Note that this logic only works because we're currently only trading
@@ -113,7 +111,7 @@ const findBestDeals = async ({
       // file, the traded token is used as a reference for each gas estimate,
       // which is why here we use the address of the token that's not WETH as a
       // reference.
-      const refTokenAddress = fromToken.address === wethAddress ? toToken.address : fromToken.address;
+      const refTokenAddress = fromToken.address === WETH.address ? toToken.address : fromToken.address;
 
       const gasEstimateFromConfig = gasEstimates[exchange.index][refTokenAddress];
       if (!gasEstimateFromConfig) {

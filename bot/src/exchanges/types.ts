@@ -1,9 +1,7 @@
 import { ContractCallContext, ContractCallReturnContext } from '@maxime.julian/ethereum-multicall';
 import { Signer, BigNumber } from 'ethers';
 
-import { ExchangeIndex } from '@localTypes';
-
-import { Token } from '@bot/src/types';
+import { ExchangeIndex, Token } from '@localTypes';
 
 export interface IGetEstimateDecimalAmountOutInput {
   toTokenAddress: string;
@@ -11,6 +9,7 @@ export interface IGetEstimateDecimalAmountOutInput {
   signer: Signer;
   isProd: boolean;
 }
+
 export interface IGetDecimalAmountOutCallContextInput {
   callReference: string;
   fromToken: Token;

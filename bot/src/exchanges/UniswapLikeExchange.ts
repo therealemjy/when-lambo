@@ -3,7 +3,7 @@ import { BigNumber, ethers } from 'ethers';
 import { ExchangeIndex } from '@localTypes';
 import wethInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
-import { Exchange } from '@bot/src/types';
+import { Exchange } from './types';
 
 export interface ContractInfo {
   address: string;

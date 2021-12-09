@@ -9,6 +9,12 @@ export enum ExchangeIndex {
   CryptoCom = 2,
 }
 
+export interface Token {
+  symbol: string;
+  address: string;
+  decimals: number;
+}
+
 export type GasEstimates = {
   [exchangeIndex: number]: {
     [tokenAddress: string]: string;

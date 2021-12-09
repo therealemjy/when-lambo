@@ -1,9 +1,9 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import { BigNumber } from 'ethers';
 
-import { GasEstimates } from '@localTypes';
+import { GasEstimates, Token } from '@localTypes';
 
-import { Exchange, Token, UsedExchangeIndexes, Path } from '@bot/src/types';
+import { Exchange, UsedExchangeIndexes, Path } from '@bot/src/types';
 
 import findBestDeals from './findBestDeals';
 

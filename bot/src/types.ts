@@ -1,14 +1,10 @@
 import { BigNumber } from 'ethers';
 
-import { ExchangeIndex } from '@localTypes';
+import { ExchangeIndex, Token } from '@localTypes';
 
 import { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput } from '@bot/src/exchanges/types';
-import Token from '@bot/src/tokens/Token';
 
-export { default as Token } from '@bot/src/tokens/Token';
 export type { Exchange, ResultsFormatter, IGetDecimalAmountOutCallContextInput };
-
-// TODO: move to root of repo
 
 export interface Deal {
   timestamp: Date;

@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import { BigNumber } from 'ethers';
 
-import { OWNER_ACCOUNT_MAINNET_ADDRESS, VAULT_ACCOUNT_MAINNET_ADDRESS } from '@constants';
 import { Environment, ExchangeIndex, Strategy } from '@localTypes';
 import env from '@utils/env';
 import formatStrategies from '@utils/formatStrategies';
@@ -73,11 +72,11 @@ const strategies: Strategy[] = formatStrategies(
 
 const mainnetAccounts = {
   owner: {
-    address: OWNER_ACCOUNT_MAINNET_ADDRESS,
+    address: env('OWNER_ACCOUNT_MAINNET_ADDRESS'),
     privateKey: env('OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
   },
   vault: {
-    address: VAULT_ACCOUNT_MAINNET_ADDRESS,
+    address: env('VAULT_ACCOUNT_MAINNET_ADDRESS'),
   },
 };
 

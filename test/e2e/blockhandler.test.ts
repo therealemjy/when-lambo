@@ -4,9 +4,8 @@ import { BigNumber } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { ethers, deployments } from 'hardhat';
 
-import { MULTICALL_CONTRACT_MAINNET_ADDRESS } from '@constants';
-import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
-import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json';
+import { address as MULTICALL_CONTRACT_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/multicall2.json';
+import wethContractInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 
@@ -22,11 +21,11 @@ const setup = deployments.createFixture(async () => {
 });
 
 const getContractWethBalance = async (contract: ITransactorContract): Promise<BigNumber> => {
-  const wethContract = new ethers.Contract(WETH_MAINNET_ADDRESS, wethAbi, contract.signer);
+  const wethContract = new ethers.Contract(wethContractInfo.address, wethContractInfo.abi, contract.signer);
   return wethContract.balanceOf(contract.address);
 };
 
-describe.only('blockhandler', function () {
+describe('blockhandler', function () {
   it('should find opportunity, execute trade and yield profit', async function () {
     const { TransactorContract } = await setup();
 
