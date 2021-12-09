@@ -13,12 +13,12 @@
     "format:json": "prettier --write \"**/*.json\"",
     "format:ts": "prettier --write \"**/*.ts\"",
     "fetch-gas-estimates": "IS_FETCHING_GAS_ESTIMATES=true ts-node scripts/fetchGasEstimates/index.ts | ./node_modules/.bin/bunyan",
-    "prebot:deploy": "rm -rf ./dist/bot && npm run bot:build && rm -rf ./dist/swapGasEstimates.json && npm run fetch-gas-estimates && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
     "bot:tsc": "tsc --noEmit --project ./bot/tsconfig.json",
-    "bot:deploy": "npx pm2 deploy one update --force",
     "bot:build": "esbuild ./bot/index.ts --bundle --outfile=./dist/bot/index.js --platform=node",
     "bot:dev": "rm -rf ./dist/bot && npm run bot:build && NODE_ENV=development node --inspect ./dist/bot/index | ./node_modules/.bin/bunyan",
-    "bot:start": "NODE_ENV=production node ./dist/bot/index.js"
+    "bot:start": "NODE_ENV=production node ./dist/bot/index.js",
+    "prebot:deploy": "rm -rf ./dist/bot && npm run bot:build && npm run fetch-gas-estimates && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
+    "bot:deploy": "npx pm2 deploy one update --force"
   },
   "license": "ISC",
   "dependencies": {
