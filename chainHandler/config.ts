@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { ethers, BigNumber } from 'ethers';
+import { BigNumber } from 'ethers';
 
 import { OWNER_ACCOUNT_MAINNET_ADDRESS, VAULT_ACCOUNT_MAINNET_ADDRESS } from '@constants';
 import { Environment, ExchangeIndex, Strategy } from '@localTypes';

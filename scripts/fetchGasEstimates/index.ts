@@ -4,8 +4,9 @@ import 'hardhat-deploy';
 
 import { GasEstimates } from '@localTypes';
 import logger from '@logger';
+import env from '@utils/env';
+import formatStrategies from '@utils/formatStrategies';
 
-import config from '@chainHandler/config';
 import wrapEth from '@chainHandler/utils/wrapEth';
 
 import exchanges from '@bot/src/exchanges';
@@ -16,7 +17,10 @@ const ethers = hre.ethers;
 const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
 const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/swapGasEstimates.json`;
 
-const tokenAddresses = config.strategies.reduce((allTokenAddresses, formattedStrategy) => {
+const strategies = formatStrategies(JSON.parse(env('STRINGIFIED_STRATEGIES')), +env('STRATEGY_BORROWED_AMOUNTS_COUNT'));
+const isProd = process.env.NODE_ENV === 'production';
+
+const tokenAddresses = strategies.reduce((allTokenAddresses, formattedStrategy) => {
   if (allTokenAddresses.find((tokenAddress) => tokenAddress === formattedStrategy.toToken.address)) {
     return allTokenAddresses;
   }
@@ -53,7 +57,7 @@ const fetchGasEstimates = async () => {
         signer: testOwner,
         amountIn: testAmountIn,
         toTokenAddress,
-        isProd: config.isProd,
+        isProd,
       });
 
       // Initialize exchange estimates if it has not been done yet
