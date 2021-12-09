@@ -35,6 +35,6 @@
     "./chainHandler/deploy",
     "./chainHandler/utils"
   ],
-  "exclude": ["./bot", "./node_modules"],
+  "exclude": ["./bot", "./node_modules", "./dist"],
   "files": ["./hardhat.config.ts"]
 }
