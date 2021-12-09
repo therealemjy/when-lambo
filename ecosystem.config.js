@@ -83,7 +83,7 @@ module.exports = {
       env_one: {
         ...baseEnvs,
         SERVER_ID: 1,
-        STRINGIFIED_STRATEGIES: strategies[0],
+        STRINGIFIED_STRATEGIES: JSON.stringify(strategies[0]),
       },
     },
   ],
