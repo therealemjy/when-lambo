@@ -16,20 +16,7 @@ const deployFunc: DeployFunction = async function ({
 }: HardhatRuntimeEnvironment) {
   const { ownerAddress } = await getNamedAccounts();
 
-  const gasNecessary = BigNumber.from('1362533');
   const gasLimit = BigNumber.from('1780000'); // Roughly 30% more than the actual gas needed for the deployment (1362533)
-
-  // Update these every time we need to do a deployment Check
-  // https://www.blocknative.com/gas-estimator to have an idea of the values to
-  // use
-  const baseFee = BigNumber.from('72000000000');
-  const maxPriorityFeePerGas = BigNumber.from('1500000000');
-  const maxFeePerGas = baseFee.add(maxPriorityFeePerGas);
-
-  console.log('Estimated cost', ethers.utils.formatUnits(gasNecessary.mul(maxFeePerGas), 'ether'));
-  console.log('Max cost', ethers.utils.formatUnits(gasLimit.mul(maxFeePerGas), 'ether'));
-
-  const gasSettings = network.name === 'mainnet' ? { maxPriorityFeePerGas, maxFeePerGas } : {};
 
   await deploy('Transactor', {
     from: ownerAddress,
@@ -41,8 +28,6 @@ const deployFunc: DeployFunction = async function ({
       CRYPTO_COM_ROUTER_MAINNET_ADDRESS,
     ],
     gasLimit,
-    // Set these manually before doing any deployment to mainnet or rinkeby
-    ...gasSettings,
     log: true,
   });
 };
