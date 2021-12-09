@@ -117,10 +117,10 @@ export const bootstrap = async (): Promise<{
       // Get Google Spreadsheet
       const spreadsheet = await getSpreadsheet();
 
-      // Pull and update gas prices every 5.1 seconds (blocknative rate limit
+      // Pull and update gas prices every 5.5 seconds (blocknative rate limit
       // being one request every 5 seconds)
       const gasFeesWatcher = new GasFeesWatcher(services.config.blocknativeApiKey);
-      await gasFeesWatcher.start(services, (updatedGasFees) => (services.state.currentGasFees = updatedGasFees), 5100);
+      await gasFeesWatcher.start(services, (updatedGasFees) => (services.state.currentGasFees = updatedGasFees), 5500);
 
       // We will use this instance of state throughout the bot with dependencies
       // injection, making testing way easier

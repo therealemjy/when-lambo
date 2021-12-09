@@ -25,7 +25,7 @@ class GasFeesWatcher {
 
     await fn();
 
-    services.logger.log('Gas price watcher started.');
+    services.logger.log('Gas fees watcher started.');
     setInterval(fn, interval);
   }
 
