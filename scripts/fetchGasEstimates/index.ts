@@ -19,12 +19,10 @@ import { strategies as prodStrategies } from '../../ecosystem.config';
 const ethers = hre.ethers;
 
 function getStrategies() {
-  if (process.env.BEFORE_DEPLOY === 'true') {
-    const mergedStrategies = prodStrategies.flat();
-    return formatStrategies(mergedStrategies, +env('STRATEGY_BORROWED_AMOUNT_COUNT'));
-  }
-
-  return formatStrategies(JSON.parse(env('STRINGIFIED_STRATEGIES')), +env('STRATEGY_BORROWED_AMOUNT_COUNT'));
+  return formatStrategies(
+    process.env.USE_LOCAL_STRATEGIES ? JSON.parse(env('STRINGIFIED_STRATEGIES')) : prodStrategies.flat(),
+    +env('STRATEGY_BORROWED_AMOUNT_COUNT')
+  );
 }
 
 const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
