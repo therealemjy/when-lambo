@@ -9,10 +9,8 @@ import { address as UNISWAP_V2_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPa
 import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
 
 const deployFunc: DeployFunction = async function ({
-  network,
   deployments: { deploy },
   getNamedAccounts,
-  ethers,
 }: HardhatRuntimeEnvironment) {
   const { ownerAddress } = await getNamedAccounts();
 
