@@ -30,7 +30,7 @@ function getStrategies() {
 const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
 const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/gasEstimates.json`;
 
-const strategies = formatStrategies(JSON.parse(env('STRINGIFIED_STRATEGIES')), +env('STRATEGY_BORROWED_AMOUNT_COUNT'));
+const strategies = getStrategies();
 const isProd = process.env.NODE_ENV === 'production';
 
 const tokenAddresses = strategies.reduce((allTokenAddresses, formattedStrategy) => {
