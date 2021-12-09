@@ -12,7 +12,8 @@ import wrapEth from '@chainHandler/utils/wrapEth';
 
 import exchanges from '@bot/src/exchanges';
 
-import prodStrategies from '../../strategies.json';
+// @ts-ignore
+import { strategies as prodStrategies } from '../../ecosystem.config';
 
 // @ts-ignore
 const ethers = hre.ethers;

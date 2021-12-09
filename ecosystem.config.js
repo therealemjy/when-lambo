@@ -1,6 +1,42 @@
-import fs from 'fs';
-
-const strategies = JSON.parse(fs.readFileSync('./strategies.json', 'utf8'));
+const strategies = [
+  [
+    {
+      TRADED_TOKEN_ADDRESS: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+      TRADED_TOKEN_SYMBOL: 'YFI',
+      TRADED_TOKEN_DECIMALS: '18',
+      STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '3028502177786837930',
+      STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+    },
+    {
+      TRADED_TOKEN_ADDRESS: '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f',
+      TRADED_TOKEN_SYMBOL: 'SYN',
+      TRADED_TOKEN_DECIMALS: '18',
+      STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '3788400000000000000',
+      STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+    },
+    {
+      TRADED_TOKEN_ADDRESS: '0x514910771af9ca656af840dff83e8264ecf986ca',
+      TRADED_TOKEN_SYMBOL: 'LINK',
+      TRADED_TOKEN_DECIMALS: '18',
+      STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '1330000000000000000',
+      STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+    },
+    {
+      TRADED_TOKEN_ADDRESS: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942',
+      TRADED_TOKEN_SYMBOL: 'MANA',
+      TRADED_TOKEN_DECIMALS: '18',
+      STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '4500000000000000000',
+      STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+    },
+    {
+      TRADED_TOKEN_ADDRESS: '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
+      TRADED_TOKEN_SYMBOL: 'AAVE',
+      TRADED_TOKEN_DECIMALS: '18',
+      STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '9000000000000000000',
+      STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
+    },
+  ],
+];
 
 const baseEnvs = {
   NODE_ENV: 'production',
@@ -37,6 +73,7 @@ const baseOptions = {
 const getHookDeployCommand = (envName) => `pm2 start ./ecosystem.config.js --env ${envName}`;
 
 module.exports = {
+  strategies,
   apps: [
     {
       name: 'when-lambo-bot',
