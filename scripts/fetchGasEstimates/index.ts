@@ -12,8 +12,19 @@ import wrapEth from '@chainHandler/utils/wrapEth';
 
 import exchanges from '@bot/src/exchanges';
 
+import prodStrategies from '../../strategies.json';
+
 // @ts-ignore
 const ethers = hre.ethers;
+
+function getStrategies() {
+  if (process.env.BEFORE_DEPLOY === 'true') {
+    const mergedStrategies = prodStrategies.flat();
+    return formatStrategies(mergedStrategies, +env('STRATEGY_BORROWED_AMOUNT_COUNT'));
+  }
+
+  return formatStrategies(JSON.parse(env('STRINGIFIED_STRATEGIES')), +env('STRATEGY_BORROWED_AMOUNT_COUNT'));
+}
 
 const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
 const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/gasEstimates.json`;
