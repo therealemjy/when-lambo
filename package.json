@@ -12,11 +12,10 @@
     "format": "npm-run-all format:*",
     "format:json": "prettier --write \"**/*.json\"",
     "format:ts": "prettier --write \"**/*.ts\"",
-    "fetch-gas-estimates": "IS_FETCHING_GAS_ESTIMATES=true ts-node scripts/fetchGasEstimates/index.ts | ./node_modules/.bin/bunyan",
+    "fetch-gas-estimates": "ts-node scripts/fetchGasEstimates/index.ts | ./node_modules/.bin/bunyan",
     "bot:tsc": "tsc --noEmit --project ./bot/tsconfig.json",
     "bot:build": "rm -rf ./bot/dist && esbuild ./bot/index.ts --bundle --outfile=./bot/dist/index.js --platform=node",
     "bot:dev": "npm run bot:build && NODE_ENV=development node --inspect ./bot/dist/index | ./node_modules/.bin/bunyan",
-    "bot:start": "NODE_ENV=production node ./bot/dist/index.js",
     "prebot:deploy": "npm run test && npm run bot:build && npm run fetch-gas-estimates && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
     "bot:deploy": "npx pm2 deploy one update --force",
     "prepare": "husky install"

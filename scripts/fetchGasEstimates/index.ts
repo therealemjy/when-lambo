@@ -7,6 +7,7 @@ import logger from '@logger';
 import env from '@utils/env';
 import formatStrategies from '@utils/formatStrategies';
 
+import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import wrapEth from '@chainHandler/utils/wrapEth';
 
 import exchanges from '@bot/src/exchanges';
@@ -37,8 +38,8 @@ const fetchGasEstimates = async () => {
 
   // Because this script will only ever be run locally on Hardhat's local
   // network, we can use the test owner account as signer
-  const testOwner = await ethers.getNamedSigner('ownerAddress');
-  const testOwnerAddress = await testOwner.getAddress();
+  const testOwnerSigner = await ethers.getNamedSigner('ownerAddress');
+  const testOwnerAddress = await testOwnerSigner.getAddress();
   const testAmountIn = ethers.utils.parseEther('1.0');
 
   for (let e = 0; e < exchanges.length; e++) {
@@ -54,10 +55,10 @@ const fetchGasEstimates = async () => {
       await setup();
 
       // Wrap ETH to WETH on signer account
-      await wrapEth(testOwner, testAmountIn, testOwnerAddress);
+      await wrapEth(testOwnerSigner, testAmountIn, testOwnerAddress);
 
       const gasEstimate = await exchange.estimateGetDecimalAmountOut({
-        signer: testOwner,
+        signer: testOwnerSigner,
         amountIn: testAmountIn,
         toTokenAddress,
         isProd,
@@ -73,6 +74,23 @@ const fetchGasEstimates = async () => {
       }
     }
   }
+
+  // Execute test trade on Transactor contract (locally only)
+  logger.log('Execute fake trade locally to estimate gas cost ');
+  const TransactorContract: ITransactorContract = await ethers.getContract('Transactor', testOwnerSigner);
+
+  // const transaction = await TransactorContract.trade(
+  //   // This transaction should be mined at currentBlockNumber + 1, so passing currentBlockNumber should
+  //   // trigger a revert
+  //   currentBlockNumber,
+  //   config.testProfitableTrade.wethAmountToBorrow,
+  //   config.testProfitableTrade.sellingExchangeIndex,
+  //   config.testProfitableTrade.tradedTokenAddress,
+  //   config.testProfitableTrade.tradedTokenAmountOutMin,
+  //   config.testProfitableTrade.buyingExchangeIndex,
+  //   config.testProfitableTrade.wethAmountOutMin,
+  //   new Date(new Date().getTime() + 120000).getTime() // Set a deadline to 2 minutes from now
+  // )
 
   // Create dist folder if it does not exist
   if (!fs.existsSync(DIST_FOLDER_PATH)) {
