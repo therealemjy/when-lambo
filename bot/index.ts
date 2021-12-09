@@ -43,10 +43,10 @@ const init = async ({
     let cancelablePromise: CancelablePromise | undefined = undefined;
 
     provider.addListener('block', async (blockNumber: number) => {
-      services.logger.log(`New block received. Block # ${blockNumber}`);
+      services.logger.log(`New block: #${blockNumber}`);
 
       if (!services.state.monitoringActivated) {
-        services.logger.log(`--- Block skipped, monitoring not activated ---`);
+        services.logger.log(`Block skipped: #${blockNumber} (monitoring is deactivated)`);
         return;
       }
 
@@ -70,7 +70,7 @@ const init = async ({
       } catch (err: any) {
         // Means we intentionally cancelled the promise
         if (err.message === 'aborted') {
-          services.logger.log(`--- Block ${blockNumber} cancelled ---`);
+          services.logger.log(`Block cancelled: #${blockNumber}`);
           return;
         }
 
