@@ -19,12 +19,6 @@ export interface EnvConfig {
     accessKeyIdEthNode: string;
     secretAccessKeyEthNode: string;
   };
-  slippageAllowancePercent: number;
-  gasLimitMultiplicator: number;
-  gasPriceMultiplicator: number;
-  gasEstimates: GasEstimates;
-  gasCostMaximumThresholdWei: BigNumber;
-  strategies: Strategy[];
   googleSpreadSheet: {
     id: string;
     clientEmail: string;
@@ -33,8 +27,15 @@ export interface EnvConfig {
   slackChannelsWebhooks: {
     deals: string;
   };
-  testOwnerAccountPrivateKey: string;
+  blocknativeApiKey: string;
   sentryDNS: string;
+  testOwnerAccountPrivateKey: string;
+  slippageAllowancePercent: number;
+  gasLimitMultiplicator: number;
+  maxPriorityFeePerGasMultiplicator: number;
+  gasEstimates: GasEstimates;
+  gasCostMaximumThresholdWei: BigNumber;
+  strategies: Strategy[];
 }
 
 const strategies: Strategy[] = formatStrategies(
@@ -52,11 +53,6 @@ const config: EnvConfig = {
     accessKeyIdEthNode: env('AWS_ACCESS_KEY_ID_ETH_NODE'),
     secretAccessKeyEthNode: env('AWS_SECRET_ACCESS_KEY_ETH_NODE'),
   },
-  slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
-  gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
-  gasPriceMultiplicator: +env('GAS_PRICE_MULTIPLICATOR'),
-  gasEstimates: swapGasEstimates as GasEstimates,
-  gasCostMaximumThresholdWei: BigNumber.from(env('GAS_COST_MAXIMUM_THRESHOLD_WEI')),
   googleSpreadSheet: {
     id: env('GOOGLE_SPREADSHEET_SPREADSHEET_ID'),
     clientEmail: env('GOOGLE_SPREADSHEET_CLIENT_EMAIL'),
@@ -65,9 +61,15 @@ const config: EnvConfig = {
   slackChannelsWebhooks: {
     deals: env('SLACK_HOOK_URL_DEALS'),
   },
-  strategies,
-  testOwnerAccountPrivateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
+  blocknativeApiKey: env('BLOCKNATIVE_API_KEY'),
   sentryDNS: env('SENTRY_DNS_URL'),
+  testOwnerAccountPrivateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
+  slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
+  gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
+  maxPriorityFeePerGasMultiplicator: +env('MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR'),
+  gasEstimates: swapGasEstimates as GasEstimates,
+  gasCostMaximumThresholdWei: BigNumber.from(env('GAS_COST_MAXIMUM_THRESHOLD_WEI')),
+  strategies,
 };
 
 export default config;

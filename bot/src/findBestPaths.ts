@@ -13,7 +13,7 @@ type FindBestPathsArgs = {
   fromTokenDecimalAmounts: BigNumber[];
   toToken: Token;
   slippageAllowancePercent: number;
-  gasPriceWei: BigNumber;
+  maxFeePerGas: BigNumber;
   exchanges: Exchange[];
   gasEstimates: GasEstimates;
 };
@@ -25,7 +25,7 @@ const findBestPaths = async ({
   toToken,
   exchanges,
   slippageAllowancePercent,
-  gasPriceWei,
+  maxFeePerGas,
   gasEstimates,
 }: FindBestPathsArgs) => {
   // Find the highest amount of toToken decimals we can buy with each
@@ -37,7 +37,7 @@ const findBestPaths = async ({
     toToken,
     exchanges,
     slippageAllowancePercent,
-    gasPriceWei,
+    maxFeePerGas,
     gasEstimates,
   });
 
@@ -63,7 +63,7 @@ const findBestPaths = async ({
     toToken: fromToken,
     exchanges,
     slippageAllowancePercent,
-    gasPriceWei,
+    maxFeePerGas,
     gasEstimates,
     usedExchangeIndexes,
   });

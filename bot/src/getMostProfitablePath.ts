@@ -9,12 +9,12 @@ import calculateProfit from '@bot/src/utils/calculateProfit';
 // profitable according to the rules)
 const getMostProfitablePath = ({
   paths,
-  gasPriceWei,
+  maxFeePerGas,
   gasLimitMultiplicator,
   gasCostMaximumThresholdWei,
 }: {
   paths: Path[];
-  gasPriceWei: BigNumber;
+  maxFeePerGas: BigNumber;
   gasLimitMultiplicator: number;
   gasCostMaximumThresholdWei: BigNumber;
 }) => {
@@ -25,7 +25,7 @@ const getMostProfitablePath = ({
       }
     | undefined
   >((mostProfitablePath, path) => {
-    const tradeWithoutSwapsGasCostEstimate = gasPriceWei.mul(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE);
+    const tradeWithoutSwapsGasCostEstimate = maxFeePerGas.mul(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE);
 
     const totalGasCost = path[0].gasCostEstimate
       .add(path[1].gasCostEstimate)

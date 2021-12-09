@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 
 import logger from '@logger';
 import formatStrategies from '@utils/formatStrategies';
@@ -13,6 +13,11 @@ const config: EnvConfig = {
   isDev: false,
   isProd: false,
   serverId: 'test',
+  aws: {
+    mainnetWssRpcUrl: 'fake-mainnet-wss-rpc-url',
+    accessKeyIdEthNode: 'fake-access-key-id-eth-node',
+    secretAccessKeyEthNode: 'fake-secret-access-key-eth-node',
+  },
   googleSpreadSheet: {
     id: 'fake-id',
     clientEmail: 'fake-client-email',
@@ -21,17 +26,13 @@ const config: EnvConfig = {
   slackChannelsWebhooks: {
     deals: 'fake-channel-webhook',
   },
-  testOwnerAccountPrivateKey: 'fake-private-key',
+  blocknativeApiKey: 'fake-blocknative-api-key',
   sentryDNS: 'fake-sentry-dns',
-  aws: {
-    mainnetWssRpcUrl: 'fake-mainnet-wss-rpc-url',
-    accessKeyIdEthNode: 'fake-access-key-id-eth-node',
-    secretAccessKeyEthNode: 'fake-secret-access-key-eth-node',
-  },
+  testOwnerAccountPrivateKey: 'fake-private-key',
   slippageAllowancePercent: 0.5,
   gasLimitMultiplicator: 1.3, // TODO: check why using any value lower than that makes the contract call fail
-  gasPriceMultiplicator: 1.1,
-  gasCostMaximumThresholdWei: BigNumber.from('63000000000000000'),
+  maxPriorityFeePerGasMultiplicator: 1.1,
+  gasCostMaximumThresholdWei: ethers.utils.parseUnits('0.063', 'ether'),
   gasEstimates: {
     // Uniswap V2
     '0': {
@@ -75,11 +76,9 @@ export const EXPECTED_REVENUE_WETH = '568270094198623164';
 export const mockedServices: Services = {
   state: {
     ...defaultState,
-    currentGasPrices: {
-      rapid: BigNumber.from('100000000000'), // 100 Gwei
-      fast: BigNumber.from('80000000000'), // 80 Gwei
-      standard: BigNumber.from('60000000000'), // 60 Gwei
-      slow: BigNumber.from('40000000000'), // 40 Gwei
+    currentGasFees: {
+      maxPriorityFeePerGas: ethers.utils.parseUnits('4', 'gwei'),
+      maxFeePerGas: ethers.utils.parseUnits('101', 'gwei'),
     },
   },
   config,

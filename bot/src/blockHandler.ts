@@ -34,7 +34,7 @@ const executeStrategy = async (
   { blockNumber, multicall, strategy, TransactorContract, spreadsheet }: ExecuteStrategyArgs
 ) => {
   try {
-    const gasPriceWei = services.state.currentGasPrices.rapid;
+    const gasFees = services.state.currentGasFees;
 
     const paths = await findBestPaths({
       multicall,
@@ -48,13 +48,13 @@ const executeStrategy = async (
       exchanges: services.exchanges,
       slippageAllowancePercent: services.config.slippageAllowancePercent,
       gasEstimates: services.config.gasEstimates,
-      gasPriceWei,
+      maxFeePerGas: gasFees.maxFeePerGas,
     });
 
     // Get the most profitable path, if any of them is considered profitable
     const mostProfitablePath = getMostProfitablePath({
       paths,
-      gasPriceWei,
+      maxFeePerGas: gasFees.maxFeePerGas,
       gasLimitMultiplicator: services.config.gasLimitMultiplicator,
       gasCostMaximumThresholdWei: services.config.gasCostMaximumThresholdWei,
     });
@@ -69,7 +69,7 @@ const executeStrategy = async (
       transaction = await executeTrade({
         blockNumber,
         path: mostProfitablePath,
-        gasPriceWei,
+        gasFees,
         gasLimitMultiplicator: services.config.gasLimitMultiplicator,
         TransactorContract,
       });

@@ -4,7 +4,7 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import http from 'http';
 import TypedEmitter from 'typed-emitter';
 
-import { Strategy } from '@localTypes';
+import { Strategy, GasFees } from '@localTypes';
 import logger from '@logger';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
@@ -14,8 +14,8 @@ import eventEmitter, { MessageEvents } from '@bot/src/eventEmitter';
 import exchanges from '@bot/src/exchanges';
 import UniswapLikeExchange from '@bot/src/exchanges/UniswapLikeExchange';
 
+import GasPriceWatcher from './GasPriceWatcher';
 import fetchSecrets from './fetchSecrets';
-import gasPriceWatcher from './gasPriceWatcher';
 import getAwsWSProvider from './getAwsWSProvider';
 import getSpreadsheet from './getSpreadsheet';
 import getTransactorContract from './getTransactorContract';
@@ -25,12 +25,7 @@ export type State = {
   lastMonitoringDateTime: number | null;
   botExecutionMonitoringTick: number;
   perfMonitoringRecords: number[];
-  currentGasPrices: {
-    rapid: BigNumber;
-    fast: BigNumber;
-    standard: BigNumber;
-    slow: BigNumber;
-  };
+  currentGasFees: GasFees;
 };
 
 export const defaultState: State = {
@@ -40,11 +35,9 @@ export const defaultState: State = {
   lastMonitoringDateTime: null,
   botExecutionMonitoringTick: 0,
   perfMonitoringRecords: [],
-  currentGasPrices: {
-    rapid: BigNumber.from(0),
-    fast: BigNumber.from(0),
-    standard: BigNumber.from(0),
-    slow: BigNumber.from(0),
+  currentGasFees: {
+    maxPriorityFeePerGas: BigNumber.from(0),
+    maxFeePerGas: BigNumber.from(0),
   },
 };
 
@@ -124,10 +117,13 @@ export const bootstrap = async (): Promise<{
       // Get Google Spreadsheet
       const spreadsheet = await getSpreadsheet();
 
-      // Pull and update gas prices every 5 seconds
-      await gasPriceWatcher.start(services, (gasPrices) => (services.state.currentGasPrices = gasPrices), 5000);
+      // Pull and update gas prices every 5.1 seconds (blocknative rate limit
+      // being one request every 5 seconds)
+      const gasPriceWatcher = new GasPriceWatcher(services.config.blocknativeApiKey);
+      await gasPriceWatcher.start(services, (updatedGasFees) => (services.state.currentGasFees = updatedGasFees), 5100);
 
-      // We will use this instance of state throughout the bot with dependencies injection, making testing way easier
+      // We will use this instance of state throughout the bot with dependencies
+      // injection, making testing way easier
       resolve({ services, provider, spreadsheet, multicall, TransactorContract });
     });
   });

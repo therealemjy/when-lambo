@@ -15,6 +15,11 @@ export type GasEstimates = {
   };
 };
 
+export interface GasFees {
+  maxPriorityFeePerGas: BigNumber;
+  maxFeePerGas: BigNumber;
+}
+
 export interface ParsedStrategy {
   TRADED_TOKEN_ADDRESS: string;
   TRADED_TOKEN_SYMBOL: string;

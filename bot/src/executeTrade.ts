@@ -1,6 +1,7 @@
-import { ContractTransaction, BigNumber } from 'ethers';
+import { ContractTransaction } from 'ethers';
 
 import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
+import { GasFees } from '@localTypes';
 import logger from '@logger';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
@@ -10,13 +11,13 @@ import { Path } from '@bot/src/types';
 const executeTrade = async ({
   blockNumber,
   path,
-  gasPriceWei,
+  gasFees,
   gasLimitMultiplicator,
   TransactorContract,
 }: {
   blockNumber: number;
   path: Path;
-  gasPriceWei: BigNumber;
+  gasFees: GasFees;
   gasLimitMultiplicator: number;
   TransactorContract: ITransactorContract;
 }): Promise<ContractTransaction> => {
@@ -55,7 +56,7 @@ const executeTrade = async ({
     buyingExchangeIndex,
     wethAmountOutMin,
     deadline,
-    { gasPrice: gasPriceWei, gasLimit },
+    { ...gasFees, gasLimit },
   ];
 
   logger.log('Sending trade transaction...', args);
