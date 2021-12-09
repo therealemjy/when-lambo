@@ -32,6 +32,12 @@ const tokenAddresses = strategies.reduce((allTokenAddresses, formattedStrategy) 
 const setup = deployments.createFixture(() => deployments.fixture());
 
 const fetchGasEstimates = async () => {
+  if (isProd) {
+    throw new Error(
+      'fetchGasEstimates script can only be called in non-production environments, as it sends real transactions to the node! Make sure to only run this script on a test/forked network only using fake ETH.'
+    );
+  }
+
   logger.log('Fetching gas estimates...');
 
   const gasEstimates: GasEstimates = {};
