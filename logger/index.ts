@@ -20,6 +20,7 @@ import { WorksheetRow } from './types';
 const bunyanLogger = Bunyan.createLogger({
   name: 'bot',
   serializers: Bunyan.stdSerializers,
+  src: true,
 });
 
 // Save logs in files in prod

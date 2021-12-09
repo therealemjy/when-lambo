@@ -114,9 +114,9 @@ const blockHandler = async (
     services.strategies.map((strategy) =>
       executeStrategy(services, {
         blockNumber,
-        multicall,
         strategy,
         TransactorContract,
+        multicall,
         spreadsheet,
       })
     )

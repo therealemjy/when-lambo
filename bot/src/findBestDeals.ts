@@ -115,9 +115,14 @@ const findBestDeals = async ({
       // reference.
       const refTokenAddress = fromToken.address === wethAddress ? toToken.address : fromToken.address;
 
-      // TODO: add safe guard that logs an error in case the estimate wasn't
-      // found
-      const gasEstimate = BigNumber.from(gasEstimates[exchange.index][refTokenAddress]);
+      const gasEstimateFromConfig = gasEstimates[exchange.index][refTokenAddress];
+      if (!gasEstimateFromConfig) {
+        throw new Error(
+          `Gas estimate missing for token address ${refTokenAddress}. This most likely means estimates have not been updated, running "npm run fetch-gas-estimate" should fix the issue.`
+        );
+      }
+
+      const gasEstimate = BigNumber.from(gasEstimateFromConfig);
 
       const deal: Deal = {
         timestamp: new Date(),
