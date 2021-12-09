@@ -11,7 +11,7 @@ npm-debug.log*
 
 .env
 
-dist
+dist/swapGasEstimates.json
 coverage
 coverage.json
 
