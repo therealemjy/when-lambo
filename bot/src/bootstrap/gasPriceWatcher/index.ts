@@ -37,7 +37,9 @@ class GasPriceWatcher {
       // In order to make sure transactions are mined as fast as possible, we
       // multiply the gas price for rapid transactions by a given
       // multiplicator
-      rapid: BigNumber.from(res.data.data.rapid).mul(services.config.gasPriceMultiplicator),
+      rapid: BigNumber.from(res.data.data.rapid)
+        .mul(Math.floor(services.config.gasPriceMultiplicator * 100))
+        .div(100),
       fast: BigNumber.from(res.data.data.fast),
       standard: BigNumber.from(res.data.data.standard),
       slow: BigNumber.from(res.data.data.slow),
