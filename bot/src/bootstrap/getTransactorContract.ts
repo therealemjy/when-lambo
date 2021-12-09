@@ -1,8 +1,7 @@
 import { ethers, Signer } from 'ethers';
 
 import hardhatTransactorContractInfo from '@deployments/localhost/Transactor.json';
-// TODO: import real mainnet contract info once it's been deployed
-import mainnetTransactorContractInfo from '@deployments/localhost/Transactor.json';
+import mainnetTransactorContractInfo from '@deployments/mainnet/Transactor.json';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 

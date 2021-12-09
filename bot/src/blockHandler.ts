@@ -1,14 +1,14 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import { ContractTransaction } from 'ethers';
+// import { ContractTransaction } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { Strategy } from '@localTypes';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
-import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
+// import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 import { Services } from './bootstrap';
-import executeTrade from './executeTrade';
+// import executeTrade from './executeTrade';
 import findBestPaths from './findBestPaths';
 import getMostProfitablePath from './getMostProfitablePath';
 import { WETH } from './tokens';
@@ -59,41 +59,44 @@ const executeStrategy = async (
       gasCostMaximumThresholdWei: services.config.gasCostMaximumThresholdWei,
     });
 
-    let transaction: ContractTransaction | undefined = undefined;
+    // TODO: uncomment once we're confident the script can start executing real
+    // trades
+
+    // let transaction: ContractTransaction | undefined = undefined;
 
     // Execute trade, in production and test environments only
-    if (mostProfitablePath && !services.config.isDev) {
-      // Deactivate the bot completely
-      services.state.monitoringActivated = false;
+    // if (mostProfitablePath && !services.config.isDev) {
+    //   // Deactivate the bot completely
+    //   services.state.monitoringActivated = false;
 
-      transaction = await executeTrade({
-        blockNumber,
-        path: mostProfitablePath,
-        gasFees,
-        gasLimitMultiplicator: services.config.gasLimitMultiplicator,
-        TransactorContract,
-      });
-    }
+    //   transaction = await executeTrade({
+    //     blockNumber,
+    //     path: mostProfitablePath,
+    //     gasFees,
+    //     gasLimitMultiplicator: services.config.gasLimitMultiplicator,
+    //     TransactorContract,
+    //   });
+    // }
 
     // Log trade
     if (mostProfitablePath) {
       await services.logger.transaction({
         blockNumber,
         path: mostProfitablePath,
-        transactionHash: transaction?.hash,
+        // transactionHash: transaction?.hash,
         spreadsheet,
       });
     }
 
     // Watch transaction
-    if (transaction) {
-      services.logger.log('Watching pending transaction...');
-      const receipt = await transaction.wait();
-      services.logger.log('Trade successfully executed! Human-readable receipt:');
-      services.logger.log(formatNestedBN(receipt));
-      services.logger.log('Stringified receipt:');
-      services.logger.log(JSON.stringify(receipt));
-    }
+    // if (transaction) {
+    //   services.logger.log('Watching pending transaction...');
+    //   const receipt = await transaction.wait();
+    //   services.logger.log('Trade successfully executed! Human-readable receipt:');
+    //   services.logger.log(formatNestedBN(receipt));
+    //   services.logger.log('Stringified receipt:');
+    //   services.logger.log(JSON.stringify(receipt));
+    // }
   } catch (error: unknown) {
     services.eventEmitter.emit('error', error);
   }
