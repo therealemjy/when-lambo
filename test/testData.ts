@@ -17,6 +17,8 @@ const config: EnvConfig = {
     mainnetWssRpcUrl: 'fake-mainnet-wss-rpc-url',
     accessKeyIdEthNode: 'fake-access-key-id-eth-node',
     secretAccessKeyEthNode: 'fake-secret-access-key-eth-node',
+    region: 'fake-region',
+    secretName: 'fake-secret-name',
   },
   googleSpreadSheet: {
     id: 'fake-id',
@@ -28,7 +30,6 @@ const config: EnvConfig = {
   },
   blocknativeApiKey: 'fake-blocknative-api-key',
   sentryDNS: 'fake-sentry-dns',
-  testOwnerAccountPrivateKey: 'fake-private-key',
   slippageAllowancePercent: 0.5,
   gasLimitMultiplicator: 1.3, // TODO: check why using any value lower than that makes the contract call fail
   maxPriorityFeePerGasMultiplicator: 1.1,

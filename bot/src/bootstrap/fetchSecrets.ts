@@ -2,28 +2,16 @@ import AWS from 'aws-sdk';
 
 import logger from '@logger';
 
-import config from '@bot/config';
-
 export type WLSecrets = {
   ownerAccountPrivateKey: string;
 };
 
-const fetchSecrets = async (): Promise<WLSecrets> => {
-  if (config.isDev) {
-    return {
-      // WARNING: this private key corresponds to a REAL account on the mainnet,
-      // but this private key is well known since it's one of the accounts
-      // Hardhat uses for tests. DO NOT ever send any funds to this address and
-      // do not use it for anything else than obtaining transaction estimates.
-      ownerAccountPrivateKey: config.testOwnerAccountPrivateKey,
-    };
-  }
+interface IFetchSecretsInput {
+  region: string;
+  secretName: string;
+}
 
-  // Load the AWS SDK
-  // TODO: move to env variables
-  const region = 'us-east-1';
-  const secretName = 'arn:aws:secretsmanager:us-east-1:725566919168:secret:prod/secret-O2a6FL';
-
+const fetchSecrets = async ({ region, secretName }: IFetchSecretsInput): Promise<WLSecrets> => {
   // Create a Secrets Manager client
   const client = new AWS.SecretsManager({
     region: region,

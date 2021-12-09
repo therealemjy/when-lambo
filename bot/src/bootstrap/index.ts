@@ -109,7 +109,10 @@ export const bootstrap = async (): Promise<{
 
       // Get provider and other blockchain related elements
       const provider = getAwsWSProvider();
-      const secrets = await fetchSecrets();
+      const secrets = await fetchSecrets({
+        region: services.config.aws.region,
+        secretName: services.config.aws.secretName,
+      });
       const ownerAccount = new ethers.Wallet(secrets.ownerAccountPrivateKey, provider);
       const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
       const TransactorContract = getTransactorContract(ownerAccount, services.config.isProd);

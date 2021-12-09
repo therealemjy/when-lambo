@@ -18,6 +18,8 @@ export interface EnvConfig {
     mainnetWssRpcUrl: string;
     accessKeyIdEthNode: string;
     secretAccessKeyEthNode: string;
+    region: string;
+    secretName: string;
   };
   googleSpreadSheet: {
     id: string;
@@ -29,7 +31,6 @@ export interface EnvConfig {
   };
   blocknativeApiKey: string;
   sentryDNS: string;
-  testOwnerAccountPrivateKey: string;
   slippageAllowancePercent: number;
   gasLimitMultiplicator: number;
   maxPriorityFeePerGasMultiplicator: number;
@@ -52,6 +53,8 @@ const config: EnvConfig = {
     mainnetWssRpcUrl: env('AWS_WSS_RPC_URL'),
     accessKeyIdEthNode: env('AWS_ACCESS_KEY_ID_ETH_NODE'),
     secretAccessKeyEthNode: env('AWS_SECRET_ACCESS_KEY_ETH_NODE'),
+    region: env('AWS_REGION'),
+    secretName: env('AWS_SECRET_NAME'),
   },
   googleSpreadSheet: {
     id: env('GOOGLE_SPREADSHEET_SPREADSHEET_ID'),
@@ -63,7 +66,6 @@ const config: EnvConfig = {
   },
   blocknativeApiKey: env('BLOCKNATIVE_API_KEY'),
   sentryDNS: env('SENTRY_DNS_URL'),
-  testOwnerAccountPrivateKey: env('TEST_OWNER_ACCOUNT_MAINNET_PRIVATE_KEY'),
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   maxPriorityFeePerGasMultiplicator: +env('MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR'),
