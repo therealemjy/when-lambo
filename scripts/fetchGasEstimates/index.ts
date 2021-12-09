@@ -15,7 +15,7 @@ import exchanges from '@bot/src/exchanges';
 const ethers = hre.ethers;
 
 const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
-const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/swapGasEstimates.json`;
+const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/gasEstimates.json`;
 
 const strategies = formatStrategies(JSON.parse(env('STRINGIFIED_STRATEGIES')), +env('STRATEGY_BORROWED_AMOUNT_COUNT'));
 const isProd = process.env.NODE_ENV === 'production';
@@ -43,9 +43,12 @@ const fetchGasEstimates = async () => {
 
   for (let e = 0; e < exchanges.length; e++) {
     const exchange = exchanges[e];
+    logger.log(`Exchange #${exchange.index}: ${exchange.name}`);
 
     for (let i = 0; i < tokenAddresses.length; i++) {
       const toTokenAddress = tokenAddresses[i];
+
+      logger.log(`Token address: ${toTokenAddress}`);
 
       // Reset blockchain state
       await setup();

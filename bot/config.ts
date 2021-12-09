@@ -5,7 +5,7 @@ import { Environment, GasEstimates, Strategy } from '@localTypes';
 import env from '@utils/env';
 import formatStrategies from '@utils/formatStrategies';
 
-import swapGasEstimates from '@dist/swapGasEstimates.json';
+import gasEstimates from '@dist/gasEstimates.json';
 
 dotenv.config();
 
@@ -69,7 +69,7 @@ const config: EnvConfig = {
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   maxPriorityFeePerGasMultiplicator: +env('MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR'),
-  gasEstimates: swapGasEstimates as GasEstimates,
+  gasEstimates: gasEstimates as GasEstimates,
   gasCostMaximumThresholdWei: BigNumber.from(env('GAS_COST_MAXIMUM_THRESHOLD_WEI')),
   strategies,
 };
