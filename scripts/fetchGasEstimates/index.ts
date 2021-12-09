@@ -7,7 +7,6 @@ import logger from '@logger';
 import env from '@utils/env';
 import formatStrategies from '@utils/formatStrategies';
 
-import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import wrapEth from '@chainHandler/utils/wrapEth';
 
 import exchanges from '@bot/src/exchanges';
@@ -90,23 +89,6 @@ const fetchGasEstimates = async () => {
       }
     }
   }
-
-  // Execute test trade on Transactor contract (locally only)
-  logger.log('Execute fake trade locally to estimate gas cost ');
-  const TransactorContract: ITransactorContract = await ethers.getContract('Transactor', testOwnerSigner);
-
-  // const transaction = await TransactorContract.trade(
-  //   // This transaction should be mined at currentBlockNumber + 1, so passing currentBlockNumber should
-  //   // trigger a revert
-  //   currentBlockNumber,
-  //   config.testProfitableTrade.wethAmountToBorrow,
-  //   config.testProfitableTrade.sellingExchangeIndex,
-  //   config.testProfitableTrade.tradedTokenAddress,
-  //   config.testProfitableTrade.tradedTokenAmountOutMin,
-  //   config.testProfitableTrade.buyingExchangeIndex,
-  //   config.testProfitableTrade.wethAmountOutMin,
-  //   new Date(new Date().getTime() + 120000).getTime() // Set a deadline to 2 minutes from now
-  // )
 
   // Create dist folder if it does not exist
   if (!fs.existsSync(DIST_FOLDER_PATH)) {
