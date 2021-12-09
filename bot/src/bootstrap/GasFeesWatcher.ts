@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ethers, BigNumber } from 'ethers';
+import { BigNumber } from 'ethers';
 
 import { Services } from '.';
 
@@ -8,7 +8,7 @@ export interface GasFees {
   maxFeePerGas: BigNumber;
 }
 
-class GasPriceWatcher {
+class GasFeesWatcher {
   blocknativeApiKey: string;
 
   constructor(blocknativeApiKey: string) {
@@ -33,7 +33,7 @@ class GasPriceWatcher {
     // Because BigNumber does not support decimal numbers, we need to convert
     // gwei values expressed with decimal numbers into wei using a normal
     // calculation
-    return gwei * 10 ** 9;
+    return Math.ceil(gwei * 10 ** 9);
   }
 
   private async getPrices(services: Services): Promise<GasFees> {
@@ -79,7 +79,7 @@ class GasPriceWatcher {
     )
       // In order to make sure transactions are mined as fast as possible, we
       // multiply the max priority fee per gas returned by blocknative by a given
-      // multiplicator
+      // multiplicator set in config
       .mul(Math.floor(services.config.maxPriorityFeePerGasMultiplicator * 100))
       .div(100);
 
@@ -92,4 +92,4 @@ class GasPriceWatcher {
   }
 }
 
-export default GasPriceWatcher;
+export default GasFeesWatcher;
