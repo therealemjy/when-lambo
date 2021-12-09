@@ -19,7 +19,7 @@ const ethers = hre.ethers;
 
 function getStrategies() {
   return formatStrategies(
-    process.env.USE_LOCAL_STRATEGIES ? JSON.parse(env('STRINGIFIED_STRATEGIES')) : prodStrategies.flat(),
+    process.env.USE_PROD_STRATEGIES ? prodStrategies.flat() : JSON.parse(env('STRINGIFIED_STRATEGIES')),
     +env('STRATEGY_BORROWED_AMOUNT_COUNT')
   );
 }
