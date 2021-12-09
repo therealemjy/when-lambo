@@ -40,7 +40,7 @@ export interface EnvConfig {
 
 const strategies: Strategy[] = formatStrategies(
   JSON.parse(env('STRINGIFIED_STRATEGIES')),
-  +env('STRATEGY_BORROWED_AMOUNTS_COUNT')
+  +env('STRATEGY_BORROWED_AMOUNT_COUNT')
 );
 
 const config: EnvConfig = {

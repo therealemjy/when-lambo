@@ -17,7 +17,7 @@ const ethers = hre.ethers;
 const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
 const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/swapGasEstimates.json`;
 
-const strategies = formatStrategies(JSON.parse(env('STRINGIFIED_STRATEGIES')), +env('STRATEGY_BORROWED_AMOUNTS_COUNT'));
+const strategies = formatStrategies(JSON.parse(env('STRINGIFIED_STRATEGIES')), +env('STRATEGY_BORROWED_AMOUNT_COUNT'));
 const isProd = process.env.NODE_ENV === 'production';
 
 const tokenAddresses = strategies.reduce((allTokenAddresses, formattedStrategy) => {
@@ -35,8 +35,8 @@ const fetchGasEstimates = async () => {
 
   const gasEstimates: GasEstimates = {};
 
-  // Because this script will only ever be run locally on Hardhat's local network, we can use
-  // the test owner account as signer
+  // Because this script will only ever be run locally on Hardhat's local
+  // network, we can use the test owner account as signer
   const testOwner = await ethers.getNamedSigner('ownerAddress');
   const testOwnerAddress = await testOwner.getAddress();
   const testAmountIn = ethers.utils.parseEther('1.0');
@@ -79,10 +79,33 @@ const fetchGasEstimates = async () => {
   // Write gas estimates inside a JSON file
   fs.writeFileSync(SWAP_GAS_ESTIMATES_FILE_PATH, JSON.stringify(gasEstimates));
 
+  // Go through estimates and throw error if a token is only present on one
+  // exchange. Note that we do this check after writing the gas estimates inside
+  // the JSON file, so that the results can be analyzed even if an error is
+  // thrown.
+  tokenAddresses.forEach((tokenAddress) => {
+    let exchangeCount = 0;
+
+    Object.keys(gasEstimates)
+      .filter((key) => Object.prototype.hasOwnProperty.call(gasEstimates, key))
+      .forEach((exchangeIndex) => {
+        if (Object.prototype.hasOwnProperty.call(gasEstimates[+exchangeIndex], tokenAddress)) {
+          exchangeCount++;
+        }
+      });
+
+    if (exchangeCount < 2) {
+      throw new Error(
+        `Token with address ${tokenAddress} is only present on one exchange, meaning we can't trade it and so it should be removed from the strategies.`
+      );
+    }
+  });
+
   logger.log('Gas estimates fetched successfully.');
   logger.log(gasEstimates);
 };
 
-// Note: we voluntarily don't catch errors so that execution stops if this script fails, as
-// it is crucial for the estimates to have been fetched in order for the bot to work
+// Note: we voluntarily don't catch errors so that execution stops if this
+// script fails, as it is crucial for the estimates to have been fetched in
+// order for the bot to work
 fetchGasEstimates().then(() => process.exit(0));
