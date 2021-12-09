@@ -10,4 +10,3 @@ deployments
 chainHandler/artifacts
 chainHandler/cache
 chainHandler/typechain
-bot/dist
