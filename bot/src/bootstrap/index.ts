@@ -1,5 +1,5 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import { ethers, BigNumber } from 'ethers';
+import { ethers, BigNumber, Signer } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import http from 'http';
 import TypedEmitter from 'typed-emitter';
@@ -109,13 +109,20 @@ export const bootstrap = async (): Promise<{
 
       // Get provider and other blockchain related elements
       const provider = getAwsWSProvider();
-      const secrets = await fetchSecrets({
-        region: services.config.aws.region,
-        secretName: services.config.aws.secretName,
-      });
-      const ownerAccount = new ethers.Wallet(secrets.ownerAccountPrivateKey, provider);
       const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true });
-      const TransactorContract = getTransactorContract(ownerAccount, services.config.isProd);
+
+      // Only sign the Transactor contract with the actual owner in prod
+      let ownerAccount: Signer | undefined = undefined;
+
+      if (services.config.isProd) {
+        const secrets = await fetchSecrets({
+          region: services.config.aws.region,
+          secretName: services.config.aws.secretName,
+        });
+        ownerAccount = new ethers.Wallet(secrets.ownerAccountPrivateKey, provider);
+      }
+
+      const TransactorContract = getTransactorContract(services.config.isProd, ownerAccount);
 
       // Get Google Spreadsheet
       const spreadsheet = await getSpreadsheet();
