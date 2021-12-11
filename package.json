@@ -1,6 +1,6 @@
 {
   "name": "when-lambo-smart-contracts",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "Smart contracts for When Lambo",
   "author": "",
   "private": true,
@@ -16,7 +16,7 @@
     "bot:tsc": "tsc --noEmit --project ./bot/tsconfig.json",
     "bot:build": "rm -rf ./dist/index.js && esbuild ./bot/index.ts --bundle --outfile=./dist/index.js --platform=node",
     "bot:dev": "npm run bot:build && NODE_ENV=development node --inspect ./dist/index | ./node_modules/.bin/bunyan",
-    "prebot:deploy": "npm run test && npm run bot:build && USE_PROD_STRATEGIES=true npm run fetch-gas-estimates && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
+    "prebot:deploy": "npm run tsc && npm run lint && npm run test && USE_PROD_STRATEGIES=true npm run fetch-gas-estimates && npm run bot:build && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" --no-verify && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
     "bot:deploy": "npx pm2 deploy one update --force",
     "prepare": "husky install"
   },
