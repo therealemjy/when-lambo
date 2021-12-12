@@ -29,11 +29,9 @@ export interface EnvConfig {
   slackChannelsWebhooks: {
     deals: string;
   };
-  blocknativeApiKey: string;
   sentryDNS: string;
   slippageAllowancePercent: number;
   gasLimitMultiplicator: number;
-  maxPriorityFeePerGasMultiplicator: number;
   gasEstimates: GasEstimates;
   gasCostMaximumThresholdWei: BigNumber;
   strategies: Strategy[];
@@ -64,11 +62,9 @@ const config: EnvConfig = {
   slackChannelsWebhooks: {
     deals: env('SLACK_HOOK_URL_DEALS'),
   },
-  blocknativeApiKey: env('BLOCKNATIVE_API_KEY'),
   sentryDNS: env('SENTRY_DNS_URL'),
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
-  maxPriorityFeePerGasMultiplicator: +env('MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR'),
   gasEstimates: gasEstimates as GasEstimates,
   gasCostMaximumThresholdWei: BigNumber.from(env('GAS_COST_MAXIMUM_THRESHOLD_WEI')),
   strategies,

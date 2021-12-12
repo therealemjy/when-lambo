@@ -14,7 +14,6 @@ import eventEmitter, { MessageEvents } from '@bot/src/eventEmitter';
 import exchanges from '@bot/src/exchanges';
 import UniswapLikeExchange from '@bot/src/exchanges/UniswapLikeExchange';
 
-import GasFeesWatcher from './GasFeesWatcher';
 import fetchSecrets from './fetchSecrets';
 import getAwsWSProvider from './getAwsWSProvider';
 import getSpreadsheet from './getSpreadsheet';
@@ -126,11 +125,6 @@ export const bootstrap = async (): Promise<{
 
       // Get Google Spreadsheet
       const spreadsheet = await getSpreadsheet();
-
-      // Pull and update gas prices every 5.5 seconds (blocknative rate limit
-      // being one request every 5 seconds)
-      const gasFeesWatcher = new GasFeesWatcher(services.config.blocknativeApiKey);
-      await gasFeesWatcher.start(services, (updatedGasFees) => (services.state.currentGasFees = updatedGasFees), 5500);
 
       // We will use this instance of state throughout the bot with dependencies
       // injection, making testing way easier

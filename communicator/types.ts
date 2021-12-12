@@ -1,3 +1,5 @@
+import { GasFees } from './GasFeesWatcher';
+
 export type Message = StopMonitoringSignalMessage | GasFeesUpdateMessage;
 
 export type StopMonitoringSignalMessage = {
@@ -6,8 +8,5 @@ export type StopMonitoringSignalMessage = {
 
 export type GasFeesUpdateMessage = {
   type: 'gasFeesUpdate';
-  data: {
-    maxPriorityFeePerGas: string;
-    maxFeePerGas: string;
-  };
+  data: GasFees;
 };

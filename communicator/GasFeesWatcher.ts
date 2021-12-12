@@ -1,42 +1,38 @@
 import axios from 'axios';
-import { BigNumber } from 'ethers';
 
-import { Services } from '.';
+import logger from '@logger';
 
 export interface GasFees {
-  maxPriorityFeePerGas: BigNumber;
-  maxFeePerGas: BigNumber;
+  maxPriorityFeePerGas: number;
+  maxFeePerGas: number;
 }
 
 class GasFeesWatcher {
   blocknativeApiKey: string;
+  maxPriorityFeePerGasMultiplicator: number;
 
-  constructor(blocknativeApiKey: string) {
+  constructor(blocknativeApiKey: string, maxPriorityFeePerGasMultiplicator: number) {
     this.blocknativeApiKey = blocknativeApiKey;
+    this.maxPriorityFeePerGasMultiplicator = maxPriorityFeePerGasMultiplicator;
   }
 
-  public async start(services: Services, callback: (gasFees: GasFees) => void, interval: number) {
-    this.blocknativeApiKey = services.config.blocknativeApiKey;
-
+  public async start(callback: (gasFees: GasFees) => void, interval: number) {
     const fn = async () => {
-      const prices = await this.getPrices(services);
+      const prices = await this.getPrices();
       callback(prices);
     };
 
     await fn();
 
-    services.logger.log('Gas fees watcher started.');
+    logger.log('Gas fees watcher started.');
     setInterval(fn, interval);
   }
 
   private convertGweiNumberToWei(gwei: number) {
-    // Because BigNumber does not support decimal numbers, we need to convert
-    // gwei values expressed with decimal numbers into wei using a normal
-    // calculation
     return Math.ceil(gwei * 10 ** 9);
   }
 
-  private async getPrices(services: Services): Promise<GasFees> {
+  private async getPrices(): Promise<GasFees> {
     const res = await axios.get<{
       system: string;
       network: string;
@@ -74,16 +70,15 @@ class GasFeesWatcher {
       );
     }
 
-    const maxPriorityFeePerGas = BigNumber.from(
-      this.convertGweiNumberToWei(pendingBlock.estimatedPrices[0].maxPriorityFeePerGas)
-    )
-      // In order to make sure transactions are mined as fast as possible, we
-      // multiply the max priority fee per gas returned by blocknative by a given
-      // multiplicator set in config
-      .mul(Math.floor(services.config.maxPriorityFeePerGasMultiplicator * 100))
-      .div(100);
+    const maxPriorityFeePerGasWei = this.convertGweiNumberToWei(pendingBlock.estimatedPrices[0].maxPriorityFeePerGas);
 
-    const maxFeePerGas = maxPriorityFeePerGas.add(this.convertGweiNumberToWei(baseFeePerGas));
+    // In order to make sure transactions are mined as fast as possible, we
+    // multiply the max priority fee per gas returned by blocknative by a given
+    // multiplicator set in config
+    const maxPriorityFeePerGas = Math.floor(maxPriorityFeePerGasWei * this.maxPriorityFeePerGasMultiplicator);
+
+    const baseFeePerGasWei = this.convertGweiNumberToWei(baseFeePerGas);
+    const maxFeePerGas = baseFeePerGasWei + maxPriorityFeePerGas;
 
     return {
       maxPriorityFeePerGas,
