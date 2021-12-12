@@ -19,10 +19,12 @@ import fetchSecrets from './fetchSecrets';
 import getAwsWSProvider from './getAwsWSProvider';
 import getSpreadsheet from './getSpreadsheet';
 import getTransactorContract from './getTransactorContract';
+import Messenger from './messenger';
 
 export type State = {
-  monitoringActivated: boolean;
-  lastMonitoringDateTime: number | null;
+  isMonitoringActivated: boolean;
+  lastMonitoringDateTime?: number;
+  lastGasPriceUpdateDateTime?: number;
   botExecutionMonitoringTick: number;
   perfMonitoringRecords: number[];
   gasFees?: GasFees;
@@ -30,9 +32,8 @@ export type State = {
 
 export const defaultState: State = {
   // safe guard if we found a trade
-  monitoringActivated: true,
+  isMonitoringActivated: true,
   // Set to the last date the bot checked prices
-  lastMonitoringDateTime: null,
   botExecutionMonitoringTick: 0,
   perfMonitoringRecords: [],
 };
@@ -44,6 +45,7 @@ export type Services = {
   exchanges: UniswapLikeExchange[];
   eventEmitter: TypedEmitter<MessageEvents>;
   strategies: Strategy[];
+  messenger?: Messenger;
 };
 
 const services: Services = {
@@ -53,6 +55,16 @@ const services: Services = {
   exchanges,
   eventEmitter,
   strategies: config.strategies,
+  messenger: new Messenger({
+    communicatorWssUrl: config.communicationWssUrl,
+    onGasFeesUpdate: (gasFees) => {
+      services.state.gasFees = gasFees;
+      services.state.lastGasPriceUpdateDateTime = new Date().getTime();
+    },
+    onStopMonitoringMessage: () => {
+      services.state.isMonitoringActivated = false;
+    },
+  }),
 };
 
 const server = http.createServer(function (req, res) {

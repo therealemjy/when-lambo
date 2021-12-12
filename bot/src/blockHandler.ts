@@ -30,6 +30,8 @@ type BlockHandlerArgs = {
   TransactorContract: ITransactorContract;
 };
 
+const HEIGHT_SECONDS_IN_MS = 8000;
+
 const executeStrategy = async (
   services: Services,
   { blockNumber, multicall, strategy, TransactorContract, spreadsheet }: ExecuteStrategyArgs
@@ -72,7 +74,7 @@ const executeStrategy = async (
     // Execute trade, in production and test environments only
     // if (mostProfitablePath && !services.config.isDev) {
     //   // Deactivate the bot completely
-    //   services.state.monitoringActivated = false;
+    //   services.state.isMonitoringActivated = false;
 
     //   transaction = await executeTrade({
     //     blockNumber,
@@ -88,6 +90,7 @@ const executeStrategy = async (
       await services.logger.transaction({
         blockNumber,
         path: mostProfitablePath,
+        maxFeePerGas: gasFees.maxFeePerGas,
         // transactionHash: transaction?.hash,
         spreadsheet,
       });
@@ -114,10 +117,19 @@ const blockHandler = async (
   // Record time for perf monitoring
   services.state.botExecutionMonitoringTick = new Date().getTime();
 
-  if (!services.state.gasFees) {
+  if (!services.state.gasFees || !services.state.lastGasPriceUpdateDateTime) {
     services.logger.log(`Block skipped: #${blockNumber} (gas fees missing)`);
     return;
   }
+
+  // Check if gas fees aren't outdated
+  const dateNow = new Date().getTime();
+  if (dateNow - services.state.lastGasPriceUpdateDateTime > HEIGHT_SECONDS_IN_MS) {
+    services.logger.log(`Block skipped: #${blockNumber} (gas fees outdated)`);
+    return;
+  }
+
+  logger.log('GAS FEES', services.state.gasFees);
 
   // Execute all strategies simultaneously
   const res = await Promise.allSettled(

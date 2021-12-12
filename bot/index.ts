@@ -52,7 +52,7 @@ const init = async ({
 
       services.logger.log(`New block: #${blockNumber}`);
 
-      if (!services.state.monitoringActivated) {
+      if (!services.state.isMonitoringActivated) {
         services.logger.log(`Block skipped: #${blockNumber} (monitoring is deactivated)`);
         return;
       }

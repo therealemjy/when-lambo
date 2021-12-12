@@ -35,6 +35,7 @@ export interface EnvConfig {
   gasEstimates: GasEstimates;
   gasCostMaximumThresholdWei: BigNumber;
   strategies: Strategy[];
+  communicationWssUrl: string;
 }
 
 const strategies: Strategy[] = formatStrategies(
@@ -63,6 +64,7 @@ const config: EnvConfig = {
     deals: env('SLACK_HOOK_URL_DEALS'),
   },
   sentryDNS: env('SENTRY_DNS_URL'),
+  communicationWssUrl: env('COMMUNICATOR_WSS_URL'),
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasEstimates: gasEstimates as GasEstimates,

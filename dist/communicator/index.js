@@ -70,7 +70,7 @@ var require_stream = __commonJS({
         objectMode: false,
         writableObjectMode: false
       });
-      ws.on("message", function message3(msg, isBinary) {
+      ws.on("message", function message(msg, isBinary) {
         const data = !isBinary && duplex._readableState.objectMode ? msg.toString() : msg;
         if (!duplex.push(data))
           ws.pause();
@@ -107,7 +107,7 @@ var require_stream = __commonJS({
       };
       duplex._final = function(callback) {
         if (ws.readyState === ws.CONNECTING) {
-          ws.once("open", function open2() {
+          ws.once("open", function open() {
             duplex._final(callback);
           });
           return;
@@ -131,7 +131,7 @@ var require_stream = __commonJS({
       };
       duplex._write = function(chunk, encoding, callback) {
         if (ws.readyState === ws.CONNECTING) {
-          ws.once("open", function open2() {
+          ws.once("open", function open() {
             duplex._write(chunk, encoding, callback);
           });
           return;
@@ -1303,8 +1303,8 @@ var require_receiver = __commonJS({
       }
     };
     module2.exports = Receiver2;
-    function error2(ErrorCtor, message3, prefix, statusCode, errorCode) {
-      const err = new ErrorCtor(prefix ? `Invalid WebSocket frame: ${message3}` : message3);
+    function error2(ErrorCtor, message, prefix, statusCode, errorCode) {
+      const err = new ErrorCtor(prefix ? `Invalid WebSocket frame: ${message}` : message);
       Error.captureStackTrace(err, error2);
       err.code = errorCode;
       err[kStatusCode] = statusCode;
@@ -1626,10 +1626,10 @@ var require_event_target = __commonJS({
             listener.call(this, event);
           };
         } else if (type === "close") {
-          wrapper = function onClose(code, message3) {
+          wrapper = function onClose(code, message) {
             const event = new CloseEvent("close", {
               code,
-              reason: message3.toString(),
+              reason: message.toString(),
               wasClean: this._closeFrameReceived && this._closeFrameSent
             });
             event[kTarget] = this;
@@ -2358,29 +2358,29 @@ var require_websocket = __commonJS({
         const secWebSocketExtensions = res.headers["sec-websocket-extensions"];
         if (secWebSocketExtensions !== void 0) {
           if (!perMessageDeflate) {
-            const message3 = "Server sent a Sec-WebSocket-Extensions header but no extension was requested";
-            abortHandshake(websocket, socket, message3);
+            const message = "Server sent a Sec-WebSocket-Extensions header but no extension was requested";
+            abortHandshake(websocket, socket, message);
             return;
           }
           let extensions;
           try {
             extensions = parse(secWebSocketExtensions);
           } catch (err) {
-            const message3 = "Invalid Sec-WebSocket-Extensions header";
-            abortHandshake(websocket, socket, message3);
+            const message = "Invalid Sec-WebSocket-Extensions header";
+            abortHandshake(websocket, socket, message);
             return;
           }
           const extensionNames = Object.keys(extensions);
           if (extensionNames.length !== 1 || extensionNames[0] !== PerMessageDeflate.extensionName) {
-            const message3 = "Server indicated an extension that was not requested";
-            abortHandshake(websocket, socket, message3);
+            const message = "Server indicated an extension that was not requested";
+            abortHandshake(websocket, socket, message);
             return;
           }
           try {
             perMessageDeflate.accept(extensions[PerMessageDeflate.extensionName]);
           } catch (err) {
-            const message3 = "Invalid Sec-WebSocket-Extensions header";
-            abortHandshake(websocket, socket, message3);
+            const message = "Invalid Sec-WebSocket-Extensions header";
+            abortHandshake(websocket, socket, message);
             return;
           }
           websocket._extensions[PerMessageDeflate.extensionName] = perMessageDeflate;
@@ -2407,9 +2407,9 @@ var require_websocket = __commonJS({
       }
       return tls.connect(options);
     }
-    function abortHandshake(websocket, stream, message3) {
+    function abortHandshake(websocket, stream, message) {
       websocket._readyState = WebSocket2.CLOSING;
-      const err = new Error(message3);
+      const err = new Error(message);
       Error.captureStackTrace(err, abortHandshake);
       if (stream.setHeader) {
         stream.abort();
@@ -2737,9 +2737,9 @@ var require_websocket_server = __commonJS({
             req
           };
           if (this.options.verifyClient.length === 2) {
-            this.options.verifyClient(info, (verified, code, message3, headers) => {
+            this.options.verifyClient(info, (verified, code, message, headers) => {
               if (!verified) {
-                return abortHandshake(socket, code || 401, message3, headers);
+                return abortHandshake(socket, code || 401, message, headers);
               }
               this.completeUpgrade(extensions, key, protocols, req, socket, head, cb);
             });
@@ -2817,17 +2817,17 @@ var require_websocket_server = __commonJS({
     function socketOnError() {
       this.destroy();
     }
-    function abortHandshake(socket, code, message3, headers) {
+    function abortHandshake(socket, code, message, headers) {
       if (socket.writable) {
-        message3 = message3 || http.STATUS_CODES[code];
+        message = message || http.STATUS_CODES[code];
         headers = {
           Connection: "close",
           "Content-Type": "text/html",
-          "Content-Length": Buffer.byteLength(message3),
+          "Content-Length": Buffer.byteLength(message),
           ...headers
         };
         socket.write(`HTTP/1.1 ${code} ${http.STATUS_CODES[code]}\r
-` + Object.keys(headers).map((h) => `${h}: ${headers[h]}`).join("\r\n") + "\r\n\r\n" + message3);
+` + Object.keys(headers).map((h) => `${h}: ${headers[h]}`).join("\r\n") + "\r\n\r\n" + message);
       }
       socket.removeListener("error", socketOnError);
       socket.destroy();
@@ -7740,8 +7740,8 @@ var require_source_map_support = __commonJS({
         sourceMapCache = {};
       }
       var name2 = error2.name || "Error";
-      var message3 = error2.message || "";
-      var errorString = name2 + ": " + message3;
+      var message = error2.message || "";
+      var errorString = name2 + ": " + message;
       var state = { nextPosition: null, curPosition: null };
       var processedStack = [];
       for (var i = stack.length - 1; i >= 0; i--) {
@@ -16304,8 +16304,8 @@ var require_limitedqueue = __commonJS({
             "message": "Write queue cleared, allowing new log events",
             "v": 0
           };
-          var message3 = _4.extend({}, { immediatelog: false }, notification);
-          queue.push(JSON.stringify(message3) + "\n");
+          var message = _4.extend({}, { immediatelog: false }, notification);
+          queue.push(JSON.stringify(message) + "\n");
           console.log(notification.message);
           throwLogsAway = false;
           base.emit("caughtup");
@@ -17092,9 +17092,9 @@ var require_strftime = __commonJS({
       function getTimestampToUtcOffsetFor(date) {
         return (date.getTimezoneOffset() || 0) * 6e4;
       }
-      function warn(message3) {
+      function warn(message) {
         if (typeof console !== "undefined" && typeof console.warn == "function") {
-          console.warn(message3);
+          console.warn(message);
         }
       }
     })();
@@ -21035,8 +21035,8 @@ var require_main = __commonJS({
   "node_modules/dotenv/lib/main.js"(exports2, module2) {
     var fs = require("fs");
     var path = require("path");
-    function log2(message3) {
-      console.log(`[dotenv][DEBUG] ${message3}`);
+    function log2(message) {
+      console.log(`[dotenv][DEBUG] ${message}`);
     }
     var NEWLINE = "\n";
     var RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/;
@@ -24052,7 +24052,7 @@ var require_lib = __commonJS({
         }
         this._log(Logger2.levels.WARNING, args);
       };
-      Logger2.prototype.makeError = function(message3, code, params) {
+      Logger2.prototype.makeError = function(message, code, params) {
         if (_censorErrors) {
           return this.makeError("censored error", code, {});
         }
@@ -24082,11 +24082,11 @@ var require_lib = __commonJS({
         });
         messageDetails.push("code=" + code);
         messageDetails.push("version=" + this.version);
-        var reason = message3;
+        var reason = message;
         if (messageDetails.length) {
-          message3 += " (" + messageDetails.join(", ") + ")";
+          message += " (" + messageDetails.join(", ") + ")";
         }
-        var error2 = new Error(message3);
+        var error2 = new Error(message);
         error2.reason = reason;
         error2.code = code;
         Object.keys(params).forEach(function(key) {
@@ -24094,30 +24094,30 @@ var require_lib = __commonJS({
         });
         return error2;
       };
-      Logger2.prototype.throwError = function(message3, code, params) {
-        throw this.makeError(message3, code, params);
+      Logger2.prototype.throwError = function(message, code, params) {
+        throw this.makeError(message, code, params);
       };
-      Logger2.prototype.throwArgumentError = function(message3, name2, value) {
-        return this.throwError(message3, Logger2.errors.INVALID_ARGUMENT, {
+      Logger2.prototype.throwArgumentError = function(message, name2, value) {
+        return this.throwError(message, Logger2.errors.INVALID_ARGUMENT, {
           argument: name2,
           value
         });
       };
-      Logger2.prototype.assert = function(condition, message3, code, params) {
+      Logger2.prototype.assert = function(condition, message, code, params) {
         if (!!condition) {
           return;
         }
-        this.throwError(message3, code, params);
+        this.throwError(message, code, params);
       };
-      Logger2.prototype.assertArgument = function(condition, message3, name2, value) {
+      Logger2.prototype.assertArgument = function(condition, message, name2, value) {
         if (!!condition) {
           return;
         }
-        this.throwArgumentError(message3, name2, value);
+        this.throwArgumentError(message, name2, value);
       };
-      Logger2.prototype.checkNormalize = function(message3) {
-        if (message3 == null) {
-          message3 = "platform missing String.prototype.normalize";
+      Logger2.prototype.checkNormalize = function(message) {
+        if (message == null) {
+          message = "platform missing String.prototype.normalize";
         }
         if (_normalizeError) {
           this.throwError("platform missing String.prototype.normalize", Logger2.errors.UNSUPPORTED_OPERATION, {
@@ -24126,42 +24126,42 @@ var require_lib = __commonJS({
           });
         }
       };
-      Logger2.prototype.checkSafeUint53 = function(value, message3) {
+      Logger2.prototype.checkSafeUint53 = function(value, message) {
         if (typeof value !== "number") {
           return;
         }
-        if (message3 == null) {
-          message3 = "value not safe";
+        if (message == null) {
+          message = "value not safe";
         }
         if (value < 0 || value >= 9007199254740991) {
-          this.throwError(message3, Logger2.errors.NUMERIC_FAULT, {
+          this.throwError(message, Logger2.errors.NUMERIC_FAULT, {
             operation: "checkSafeInteger",
             fault: "out-of-safe-range",
             value
           });
         }
         if (value % 1) {
-          this.throwError(message3, Logger2.errors.NUMERIC_FAULT, {
+          this.throwError(message, Logger2.errors.NUMERIC_FAULT, {
             operation: "checkSafeInteger",
             fault: "non-integer",
             value
           });
         }
       };
-      Logger2.prototype.checkArgumentCount = function(count, expectedCount, message3) {
-        if (message3) {
-          message3 = ": " + message3;
+      Logger2.prototype.checkArgumentCount = function(count, expectedCount, message) {
+        if (message) {
+          message = ": " + message;
         } else {
-          message3 = "";
+          message = "";
         }
         if (count < expectedCount) {
-          this.throwError("missing argument" + message3, Logger2.errors.MISSING_ARGUMENT, {
+          this.throwError("missing argument" + message, Logger2.errors.MISSING_ARGUMENT, {
             count,
             expectedCount
           });
         }
         if (count > expectedCount) {
-          this.throwError("too many arguments" + message3, Logger2.errors.UNEXPECTED_ARGUMENT, {
+          this.throwError("too many arguments" + message, Logger2.errors.UNEXPECTED_ARGUMENT, {
             count,
             expectedCount
           });
@@ -24926,12 +24926,12 @@ var require_fixednumber = __commonJS({
     var _constructorGuard = {};
     var Zero = bignumber_1.BigNumber.from(0);
     var NegativeOne = bignumber_1.BigNumber.from(-1);
-    function throwFault(message3, fault, operation, value) {
+    function throwFault(message, fault, operation, value) {
       var params = { fault, operation };
       if (value !== void 0) {
         params.value = value;
       }
-      return logger.throwError(message3, logger_1.Logger.errors.NUMERIC_FAULT, params);
+      return logger.throwError(message, logger_1.Logger.errors.NUMERIC_FAULT, params);
     }
     var zeros = "0";
     while (zeros.length < 256) {
@@ -26488,8 +26488,8 @@ var require_abstract_coder = __commonJS({
         this.localName = localName;
         this.dynamic = dynamic;
       }
-      Coder2.prototype._throwError = function(message3, value) {
-        logger.throwArgumentError(message3, this.localName, value);
+      Coder2.prototype._throwError = function(message, value) {
+        logger.throwArgumentError(message, this.localName, value);
       };
       return Coder2;
     }();
@@ -26721,23 +26721,23 @@ var require_sha3 = __commonJS({
         };
       }
       var createOutputMethod = function(bits2, padding, outputType) {
-        return function(message3) {
-          return new Keccak(bits2, padding, bits2).update(message3)[outputType]();
+        return function(message) {
+          return new Keccak(bits2, padding, bits2).update(message)[outputType]();
         };
       };
       var createShakeOutputMethod = function(bits2, padding, outputType) {
-        return function(message3, outputBits) {
-          return new Keccak(bits2, padding, outputBits).update(message3)[outputType]();
+        return function(message, outputBits) {
+          return new Keccak(bits2, padding, outputBits).update(message)[outputType]();
         };
       };
       var createCshakeOutputMethod = function(bits2, padding, outputType) {
-        return function(message3, outputBits, n, s) {
-          return methods["cshake" + bits2].update(message3, outputBits, n, s)[outputType]();
+        return function(message, outputBits, n, s) {
+          return methods["cshake" + bits2].update(message, outputBits, n, s)[outputType]();
         };
       };
       var createKmacOutputMethod = function(bits2, padding, outputType) {
-        return function(key, message3, outputBits, s) {
-          return methods["kmac" + bits2].update(key, message3, outputBits, s)[outputType]();
+        return function(key, message, outputBits, s) {
+          return methods["kmac" + bits2].update(key, message, outputBits, s)[outputType]();
         };
       };
       var createOutputMethods = function(method, createMethod2, bits2, padding) {
@@ -26752,8 +26752,8 @@ var require_sha3 = __commonJS({
         method.create = function() {
           return new Keccak(bits2, padding, bits2);
         };
-        method.update = function(message3) {
-          return method.create().update(message3);
+        method.update = function(message) {
+          return method.create().update(message);
         };
         return createOutputMethods(method, createOutputMethod, bits2, padding);
       };
@@ -26762,8 +26762,8 @@ var require_sha3 = __commonJS({
         method.create = function(outputBits) {
           return new Keccak(bits2, padding, outputBits);
         };
-        method.update = function(message3, outputBits) {
-          return method.create(outputBits).update(message3);
+        method.update = function(message, outputBits) {
+          return method.create(outputBits).update(message);
         };
         return createOutputMethods(method, createShakeOutputMethod, bits2, padding);
       };
@@ -26777,8 +26777,8 @@ var require_sha3 = __commonJS({
             return new Keccak(bits2, padding, outputBits).bytepad([n, s], w);
           }
         };
-        method.update = function(message3, outputBits, n, s) {
-          return method.create(outputBits, n, s).update(message3);
+        method.update = function(message, outputBits, n, s) {
+          return method.create(outputBits, n, s).update(message);
         };
         return createOutputMethods(method, createCshakeOutputMethod, bits2, padding);
       };
@@ -26788,8 +26788,8 @@ var require_sha3 = __commonJS({
         method.create = function(key, outputBits, s) {
           return new Kmac(bits2, padding, outputBits).bytepad(["KMAC", s], w).bytepad([key], w);
         };
-        method.update = function(key, message3, outputBits, s) {
-          return method.create(key, outputBits, s).update(message3);
+        method.update = function(key, message, outputBits, s) {
+          return method.create(key, outputBits, s).update(message);
         };
         return createOutputMethods(method, createKmacOutputMethod, bits2, padding);
       };
@@ -26832,19 +26832,19 @@ var require_sha3 = __commonJS({
           this.s[i2] = 0;
         }
       }
-      Keccak.prototype.update = function(message3) {
+      Keccak.prototype.update = function(message) {
         if (this.finalized) {
           throw new Error(FINALIZE_ERROR);
         }
-        var notString, type = typeof message3;
+        var notString, type = typeof message;
         if (type !== "string") {
           if (type === "object") {
-            if (message3 === null) {
+            if (message === null) {
               throw new Error(INPUT_ERROR);
-            } else if (ARRAY_BUFFER && message3.constructor === ArrayBuffer) {
-              message3 = new Uint8Array(message3);
-            } else if (!Array.isArray(message3)) {
-              if (!ARRAY_BUFFER || !ArrayBuffer.isView(message3)) {
+            } else if (ARRAY_BUFFER && message.constructor === ArrayBuffer) {
+              message = new Uint8Array(message);
+            } else if (!Array.isArray(message)) {
+              if (!ARRAY_BUFFER || !ArrayBuffer.isView(message)) {
                 throw new Error(INPUT_ERROR);
               }
             }
@@ -26853,7 +26853,7 @@ var require_sha3 = __commonJS({
           }
           notString = true;
         }
-        var blocks = this.blocks, byteCount = this.byteCount, length = message3.length, blockCount = this.blockCount, index = 0, s = this.s, i2, code;
+        var blocks = this.blocks, byteCount = this.byteCount, length = message.length, blockCount = this.blockCount, index = 0, s = this.s, i2, code;
         while (index < length) {
           if (this.reset) {
             this.reset = false;
@@ -26864,11 +26864,11 @@ var require_sha3 = __commonJS({
           }
           if (notString) {
             for (i2 = this.start; index < length && i2 < byteCount; ++index) {
-              blocks[i2 >> 2] |= message3[index] << SHIFT[i2++ & 3];
+              blocks[i2 >> 2] |= message[index] << SHIFT[i2++ & 3];
             }
           } else {
             for (i2 = this.start; index < length && i2 < byteCount; ++index) {
-              code = message3.charCodeAt(index);
+              code = message.charCodeAt(index);
               if (code < 128) {
                 blocks[i2 >> 2] |= code << SHIFT[i2++ & 3];
               } else if (code < 2048) {
@@ -26879,7 +26879,7 @@ var require_sha3 = __commonJS({
                 blocks[i2 >> 2] |= (128 | code >> 6 & 63) << SHIFT[i2++ & 3];
                 blocks[i2 >> 2] |= (128 | code & 63) << SHIFT[i2++ & 3];
               } else {
-                code = 65536 + ((code & 1023) << 10 | message3.charCodeAt(++index) & 1023);
+                code = 65536 + ((code & 1023) << 10 | message.charCodeAt(++index) & 1023);
                 blocks[i2 >> 2] |= (240 | code >> 18) << SHIFT[i2++ & 3];
                 blocks[i2 >> 2] |= (128 | code >> 12 & 63) << SHIFT[i2++ & 3];
                 blocks[i2 >> 2] |= (128 | code >> 6 & 63) << SHIFT[i2++ & 3];
@@ -29136,14 +29136,14 @@ var require_message = __commonJS({
     var keccak256_1 = require_lib5();
     var strings_1 = require_lib9();
     exports2.messagePrefix = "Ethereum Signed Message:\n";
-    function hashMessage(message3) {
-      if (typeof message3 === "string") {
-        message3 = (0, strings_1.toUtf8Bytes)(message3);
+    function hashMessage(message) {
+      if (typeof message === "string") {
+        message = (0, strings_1.toUtf8Bytes)(message);
       }
       return (0, keccak256_1.keccak256)((0, bytes_1.concat)([
         (0, strings_1.toUtf8Bytes)(exports2.messagePrefix),
-        (0, strings_1.toUtf8Bytes)(String(message3.length)),
-        message3
+        (0, strings_1.toUtf8Bytes)(String(message.length)),
+        message
       ]));
     }
     exports2.hashMessage = hashMessage;
@@ -31131,12 +31131,12 @@ var require_lib13 = __commonJS({
       VoidSigner2.prototype.getAddress = function() {
         return Promise.resolve(this.address);
       };
-      VoidSigner2.prototype._fail = function(message3, operation) {
+      VoidSigner2.prototype._fail = function(message, operation) {
         return Promise.resolve().then(function() {
-          logger.throwError(message3, logger_1.Logger.errors.UNSUPPORTED_OPERATION, { operation });
+          logger.throwError(message, logger_1.Logger.errors.UNSUPPORTED_OPERATION, { operation });
         });
       };
-      VoidSigner2.prototype.signMessage = function(message3) {
+      VoidSigner2.prototype.signMessage = function(message) {
         return this._fail("VoidSigner cannot sign messages", "signMessage");
       };
       VoidSigner2.prototype.signTransaction = function(transaction2) {
@@ -38867,12 +38867,12 @@ var require_key2 = __commonJS({
     cachedProperty(KeyPair, "messagePrefix", function messagePrefix() {
       return this.hash().slice(this.eddsa.encodingLength);
     });
-    KeyPair.prototype.sign = function sign(message3) {
+    KeyPair.prototype.sign = function sign(message) {
       assert(this._secret, "KeyPair can only verify");
-      return this.eddsa.sign(message3, this);
+      return this.eddsa.sign(message, this);
     };
-    KeyPair.prototype.verify = function verify(message3, sig) {
-      return this.eddsa.verify(message3, sig, this);
+    KeyPair.prototype.verify = function verify(message, sig) {
+      return this.eddsa.verify(message, sig, this);
     };
     KeyPair.prototype.getSecret = function getSecret(enc) {
       assert(this._secret, "KeyPair is public only");
@@ -38958,21 +38958,21 @@ var require_eddsa = __commonJS({
       this.hash = hash.sha512;
     }
     module2.exports = EDDSA;
-    EDDSA.prototype.sign = function sign(message3, secret) {
-      message3 = parseBytes(message3);
+    EDDSA.prototype.sign = function sign(message, secret) {
+      message = parseBytes(message);
       var key = this.keyFromSecret(secret);
-      var r = this.hashInt(key.messagePrefix(), message3);
+      var r = this.hashInt(key.messagePrefix(), message);
       var R = this.g.mul(r);
       var Rencoded = this.encodePoint(R);
-      var s_ = this.hashInt(Rencoded, key.pubBytes(), message3).mul(key.priv());
+      var s_ = this.hashInt(Rencoded, key.pubBytes(), message).mul(key.priv());
       var S = r.add(s_).umod(this.curve.n);
       return this.makeSignature({ R, S, Rencoded });
     };
-    EDDSA.prototype.verify = function verify(message3, sig, pub) {
-      message3 = parseBytes(message3);
+    EDDSA.prototype.verify = function verify(message, sig, pub) {
+      message = parseBytes(message);
       sig = this.makeSignature(sig);
       var key = this.keyFromPublic(pub);
-      var h = this.hashInt(sig.Rencoded(), key.pubBytes(), message3);
+      var h = this.hashInt(sig.Rencoded(), key.pubBytes(), message);
       var SG = this.g.mul(sig.S());
       var RplusAh = sig.R().add(key.pub().mul(h));
       return RplusAh.eq(SG);
@@ -44138,10 +44138,10 @@ var require_lib24 = __commonJS({
           return (0, transactions_1.serialize)(tx, signature);
         });
       };
-      Wallet2.prototype.signMessage = function(message3) {
+      Wallet2.prototype.signMessage = function(message) {
         return __awaiter(this, void 0, void 0, function() {
           return __generator(this, function(_a) {
-            return [2, (0, bytes_1.joinSignature)(this._signingKey().signDigest((0, hash_1.hashMessage)(message3)))];
+            return [2, (0, bytes_1.joinSignature)(this._signingKey().signDigest((0, hash_1.hashMessage)(message)))];
           });
         });
       };
@@ -44209,8 +44209,8 @@ var require_lib24 = __commonJS({
       return Wallet2;
     }(abstract_signer_1.Signer);
     exports2.Wallet = Wallet;
-    function verifyMessage(message3, signature) {
-      return (0, transactions_1.recoverAddress)((0, hash_1.hashMessage)(message3), signature);
+    function verifyMessage(message, signature) {
+      return (0, transactions_1.recoverAddress)((0, hash_1.hashMessage)(message), signature);
     }
     exports2.verifyMessage = verifyMessage;
     function verifyTypedData(domain, types, value, signature) {
@@ -48278,45 +48278,45 @@ var require_json_rpc_provider = __commonJS({
           data: "0x"
         });
       }
-      var message3 = error2.message;
+      var message = error2.message;
       if (error2.code === logger_1.Logger.errors.SERVER_ERROR && error2.error && typeof error2.error.message === "string") {
-        message3 = error2.error.message;
+        message = error2.error.message;
       } else if (typeof error2.body === "string") {
-        message3 = error2.body;
+        message = error2.body;
       } else if (typeof error2.responseText === "string") {
-        message3 = error2.responseText;
+        message = error2.responseText;
       }
-      message3 = (message3 || "").toLowerCase();
+      message = (message || "").toLowerCase();
       var transaction2 = params.transaction || params.signedTransaction;
-      if (message3.match(/insufficient funds|base fee exceeds gas limit/)) {
+      if (message.match(/insufficient funds|base fee exceeds gas limit/)) {
         logger.throwError("insufficient funds for intrinsic transaction cost", logger_1.Logger.errors.INSUFFICIENT_FUNDS, {
           error: error2,
           method,
           transaction: transaction2
         });
       }
-      if (message3.match(/nonce too low/)) {
+      if (message.match(/nonce too low/)) {
         logger.throwError("nonce has already been used", logger_1.Logger.errors.NONCE_EXPIRED, {
           error: error2,
           method,
           transaction: transaction2
         });
       }
-      if (message3.match(/replacement transaction underpriced/)) {
+      if (message.match(/replacement transaction underpriced/)) {
         logger.throwError("replacement fee too low", logger_1.Logger.errors.REPLACEMENT_UNDERPRICED, {
           error: error2,
           method,
           transaction: transaction2
         });
       }
-      if (message3.match(/only replay-protected/)) {
+      if (message.match(/only replay-protected/)) {
         logger.throwError("legacy pre-eip-155 transactions not supported", logger_1.Logger.errors.UNSUPPORTED_OPERATION, {
           error: error2,
           method,
           transaction: transaction2
         });
       }
-      if (errorGas.indexOf(method) >= 0 && message3.match(/gas required exceeds allowance|always failing transaction|execution reverted/)) {
+      if (errorGas.indexOf(method) >= 0 && message.match(/gas required exceeds allowance|always failing transaction|execution reverted/)) {
         logger.throwError("cannot estimate gas; transaction may fail or may require manual gas limit", logger_1.Logger.errors.UNPREDICTABLE_GAS_LIMIT, {
           error: error2,
           method,
@@ -48499,13 +48499,13 @@ var require_json_rpc_provider = __commonJS({
           });
         });
       };
-      JsonRpcSigner2.prototype.signMessage = function(message3) {
+      JsonRpcSigner2.prototype.signMessage = function(message) {
         return __awaiter(this, void 0, void 0, function() {
           var data, address2;
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                data = typeof message3 === "string" ? (0, strings_1.toUtf8Bytes)(message3) : message3;
+                data = typeof message === "string" ? (0, strings_1.toUtf8Bytes)(message) : message;
                 return [4, this.getAddress()];
               case 1:
                 address2 = _a.sent();
@@ -48516,13 +48516,13 @@ var require_json_rpc_provider = __commonJS({
           });
         });
       };
-      JsonRpcSigner2.prototype._legacySignMessage = function(message3) {
+      JsonRpcSigner2.prototype._legacySignMessage = function(message) {
         return __awaiter(this, void 0, void 0, function() {
           var data, address2;
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                data = typeof message3 === "string" ? (0, strings_1.toUtf8Bytes)(message3) : message3;
+                data = typeof message === "string" ? (0, strings_1.toUtf8Bytes)(message) : message;
                 return [4, this.getAddress()];
               case 1:
                 address2 = _a.sent();
@@ -49719,8 +49719,8 @@ var require_receiver2 = __commonJS({
       }
     };
     module2.exports = Receiver2;
-    function error2(ErrorCtor, message3, prefix, statusCode) {
-      const err = new ErrorCtor(prefix ? `Invalid WebSocket frame: ${message3}` : message3);
+    function error2(ErrorCtor, message, prefix, statusCode) {
+      const err = new ErrorCtor(prefix ? `Invalid WebSocket frame: ${message}` : message);
       Error.captureStackTrace(err, error2);
       err[kStatusCode] = statusCode;
       return err;
@@ -49994,8 +49994,8 @@ var require_event_target2 = __commonJS({
         function onMessage(data) {
           listener.call(this, new MessageEvent(data, this));
         }
-        function onClose(code, message3) {
-          listener.call(this, new CloseEvent(code, message3, this));
+        function onClose(code, message) {
+          listener.call(this, new CloseEvent(code, message, this));
         }
         function onError(error2) {
           listener.call(this, new ErrorEvent(error2, this));
@@ -50752,9 +50752,9 @@ var require_websocket2 = __commonJS({
       }
       return tls.connect(options);
     }
-    function abortHandshake(websocket, stream, message3) {
+    function abortHandshake(websocket, stream, message) {
       websocket._readyState = WebSocket2.CLOSING;
-      const err = new Error(message3);
+      const err = new Error(message);
       Error.captureStackTrace(err, abortHandshake);
       if (stream.setHeader) {
         stream.abort();
@@ -50886,7 +50886,7 @@ var require_stream2 = __commonJS({
           ws._socket.resume();
       }
       if (ws.readyState === ws.CONNECTING) {
-        ws.once("open", function open2() {
+        ws.once("open", function open() {
           ws._receiver.removeAllListeners("drain");
           ws._receiver.on("drain", receiverOnDrain);
         });
@@ -50901,7 +50901,7 @@ var require_stream2 = __commonJS({
         objectMode: false,
         writableObjectMode: false
       });
-      ws.on("message", function message3(msg) {
+      ws.on("message", function message(msg) {
         if (!duplex.push(msg)) {
           resumeOnReceiverDrain = false;
           ws._socket.pause();
@@ -50937,7 +50937,7 @@ var require_stream2 = __commonJS({
       };
       duplex._final = function(callback) {
         if (ws.readyState === ws.CONNECTING) {
-          ws.once("open", function open2() {
+          ws.once("open", function open() {
             duplex._final(callback);
           });
           return;
@@ -50964,7 +50964,7 @@ var require_stream2 = __commonJS({
       };
       duplex._write = function(chunk, encoding, callback) {
         if (ws.readyState === ws.CONNECTING) {
-          ws.once("open", function open2() {
+          ws.once("open", function open() {
             duplex._write(chunk, encoding, callback);
           });
           return;
@@ -51102,9 +51102,9 @@ var require_websocket_server2 = __commonJS({
             req
           };
           if (this.options.verifyClient.length === 2) {
-            this.options.verifyClient(info, (verified, code, message3, headers) => {
+            this.options.verifyClient(info, (verified, code, message, headers) => {
               if (!verified) {
-                return abortHandshake(socket, code || 401, message3, headers);
+                return abortHandshake(socket, code || 401, message, headers);
               }
               this.completeUpgrade(key, extensions, req, socket, head, cb);
             });
@@ -51177,17 +51177,17 @@ var require_websocket_server2 = __commonJS({
     function socketOnError() {
       this.destroy();
     }
-    function abortHandshake(socket, code, message3, headers) {
+    function abortHandshake(socket, code, message, headers) {
       if (socket.writable) {
-        message3 = message3 || STATUS_CODES[code];
+        message = message || STATUS_CODES[code];
         headers = {
           Connection: "close",
           "Content-Type": "text/html",
-          "Content-Length": Buffer.byteLength(message3),
+          "Content-Length": Buffer.byteLength(message),
           ...headers
         };
         socket.write(`HTTP/1.1 ${code} ${STATUS_CODES[code]}\r
-` + Object.keys(headers).map((h) => `${h}: ${headers[h]}`).join("\r\n") + "\r\n\r\n" + message3);
+` + Object.keys(headers).map((h) => `${h}: ${headers[h]}`).join("\r\n") + "\r\n\r\n" + message);
       }
       socket.removeListener("error", socketOnError);
       socket.destroy();
@@ -52385,39 +52385,39 @@ var require_etherscan_provider = __commonJS({
           });
         }
       }
-      var message3 = error2.message;
+      var message = error2.message;
       if (error2.code === logger_1.Logger.errors.SERVER_ERROR) {
         if (error2.error && typeof error2.error.message === "string") {
-          message3 = error2.error.message;
+          message = error2.error.message;
         } else if (typeof error2.body === "string") {
-          message3 = error2.body;
+          message = error2.body;
         } else if (typeof error2.responseText === "string") {
-          message3 = error2.responseText;
+          message = error2.responseText;
         }
       }
-      message3 = (message3 || "").toLowerCase();
-      if (message3.match(/insufficient funds/)) {
+      message = (message || "").toLowerCase();
+      if (message.match(/insufficient funds/)) {
         logger.throwError("insufficient funds for intrinsic transaction cost", logger_1.Logger.errors.INSUFFICIENT_FUNDS, {
           error: error2,
           method,
           transaction: transaction2
         });
       }
-      if (message3.match(/same hash was already imported|transaction nonce is too low|nonce too low/)) {
+      if (message.match(/same hash was already imported|transaction nonce is too low|nonce too low/)) {
         logger.throwError("nonce has already been used", logger_1.Logger.errors.NONCE_EXPIRED, {
           error: error2,
           method,
           transaction: transaction2
         });
       }
-      if (message3.match(/another transaction with same nonce/)) {
+      if (message.match(/another transaction with same nonce/)) {
         logger.throwError("replacement fee too low", logger_1.Logger.errors.REPLACEMENT_UNDERPRICED, {
           error: error2,
           method,
           transaction: transaction2
         });
       }
-      if (message3.match(/execution failed due to an exception|execution reverted/)) {
+      if (message.match(/execution failed due to an exception|execution reverted/)) {
         logger.throwError("cannot estimate gas; transaction may fail or may require manual gas limit", logger_1.Logger.errors.UNPREDICTABLE_GAS_LIMIT, {
           error: error2,
           method,
@@ -55468,8 +55468,8 @@ var require_createError = __commonJS({
   "node_modules/axios/lib/core/createError.js"(exports2, module2) {
     "use strict";
     var enhanceError = require_enhanceError();
-    module2.exports = function createError(message3, config3, code, request2, response) {
-      var error2 = new Error(message3);
+    module2.exports = function createError(message, config3, code, request2, response) {
+      var error2 = new Error(message);
       return enhanceError(error2, config3, code, request2, response);
     };
   }
@@ -55668,8 +55668,8 @@ var require_isURLSameOrigin = __commonJS({
 var require_Cancel = __commonJS({
   "node_modules/axios/lib/cancel/Cancel.js"(exports2, module2) {
     "use strict";
-    function Cancel(message3) {
-      this.message = message3;
+    function Cancel(message) {
+      this.message = message;
     }
     Cancel.prototype.toString = function toString() {
       return "Cancel" + (this.message ? ": " + this.message : "");
@@ -57516,9 +57516,9 @@ var require_validator = __commonJS({
       };
     });
     var deprecatedWarnings = {};
-    validators.transitional = function transitional(validator, version, message3) {
+    validators.transitional = function transitional(validator, version, message) {
       function formatMessage(opt, desc) {
-        return "[Axios v" + VERSION + "] Transitional option '" + opt + "'" + desc + (message3 ? ". " + message3 : "");
+        return "[Axios v" + VERSION + "] Transitional option '" + opt + "'" + desc + (message ? ". " + message : "");
       }
       return function(value, opt, opts) {
         if (validator === false) {
@@ -57707,11 +57707,11 @@ var require_CancelToken = __commonJS({
         };
         return promise;
       };
-      executor(function cancel(message3) {
+      executor(function cancel(message) {
         if (token.reason) {
           return;
         }
-        token.reason = new Cancel(message3);
+        token.reason = new Cancel(message);
         resolvePromise(token.reason);
       });
     }
@@ -57906,11 +57906,10 @@ var config = {
   slackChannelsWebhooks: {
     deals: env_default("SLACK_HOOK_URL_DEALS")
   },
-  blocknativeApiKey: env_default("BLOCKNATIVE_API_KEY"),
   sentryDNS: env_default("SENTRY_DNS_URL"),
+  communicationWssUrl: env_default("COMMUNICATOR_WSS_URL"),
   slippageAllowancePercent: +env_default("SLIPPAGE_ALLOWANCE_PERCENT"),
   gasLimitMultiplicator: +env_default("GAS_LIMIT_MULTIPLICATOR"),
-  maxPriorityFeePerGasMultiplicator: +env_default("MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR"),
   gasEstimates: gasEstimates_default,
   gasCostMaximumThresholdWei: import_ethers2.BigNumber.from(env_default("GAS_COST_MAXIMUM_THRESHOLD_WEI")),
   strategies
@@ -59478,9 +59477,9 @@ var https = __toModule(require("https"));
 var slackChannels = {
   deals: config_default.slackChannelsWebhooks.deals
 };
-function sendSlackMessage(message3, type) {
+function sendSlackMessage(message, type) {
   return new Promise((resolve) => {
-    const body = JSON.stringify(message3);
+    const body = JSON.stringify(message);
     const options = {
       hostname: "hooks.slack.com",
       port: 443,
@@ -59727,33 +59726,35 @@ var config_default2 = config2;
 var PORT = 6969;
 
 // communicator/index.ts
-var wss = new import_websocket_server.default({ port: PORT });
 var gasFees;
 var gasFeesWatcher = new GasFeesWatcher_default(config_default2.blocknativeApiKey, config_default2.maxPriorityFeePerGasMultiplicator);
+var wss = new import_websocket_server.default({ port: PORT });
 wss.on("listening", () => {
   gasFeesWatcher.start((updatedGasFees) => {
     gasFees = updatedGasFees;
     wss.clients.forEach((client) => {
       if (client.readyState === wrapper_default.OPEN) {
-        const message3 = {
+        const message = {
           type: "gasFeesUpdate",
           data: updatedGasFees
         };
-        client.send(JSON.stringify(message3));
+        client.send(JSON.stringify(message));
       }
     });
   }, 5500);
 });
 wss.on("connection", function connection(connectedClient) {
   logger_default.log("New client connected", connectedClient.url);
-  const initialMessage = {
-    type: "gasFeesUpdate",
-    data: gasFees
-  };
-  connectedClient.send(JSON.stringify(initialMessage));
+  if (gasFees) {
+    const initialMessage = {
+      type: "gasFeesUpdate",
+      data: gasFees
+    };
+    connectedClient.send(JSON.stringify(initialMessage));
+  }
   connectedClient.on("message", (data) => {
-    const message3 = JSON.parse(data.toString());
-    if (message3.type === "stopMonitoringSignal") {
+    const message = JSON.parse(data.toString());
+    if (message.type === "stopMonitoringSignal") {
       wss.clients.forEach((client) => {
         if (client.readyState === wrapper_default.OPEN) {
           client.send(data);
@@ -59761,17 +59762,6 @@ wss.on("connection", function connection(connectedClient) {
       });
     }
   });
-});
-var wsClient = new wrapper_default("ws://localhost:6969");
-wsClient.on("message", function message(data) {
-  console.log("Client 1 received message: %s", data);
-});
-var wsClient2 = new wrapper_default("ws://localhost:6969");
-wsClient2.on("open", function open() {
-  wsClient.send(JSON.stringify({ type: "stopMonitoringSignal" }));
-});
-wsClient2.on("message", function message2(data) {
-  console.log("Client 2 received message: %s", data);
 });
 /**
  * @license

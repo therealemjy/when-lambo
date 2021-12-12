@@ -44,17 +44,37 @@ const log: typeof console.log = (...args) => {
 
 const error: typeof console.error = (...args) => bunyanLogger.error(...args);
 
-const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) =>
-  amount.div(`${10 ** tokenDecimals}`).toString();
+const _convertToHumanReadableAmount = (amount: BigNumber, _tokenDecimals: number) => {
+  // TODO: refactor
+
+  return amount.toString();
+  // let amountString = amount.toString();
+
+  // console.log('amountString', amountString);
+  // console.log('amountString.length', amountString.length);
+  // console.log('tokenDecimals', tokenDecimals);
+  // if (amountString.length < tokenDecimals + 1) {
+  //   const zerosToAddCount = tokenDecimals + 1 - amountString.length;
+  //   const zeros = new Array(zerosToAddCount).reduce((acc) => `${acc}0`, '');
+  //   console.log(amountString, zeros);
+  //   amountString = zeros + amountString;
+  // }
+
+  // const periodIndex = amountString.length - tokenDecimals;
+
+  // return amountString.substr(0, periodIndex) + amountString.substr(periodIndex);
+};
 
 const transaction = async ({
   blockNumber,
   path,
+  maxFeePerGas,
   spreadsheet,
   transactionHash = 'None',
 }: {
   blockNumber: number;
   path: Path;
+  maxFeePerGas: number;
   spreadsheet: GoogleSpreadsheet;
   transactionHash?: string;
 }) => {
@@ -66,13 +86,17 @@ const transaction = async ({
   const bestSellingExchangeName = ExchangeIndex[path[0].exchangeIndex];
   const bestBuyingExchangeName = ExchangeIndex[path[1].exchangeIndex];
 
-  const gasCost = path[0].gasCostEstimate
-    .add(path[1].gasCostEstimate)
+  // TODO: refactor so the gas cost is passed rather than calculated, since it's been calculated
+  // before already
+  const gasCost = path[0].gasEstimate
+    .add(path[1].gasEstimate)
     // Add estimated gas to trade with Transactor (without accounting for the swap themselves)
     .add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
     // Add gasLimit margin
     .mul(config.gasLimitMultiplicator * 100)
-    .div(100);
+    .div(100)
+    // Multiply by max fee per gas to get total gas cost
+    .mul(maxFeePerGas);
 
   const gasCostWETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);
 
@@ -86,7 +110,7 @@ const transaction = async ({
   const profitInTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
 
   // Log paths in Slack and Google Spreadsheet in production
-  if (!config.isDev) {
+  if (config.isDev) {
     const slackBlock = [
       {
         type: 'section',
@@ -171,6 +195,8 @@ const transaction = async ({
       // Add row
       worksheet.addRow(worksheetRow),
     ]);
+
+    console.log('res', res);
 
     // Log eventual errors
     res.forEach((result) => {

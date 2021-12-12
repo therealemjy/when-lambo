@@ -1,7 +1,7 @@
+import { GasFees } from '@communicator/types';
 import { ContractTransaction } from 'ethers';
 
 import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
-import { GasFees } from '@localTypes';
 import logger from '@logger';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
