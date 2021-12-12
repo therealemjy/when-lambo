@@ -1,4 +1,4 @@
-import { GasFees, Message } from '@communicator/types';
+import { GasFees, Message, StopMonitoringSignalMessage } from '@communicator/types';
 import WebSocket from 'ws';
 
 import logger from '@logger';
@@ -8,11 +8,11 @@ class Messenger {
 
   constructor({
     communicatorWssUrl,
-    onStopMonitoringMessage,
+    onStopMonitoringSignalMessage,
     onGasFeesUpdate,
   }: {
     communicatorWssUrl: string;
-    onStopMonitoringMessage: () => void;
+    onStopMonitoringSignalMessage: () => void;
     onGasFeesUpdate: (gasFees: GasFees) => void;
   }) {
     this.wsClient = new WebSocket(communicatorWssUrl);
@@ -32,10 +32,18 @@ class Messenger {
           break;
 
         case 'stopMonitoringSignal':
-          onStopMonitoringMessage();
+          onStopMonitoringSignalMessage();
           break;
       }
     });
+  }
+
+  sendStopMonitoringSignal() {
+    const message: StopMonitoringSignalMessage = {
+      type: 'stopMonitoringSignal',
+    };
+
+    this.wsClient.send(JSON.stringify(message));
   }
 }
 

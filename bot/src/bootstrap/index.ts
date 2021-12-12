@@ -61,7 +61,7 @@ const services: Services = {
       services.state.gasFees = gasFees;
       services.state.lastGasPriceUpdateDateTime = new Date().getTime();
     },
-    onStopMonitoringMessage: () => {
+    onStopMonitoringSignalMessage: () => {
       services.state.isMonitoringActivated = false;
     },
   }),
