@@ -1,4 +1,4 @@
-import { ethers, BigNumber } from 'ethers';
+import { ethers } from 'ethers';
 
 import logger from '@logger';
 import formatStrategies from '@utils/formatStrategies';

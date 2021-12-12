@@ -98,7 +98,7 @@ const transaction = async ({
     // Multiply by max fee per gas to get total gas cost
     .mul(maxFeePerGas);
 
-  const gasCostWETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);
+  const gasCostETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);
 
   const [profitDec, profitPercent] = calculateProfit({
     revenueDec: path[1].toTokenDecimalAmount,
@@ -110,8 +110,11 @@ const transaction = async ({
   const profitInTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
 
   // Log paths in Slack and Google Spreadsheet in production
-  if (config.isDev) {
+  if (!config.isDev) {
     const slackBlock = [
+      {
+        type: 'divider',
+      },
       {
         type: 'section',
         fields: [
@@ -149,20 +152,13 @@ const transaction = async ({
           },
           {
             type: 'mrkdwn',
-            text: `*Gas cost (in ETH):*\n${gasCost}`,
+            text: `*Gas cost (in ETH):*\n${gasCostETH}`,
           },
           {
             type: 'mrkdwn',
-            text: `*Profit (in ${path[0].fromToken.symbol}):*\n${profitInTokens}`,
-          },
-          {
-            type: 'mrkdwn',
-            text: `*Profit (%):*\n${profitPercent}%`,
+            text: `*Profit (in ${path[0].fromToken.symbol}):*\n${profitInTokens} (${profitPercent}%)`,
           },
         ],
-      },
-      {
-        type: 'divider',
       },
     ];
 
@@ -176,7 +172,7 @@ const transaction = async ({
       +boughtTokens,
       bestBuyingExchangeName,
       +revenues,
-      +gasCostWETH,
+      +gasCostETH,
       +profitInTokens,
       `${profitPercent}%`,
     ];
@@ -186,17 +182,13 @@ const transaction = async ({
 
     const res = await Promise.allSettled([
       // Send path to Slack
-      sendSlackMessage(
-        {
-          blocks: slackBlock.flat(),
-        },
-        'deals'
-      ),
+      sendSlackMessage({
+        text: 'New transaction 😍',
+        blocks: slackBlock.flat(),
+      }),
       // Add row
-      worksheet.addRow(worksheetRow),
+      worksheet.addRows([worksheetRow]),
     ]);
-
-    console.log('res', res);
 
     // Log eventual errors
     res.forEach((result) => {
@@ -215,7 +207,7 @@ const transaction = async ({
       [`${path[0].toToken.symbol} bought`]: boughtTokens,
       'Best buying exchange': bestBuyingExchangeName,
       [`${path[0].fromToken.symbol} bought back`]: revenues,
-      'Gas cost (in ETH)': gasCostWETH,
+      'Gas cost (in ETH)': gasCostETH,
       [`Profit (in ${path[0].fromToken.symbol})`]: profitInTokens,
       'Profit (%)': profitPercent + '%',
     };

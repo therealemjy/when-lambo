@@ -31158,70 +31158,36 @@ var require_lib13 = __commonJS({
 var require_package = __commonJS({
   "node_modules/elliptic/package.json"(exports2, module2) {
     module2.exports = {
-      _args: [
-        [
-          "elliptic@6.5.4",
-          "/Users/anthonyriera/Desktop/code/when-lambo-bot"
-        ]
+      name: "elliptic",
+      version: "6.5.4",
+      description: "EC cryptography",
+      main: "lib/elliptic.js",
+      files: [
+        "lib"
       ],
-      _from: "elliptic@6.5.4",
-      _id: "elliptic@6.5.4",
-      _inBundle: false,
-      _integrity: "sha512-iLhC6ULemrljPZb+QutR5TQGB+pdW6KGD5RSegS+8sorOZT+rdQFbsQFJgvN3eRqNALqJer4oQ16YvJHlU8hzQ==",
-      _location: "/elliptic",
-      _phantomChildren: {},
-      _requested: {
-        type: "version",
-        registry: true,
-        raw: "elliptic@6.5.4",
-        name: "elliptic",
-        escapedName: "elliptic",
-        rawSpec: "6.5.4",
-        saveSpec: null,
-        fetchSpec: "6.5.4"
+      scripts: {
+        lint: "eslint lib test",
+        "lint:fix": "npm run lint -- --fix",
+        unit: "istanbul test _mocha --reporter=spec test/index.js",
+        test: "npm run lint && npm run unit",
+        version: "grunt dist && git add dist/"
       },
-      _requiredBy: [
-        "/@ethersproject/signing-key",
-        "/@truffle/interface-adapter/ethers",
-        "/browserify-sign",
-        "/create-ecdh",
-        "/eth-gas-reporter/ethers",
-        "/eth-gas-reporter/secp256k1",
-        "/eth-lib",
-        "/secp256k1",
-        "/web3-core-helpers/eth-lib",
-        "/web3-core-method/eth-lib",
-        "/web3-core/eth-lib",
-        "/web3-eth-abi/eth-lib",
-        "/web3-eth-accounts/eth-lib",
-        "/web3-eth-contract/eth-lib",
-        "/web3-eth-ens/eth-lib",
-        "/web3-eth-iban/eth-lib",
-        "/web3-eth-personal/eth-lib",
-        "/web3-eth/eth-lib",
-        "/web3-net/eth-lib",
-        "/web3/eth-lib"
+      repository: {
+        type: "git",
+        url: "git@github.com:indutny/elliptic"
+      },
+      keywords: [
+        "EC",
+        "Elliptic",
+        "curve",
+        "Cryptography"
       ],
-      _resolved: "https://registry.npmjs.org/elliptic/-/elliptic-6.5.4.tgz",
-      _spec: "6.5.4",
-      _where: "/Users/anthonyriera/Desktop/code/when-lambo-bot",
-      author: {
-        name: "Fedor Indutny",
-        email: "fedor@indutny.com"
-      },
+      author: "Fedor Indutny <fedor@indutny.com>",
+      license: "MIT",
       bugs: {
         url: "https://github.com/indutny/elliptic/issues"
       },
-      dependencies: {
-        "bn.js": "^4.11.9",
-        brorand: "^1.1.0",
-        "hash.js": "^1.0.0",
-        "hmac-drbg": "^1.0.1",
-        inherits: "^2.0.4",
-        "minimalistic-assert": "^1.0.1",
-        "minimalistic-crypto-utils": "^1.0.1"
-      },
-      description: "EC cryptography",
+      homepage: "https://github.com/indutny/elliptic",
       devDependencies: {
         brfs: "^2.0.2",
         coveralls: "^3.1.0",
@@ -31237,31 +31203,15 @@ var require_package = __commonJS({
         istanbul: "^0.4.5",
         mocha: "^8.0.1"
       },
-      files: [
-        "lib"
-      ],
-      homepage: "https://github.com/indutny/elliptic",
-      keywords: [
-        "EC",
-        "Elliptic",
-        "curve",
-        "Cryptography"
-      ],
-      license: "MIT",
-      main: "lib/elliptic.js",
-      name: "elliptic",
-      repository: {
-        type: "git",
-        url: "git+ssh://git@github.com/indutny/elliptic.git"
-      },
-      scripts: {
-        lint: "eslint lib test",
-        "lint:fix": "npm run lint -- --fix",
-        test: "npm run lint && npm run unit",
-        unit: "istanbul test _mocha --reporter=spec test/index.js",
-        version: "grunt dist && git add dist/"
-      },
-      version: "6.5.4"
+      dependencies: {
+        "bn.js": "^4.11.9",
+        brorand: "^1.1.0",
+        "hash.js": "^1.0.0",
+        "hmac-drbg": "^1.0.1",
+        inherits: "^2.0.4",
+        "minimalistic-assert": "^1.0.1",
+        "minimalistic-crypto-utils": "^1.0.1"
+      }
     };
   }
 });
@@ -57878,9 +57828,9 @@ var formatStrategies = (parsedStrategies, borrowedAmountCount) => parsedStrategi
 var formatStrategies_default = formatStrategies;
 
 // dist/gasEstimates.json
-var _ = { "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e": "109509", "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f": "160230", "0xDDB3422497E61e13543BeA06989C0789117555c5": "109876", "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942": "112196", "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": "289395", "0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44": "109500" };
-var _2 = { "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e": "110446", "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f": "161167", "0xDDB3422497E61e13543BeA06989C0789117555c5": "110813", "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942": "113133", "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": "290332", "0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44": "110437" };
-var _3 = { "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e": "116931", "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f": "167652", "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": "296817" };
+var _ = { "0x6B175474E89094C44Da98b954EedeAC495271d0F": "109592" };
+var _2 = { "0x6B175474E89094C44Da98b954EedeAC495271d0F": "110529" };
+var _3 = { "0x6B175474E89094C44Da98b954EedeAC495271d0F": "117014" };
 var gasEstimates_default = { "0": _, "1": _2, "2": _3 };
 
 // bot/config.ts
@@ -59533,10 +59483,13 @@ var log = (...args) => {
   }
 };
 var error = (...args) => bunyanLogger.error(...args);
-var _convertToHumanReadableAmount = (amount, tokenDecimals) => amount.div(`${10 ** tokenDecimals}`).toString();
+var _convertToHumanReadableAmount = (amount, _tokenDecimals) => {
+  return amount.toString();
+};
 var transaction = async ({
   blockNumber,
   path,
+  maxFeePerGas,
   spreadsheet,
   transactionHash = "None"
 }) => {
@@ -59546,14 +59499,14 @@ var transaction = async ({
   const revenues = _convertToHumanReadableAmount(path[1].toTokenDecimalAmount, path[1].toToken.decimals);
   const bestSellingExchangeName = ExchangeIndex[path[0].exchangeIndex];
   const bestBuyingExchangeName = ExchangeIndex[path[1].exchangeIndex];
-  const gasCost = path[0].gasCostEstimate.add(path[1].gasCostEstimate).add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE).mul(config_default.gasLimitMultiplicator * 100).div(100);
+  const gasCost = path[0].gasEstimate.add(path[1].gasEstimate).add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE).mul(config_default.gasLimitMultiplicator * 100).div(100).mul(maxFeePerGas);
   const gasCostWETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);
   const [profitDec, profitPercent] = calculateProfit_default({
     revenueDec: path[1].toTokenDecimalAmount,
     expenseDec: path[0].fromTokenDecimalAmount.add(gasCost)
   });
   const profitInTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
-  if (!config_default.isDev) {
+  if (config_default.isDev) {
     const slackBlock = [
       {
         type: "section",
@@ -59640,6 +59593,7 @@ ${profitPercent}%`
       }, "deals"),
       worksheet.addRow(worksheetRow)
     ]);
+    console.log("res", res);
     res.forEach((result) => {
       if (result.status === "rejected") {
         eventEmitter_default.emit("error", result.reason);

@@ -58,6 +58,7 @@ const getMostProfitablePath = ({
     const isMostProfitable = !mostProfitablePath || mostProfitablePath.profitWethAmount.lt(profitWethAmount);
 
     // if (profitWethAmount.gt(totalGasCost) && totalGasCost.lte(gasCostMaximumThresholdWei) && isMostProfitable) {
+    // TODO: check profit is positive (temporarily)
     if (isMostProfitable) {
       return {
         profitWethAmount,

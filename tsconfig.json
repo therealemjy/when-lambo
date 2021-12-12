@@ -25,6 +25,18 @@
       "@communicator": ["./communicator"]
     }
   },
+  "include": [
+    "./hardhat.config.ts",
+    "./logger",
+    "./communicator",
+    "./test",
+    "./scripts",
+    "./utils",
+    "./tasks",
+    "./chainHandler/typechain",
+    "./chainHandler/deploy",
+    "./chainHandler/utils"
+  ],
   "exclude": ["./bot", "./node_modules", "./dist"],
   "files": ["./hardhat.config.ts"]
 }
