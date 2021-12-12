@@ -4,7 +4,7 @@
   "description": "Smart contracts for When Lambo",
   "author": "",
   "private": true,
-  "main": "bot/dist/index.js",
+  "main": "bot/dist/bot/index.js",
   "scripts": {
     "tsc": "npm run bot:tsc && tsc --noEmit",
     "lint": "eslint .",
@@ -14,8 +14,10 @@
     "format:ts": "prettier --write \"**/*.ts\"",
     "fetch-gas-estimates": "ts-node scripts/fetchGasEstimates/index.ts | ./node_modules/.bin/bunyan",
     "bot:tsc": "tsc --noEmit --project ./bot/tsconfig.json",
-    "bot:build": "rm -rf ./dist/index.js && esbuild ./bot/index.ts --bundle --outfile=./dist/index.js --platform=node",
-    "bot:dev": "npm run bot:build && NODE_ENV=development node --inspect ./dist/index | ./node_modules/.bin/bunyan",
+    "bot:build": "rm -rf ./dist/bot/index.js && esbuild ./bot/index.ts --bundle --outfile=./dist/bot/index.js --platform=node",
+    "bot:dev": "npm run bot:build && NODE_ENV=development node --inspect ./dist/bot/index | ./node_modules/.bin/bunyan",
+    "communicator:build": "rm -rf ./dist/communicator/index.js && esbuild ./communicator/index.ts --bundle --outfile=./dist/communicator/index.js --platform=node",
+    "communicator:dev": "npm run communicator:build && NODE_ENV=development node --inspect ./dist/communicator/index | ./node_modules/.bin/bunyan",
     "prebot:deploy": "npm run tsc && npm run lint && npm run test && USE_PROD_STRATEGIES=true npm run fetch-gas-estimates && npm run bot:build && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"Publish version $PACKAGE_VERSION\" --no-verify && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
     "bot:deploy": "npx pm2 deploy one update --force",
     "prepare": "husky install"
@@ -37,7 +39,7 @@
     "google-spreadsheet": "^3.2.0",
     "serialize-error": "^8.1.0",
     "typed-emitter": "^1.4.0",
-    "websocket": "^1.0.34"
+    "ws": "^8.3.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.3.0-beta.11",
@@ -54,6 +56,7 @@
     "@types/mocha": "^9.0.0",
     "@types/module-alias": "^2.0.1",
     "@types/node": "^16.11.10",
+    "@types/ws": "^8.2.2",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "chai": "^4.3.4",
@@ -84,8 +87,7 @@
     "solidity-coverage": "^0.7.17",
     "ts-node": "^10.4.0",
     "typechain": "^5.2.0",
-    "typescript": "^4.5.2",
-    "websocket": "^1.0.34"
+    "typescript": "^4.5.2"
   },
   "_moduleAliases": {
     "@localTypes": "./types",
