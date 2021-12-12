@@ -1,10 +1,11 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import { ethers, BigNumber, Signer } from 'ethers';
+import { ethers, Signer } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import http from 'http';
 import TypedEmitter from 'typed-emitter';
 
-import { Strategy, GasFees } from '@localTypes';
+import { GasFees } from '@communicator/types';
+import { Strategy } from '@localTypes';
 import logger from '@logger';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
@@ -24,7 +25,7 @@ export type State = {
   lastMonitoringDateTime: number | null;
   botExecutionMonitoringTick: number;
   perfMonitoringRecords: number[];
-  currentGasFees: GasFees;
+  gasFees?: GasFees;
 };
 
 export const defaultState: State = {
@@ -34,10 +35,6 @@ export const defaultState: State = {
   lastMonitoringDateTime: null,
   botExecutionMonitoringTick: 0,
   perfMonitoringRecords: [],
-  currentGasFees: {
-    maxPriorityFeePerGas: BigNumber.from(0),
-    maxFeePerGas: BigNumber.from(0),
-  },
 };
 
 export type Services = {

@@ -98,6 +98,7 @@
     "@resources": "./resources",
     "@deployments": "./deployments",
     "@chainHandler": "./chainHandler",
-    "@bot": "./bot"
+    "@bot": "./bot",
+    "@communicator": "./communicator"
   }
 }

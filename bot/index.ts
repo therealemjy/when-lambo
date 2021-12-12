@@ -40,9 +40,16 @@ const init = async ({
 }) => {
   const start = async () => {
     let isMonitoring = false;
+    let hasPassedFirstBlock = false;
     let cancelablePromise: CancelablePromise | undefined = undefined;
 
     provider.addListener('block', async (blockNumber: number) => {
+      // Skip first block to avoid potential expired deals
+      if (!hasPassedFirstBlock) {
+        hasPassedFirstBlock = true;
+        return;
+      }
+
       services.logger.log(`New block: #${blockNumber}`);
 
       if (!services.state.monitoringActivated) {

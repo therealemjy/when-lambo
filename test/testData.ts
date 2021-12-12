@@ -77,7 +77,7 @@ export const EXPECTED_REVENUE_WETH = '568270094198623164';
 export const mockedServices: Services = {
   state: {
     ...defaultState,
-    currentGasFees: {
+    gasFees: {
       maxPriorityFeePerGas: ethers.utils.parseUnits('4', 'gwei'),
       maxFeePerGas: ethers.utils.parseUnits('101', 'gwei'),
     },

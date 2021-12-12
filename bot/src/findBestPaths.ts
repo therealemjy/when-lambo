@@ -13,7 +13,7 @@ type FindBestPathsArgs = {
   fromTokenDecimalAmounts: BigNumber[];
   toToken: Token;
   slippageAllowancePercent: number;
-  maxFeePerGas: BigNumber;
+  maxFeePerGas: number;
   exchanges: Exchange[];
   gasEstimates: GasEstimates;
 };

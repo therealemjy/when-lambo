@@ -21,7 +21,8 @@
       "@tasks/*": ["./tasks/*"],
       "@deployments/*": ["./deployments/*"],
       "@chainHandler/*": ["./chainHandler/*"],
-      "@bot/*": ["./bot/*"]
+      "@bot/*": ["./bot/*"],
+      "@communicator": ["./communicator"]
     }
   },
   "exclude": ["./bot", "./node_modules", "./dist"],

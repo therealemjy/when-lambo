@@ -40,7 +40,7 @@ const findBestDeals = async ({
   fromToken: Token;
   toToken: Token;
   slippageAllowancePercent: number;
-  maxFeePerGas: BigNumber;
+  maxFeePerGas: number;
   gasEstimates: GasEstimates;
   exchanges: Exchange[];
   usedExchangeIndexes?: UsedExchangeIndexes;
@@ -131,7 +131,7 @@ const findBestDeals = async ({
         toTokenDecimalAmount: pessimisticToTokenDecimalAmount,
         slippageAllowancePercent,
         gasEstimate,
-        gasCostEstimate: maxFeePerGas.mul(gasEstimate),
+        gasCostEstimate: gasEstimate.mul(maxFeePerGas),
       };
 
       const currentBestDeal = bestDeals[formattedResult.fromTokenDecimalAmount.toString()];

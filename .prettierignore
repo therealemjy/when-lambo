@@ -2,7 +2,6 @@ node_modules
 .vscode
 package.json
 dist
-bot/dist
 build
 
 coverage*

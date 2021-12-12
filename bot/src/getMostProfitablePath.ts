@@ -14,7 +14,7 @@ const getMostProfitablePath = ({
   gasCostMaximumThresholdWei,
 }: {
   paths: Path[];
-  maxFeePerGas: BigNumber;
+  maxFeePerGas: number;
   gasLimitMultiplicator: number;
   gasCostMaximumThresholdWei: BigNumber;
 }) => {
@@ -25,7 +25,9 @@ const getMostProfitablePath = ({
       }
     | undefined
   >((mostProfitablePath, path) => {
-    const tradeWithoutSwapsGasCostEstimate = maxFeePerGas.mul(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE);
+    const tradeWithoutSwapsGasCostEstimate = BigNumber.from(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE).mul(
+      maxFeePerGas
+    );
 
     const totalGasCost = path[0].gasCostEstimate
       .add(path[1].gasCostEstimate)

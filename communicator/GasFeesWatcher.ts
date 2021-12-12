@@ -2,10 +2,7 @@ import axios from 'axios';
 
 import logger from '@logger';
 
-export interface GasFees {
-  maxPriorityFeePerGas: number;
-  maxFeePerGas: number;
-}
+import { GasFees } from './types';
 
 class GasFeesWatcher {
   blocknativeApiKey: string;

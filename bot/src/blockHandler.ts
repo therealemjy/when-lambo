@@ -13,6 +13,7 @@ import findBestPaths from './findBestPaths';
 import getMostProfitablePath from './getMostProfitablePath';
 import { WETH } from './tokens';
 import registerExecutionTime from './utils/registerExecutionTime';
+import logger from '@logger';
 
 type ExecuteStrategyArgs = {
   strategy: Strategy;
@@ -34,7 +35,11 @@ const executeStrategy = async (
   { blockNumber, multicall, strategy, TransactorContract, spreadsheet }: ExecuteStrategyArgs
 ) => {
   try {
-    const gasFees = services.state.currentGasFees;
+    const gasFees = services.state.gasFees;
+
+    if (!gasFees) {
+      throw new Error('Gas fees missing');
+    }
 
     const paths = await findBestPaths({
       multicall,
@@ -108,6 +113,11 @@ const blockHandler = async (
 ) => {
   // Record time for perf monitoring
   services.state.botExecutionMonitoringTick = new Date().getTime();
+
+  if (!services.state.gasFees) {
+    services.logger.log(`Block skipped: #${blockNumber} (gas fees missing)`);
+    return;
+  }
 
   // Execute all strategies simultaneously
   const res = await Promise.allSettled(
