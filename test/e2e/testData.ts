@@ -77,8 +77,8 @@ export const mockedServices: Services = {
   state: {
     ...defaultState,
     gasFees: {
-      maxPriorityFeePerGas: ethers.utils.parseUnits('4', 'gwei'),
-      maxFeePerGas: ethers.utils.parseUnits('101', 'gwei'),
+      maxPriorityFeePerGas: ethers.utils.parseUnits('4', 'gwei').toNumber(),
+      maxFeePerGas: ethers.utils.parseUnits('101', 'gwei').toNumber(),
     },
   },
   config,
