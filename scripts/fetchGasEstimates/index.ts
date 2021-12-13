@@ -14,6 +14,7 @@ import exchanges from '@bot/src/exchanges';
 // @ts-ignore because this is the only JS file we are using in the project
 import { strategies as prodStrategies } from '../../bot.config';
 
+// @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
 const ethers = hre.ethers;
 
 function getStrategies() {
