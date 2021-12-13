@@ -9,7 +9,6 @@ import eventEmitter from '@bot/src/eventEmitter';
 import exchanges from '@bot/src/exchanges';
 
 const config: EnvConfig = {
-  communicationWssUrl: '',
   environment: 'test',
   isDev: false,
   isProd: false,
