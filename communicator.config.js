@@ -21,7 +21,7 @@ module.exports = {
       ref: 'origin/master',
       repo: 'git@github.com:peel-chat/when-lambo-bot.git',
       path: '/home/ubuntu/when-lambo',
-      'post-deploy': 'sudo pm2 start ./communicator.config.js --env prod',
+      'post-deploy': 'pm2 start ./communicator.config.js --env prod',
       host: ['ec2-34-239-124-108.compute-1.amazonaws.com'],
     },
   },
