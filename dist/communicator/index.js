@@ -59734,6 +59734,7 @@ var gasFees;
 var gasFeesWatcher = new GasFeesWatcher_default(config_default2.blocknativeApiKey, config_default2.maxPriorityFeePerGasMultiplicator);
 var wss = new import_websocket_server.default({ port: PORT });
 wss.on("listening", () => {
+  logger_default.log(`Communicator started and listening on port ${PORT}`);
   gasFeesWatcher.start((updatedGasFees) => {
     gasFees = updatedGasFees;
     wss.clients.forEach((client) => {
@@ -59748,7 +59749,7 @@ wss.on("listening", () => {
   }, 5500);
 });
 wss.on("connection", function connection(connectedClient) {
-  logger_default.log("New client connected", connectedClient.url);
+  logger_default.log("New client connected");
   if (gasFees) {
     const initialMessage = {
       type: "gasFeesUpdate",
@@ -59759,6 +59760,7 @@ wss.on("connection", function connection(connectedClient) {
   connectedClient.on("message", (data) => {
     const message = JSON.parse(data.toString());
     if (message.type === "stopMonitoringSignal") {
+      logger_default.log(`Stop monitoring signal received and forwarded to other clients.`);
       wss.clients.forEach((client) => {
         if (client.readyState === wrapper_default.OPEN) {
           client.send(data);
