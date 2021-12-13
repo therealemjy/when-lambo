@@ -1,13 +1,13 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import { ContractTransaction } from 'ethers';
+// import { ContractTransaction } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { Strategy } from '@localTypes';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
-import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
-import executeTrade from './executeTrade';
+// import formatNestedBN from '@chainHandler/utils/formatNestedBN';
+// import executeTrade from './executeTrade';
 import findBestPaths from './findBestPaths';
 import findTrade from './findTrade';
 import { WETH } from './tokens';
@@ -69,37 +69,39 @@ const executeStrategy = async (
     // TODO: uncomment once we're confident the script can start executing real
     // trades
 
-    let transaction: ContractTransaction | undefined = undefined;
+    // let transaction: ContractTransaction | undefined = undefined;
 
     // Execute trade, in production and test environments only
     if (trade && !services.config.isDev) {
       // Deactivate the bot completely
       services.state.isMonitoringActivated = false;
+      // Stop all monitoring servers
+      services.messenger?.sendStopMonitoringSignal();
 
-      transaction = await executeTrade({
-        trade,
-        TransactorContract,
-      });
+      // transaction = await executeTrade({
+      //   trade,
+      //   TransactorContract,
+      // });
     }
 
-    // Log trade
-    if (trade) {
-      await services.logger.transaction({
-        trade,
-        transactionHash: transaction?.hash,
-        spreadsheet,
-      });
-    }
+    // // Log trade
+    // if (trade) {
+    //   await services.logger.transaction({
+    //     trade,
+    //     transactionHash: transaction?.hash,
+    //     spreadsheet,
+    //   });
+    // }
 
-    // Watch transaction
-    if (transaction) {
-      services.logger.log('Watching pending transaction...');
-      const receipt = await transaction.wait();
-      services.logger.log('Trade successfully executed! Human-readable receipt:');
-      services.logger.log(formatNestedBN(receipt));
-      services.logger.log('Stringified receipt:');
-      services.logger.log(JSON.stringify(receipt));
-    }
+    // // Watch transaction
+    // if (transaction) {
+    //   services.logger.log('Watching pending transaction...');
+    //   const receipt = await transaction.wait();
+    //   services.logger.log('Trade successfully executed! Human-readable receipt:');
+    //   services.logger.log(formatNestedBN(receipt));
+    //   services.logger.log('Stringified receipt:');
+    //   services.logger.log(JSON.stringify(receipt));
+    // }
   } catch (error: unknown) {
     services.eventEmitter.emit('error', error);
   }
