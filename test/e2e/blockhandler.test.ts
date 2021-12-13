@@ -11,7 +11,7 @@ import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 
 import blockHandler from '@bot/src/blockHandler';
 
-import { mockedServices, EXPECTED_REVENUE_WETH } from '../testData';
+import { mockedServices, EXPECTED_REVENUE_WETH } from './testData';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);

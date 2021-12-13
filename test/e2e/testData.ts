@@ -9,6 +9,7 @@ import eventEmitter from '@bot/src/eventEmitter';
 import exchanges from '@bot/src/exchanges';
 
 const config: EnvConfig = {
+  communicationWssUrl: '',
   environment: 'test',
   isDev: false,
   isProd: false,
@@ -28,11 +29,9 @@ const config: EnvConfig = {
   slackChannelsWebhooks: {
     deals: 'fake-channel-webhook',
   },
-  blocknativeApiKey: 'fake-blocknative-api-key',
   sentryDNS: 'fake-sentry-dns',
   slippageAllowancePercent: 0.5,
   gasLimitMultiplicator: 1.3, // TODO: check why using any value lower than that makes the contract call fail
-  maxPriorityFeePerGasMultiplicator: 1.1,
   gasCostMaximumThresholdWei: ethers.utils.parseUnits('0.063', 'ether'),
   gasEstimates: {
     // Uniswap V2
