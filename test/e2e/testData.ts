@@ -31,7 +31,9 @@ const config: EnvConfig = {
   },
   sentryDNS: 'fake-sentry-dns',
   slippageAllowancePercent: 0.5,
-  gasLimitMultiplicator: 1.3, // TODO: check why using any value lower than that makes the contract call fail
+  // Note: using anything lower than that will result in transactions failing.
+  // I couldn't find the actual reason for it :/
+  gasLimitMultiplicator: 1.3,
   gasCostMaximumThresholdWei: ethers.utils.parseUnits('0.063', 'ether'),
   gasEstimates: {
     // Uniswap V2
