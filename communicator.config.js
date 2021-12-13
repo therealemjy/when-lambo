@@ -9,6 +9,8 @@ module.exports = {
         NODE_ENV: 'production',
         BLOCKNATIVE_API_KEY: '6856435a-21ea-4468-8c53-f53db987a448',
         MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR: '1.1',
+        // TODO: Remove it when logger doesn't use it anymore
+        GAS_LIMIT_MULTIPLICATOR: '1.3',
       },
     },
   ],

@@ -7,7 +7,6 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 import { ExchangeIndex } from '@localTypes';
 
-import config from '@bot/config';
 import eventEmitter from '@bot/src/eventEmitter';
 import { WETH } from '@bot/src/tokens';
 import { Path } from '@bot/src/types';
@@ -15,6 +14,7 @@ import calculateProfit from '@bot/src/utils/calculateProfit';
 import formatTimestamp from '@bot/src/utils/formatTimestamp';
 import sendSlackMessage from '@bot/src/utils/sendSlackMessage';
 
+import config from './config';
 import { WorksheetRow } from './types';
 
 const bunyanLogger = Bunyan.createLogger({

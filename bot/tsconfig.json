@@ -21,7 +21,7 @@
     "baseUrl": "./",
     "types": ["@types/node"],
     "sourceMap": true,
-    "outDir": "../dist",
+    "outDir": "../dist/bot",
     "paths": {
       "@localTypes": ["../types"],
       "@constants": ["../constants"],
