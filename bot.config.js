@@ -35,13 +35,6 @@ const strategies = [
       STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '9000000000000000000',
       STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
     },
-    {
-      TRADED_TOKEN_ADDRESS: '0x3845badade8e6dff049820680d1f14bd3903a5d0',
-      TRADED_TOKEN_SYMBOL: 'SAND',
-      TRADED_TOKEN_DECIMALS: '18',
-      STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT: '5000000000000000000',
-      STRATEGY_BORROWED_INCREMENT_PERCENT: '10',
-    },
   ],
   [
     {
@@ -286,7 +279,7 @@ const baseEnvs = {
   GAS_LIMIT_MULTIPLICATOR: '1.3',
   GAS_COST_MAXIMUM_THRESHOLD_WEI: '50000000000000000',
   STRATEGY_BORROWED_AMOUNT_COUNT: 11,
-  COMMUNICATOR_WSS_URL: 'ws://ec2-52-91-212-133.compute-1.amazonaws.com:6969',
+  COMMUNICATOR_WSS_URL: 'ws://34.239.124.108:80',
 };
 
 const baseOptions = {
@@ -369,7 +362,7 @@ module.exports = {
     six: {
       ...baseOptions,
       'post-deploy': getHookDeployCommand('six'),
-      host: ['ec2-54-152-29-33.compute-1.amazonaws.com	'],
+      host: ['ec2-54-152-29-33.compute-1.amazonaws.com'],
     },
   },
 };

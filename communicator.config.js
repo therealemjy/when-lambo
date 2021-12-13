@@ -9,6 +9,7 @@ module.exports = {
         NODE_ENV: 'production',
         BLOCKNATIVE_API_KEY: '6856435a-21ea-4468-8c53-f53db987a448',
         MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR: '1.1',
+        SLACK_HOOK_URL_DEALS: '/services/T02KL0NM4JW/B02KL2YR274/uuVWs7PFmmu7HeJFznO0lnbr',
       },
     },
   ],
