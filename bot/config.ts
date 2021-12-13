@@ -26,9 +26,6 @@ export interface EnvConfig {
     clientEmail: string;
     privateKeyBase64: string;
   };
-  slackChannelsWebhooks: {
-    deals: string;
-  };
   sentryDNS: string;
   slippageAllowancePercent: number;
   gasLimitMultiplicator: number;
@@ -59,9 +56,6 @@ const config: EnvConfig = {
     id: env('GOOGLE_SPREADSHEET_SPREADSHEET_ID'),
     clientEmail: env('GOOGLE_SPREADSHEET_CLIENT_EMAIL'),
     privateKeyBase64: env('GOOGLE_SPREADSHEET_PRIVATE_KEY_BASE_64'),
-  },
-  slackChannelsWebhooks: {
-    deals: env('SLACK_HOOK_URL_DEALS'),
   },
   sentryDNS: env('SENTRY_DNS_URL'),
   communicationWssUrl: env('COMMUNICATOR_WSS_URL'),

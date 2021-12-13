@@ -26,9 +26,6 @@ const config: EnvConfig = {
     clientEmail: 'fake-client-email',
     privateKeyBase64: 'fake-private-key-base-64',
   },
-  slackChannelsWebhooks: {
-    deals: 'fake-channel-webhook',
-  },
   sentryDNS: 'fake-sentry-dns',
   slippageAllowancePercent: 0.5,
   // Note: using anything lower than that will result in transactions failing.

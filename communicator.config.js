@@ -11,6 +11,7 @@ module.exports = {
         MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR: '1.1',
         // TODO: Remove it when logger doesn't use it anymore
         GAS_LIMIT_MULTIPLICATOR: '1.3',
+        SLACK_HOOK_URL_DEALS: '/services/T02KL0NM4JW/B02KL2YR274/uuVWs7PFmmu7HeJFznO0lnbr',
       },
     },
   ],

@@ -10,9 +10,9 @@ import eventEmitter from '@bot/src/eventEmitter';
 import { WETH } from '@bot/src/tokens';
 import { Trade } from '@bot/src/types';
 import formatTimestamp from '@bot/src/utils/formatTimestamp';
-import sendSlackMessage from '@bot/src/utils/sendSlackMessage';
 
 import config from './config';
+import sendSlackMessage from './sendSlackMessage';
 import { WorksheetRow } from './types';
 
 const bunyanLogger = Bunyan.createLogger({

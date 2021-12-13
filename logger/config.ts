@@ -10,6 +10,9 @@ export interface EnvConfig {
   isDev: boolean;
   isProd: boolean;
   gasLimitMultiplicator: number;
+  slackChannelsWebhooks: {
+    deals: string;
+  };
 }
 
 const config: EnvConfig = {
@@ -17,6 +20,9 @@ const config: EnvConfig = {
   isProd: (process.env.NODE_ENV as Environment) === 'production',
   isDev: (process.env.NODE_ENV as Environment) === 'development',
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
+  slackChannelsWebhooks: {
+    deals: env('SLACK_HOOK_URL_DEALS'),
+  },
 };
 
 export default config;

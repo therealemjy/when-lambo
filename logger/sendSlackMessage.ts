@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import config from '@bot/config';
+import config from './config';
 
 const sendSlackMessage = async (message: unknown) => {
   const body = JSON.stringify(message);
