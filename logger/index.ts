@@ -90,7 +90,7 @@ const transaction = async ({
   const profitInTokens = _convertToHumanReadableAmount(trade.profitWethAmount, WETH.decimals);
 
   // Log paths in Slack and Google Spreadsheet in production
-  if (!config.isDev) {
+  if (config.isProd) {
     const slackBlock = [
       {
         type: 'divider',

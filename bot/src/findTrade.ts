@@ -6,8 +6,6 @@ import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 import { Trade, Path } from '@bot/src/types';
 import calculateProfit from '@bot/src/utils/calculateProfit';
 
-// Go through paths and find the most profitable (if any of them is considered
-// profitable according to the rules)
 const findTrade = ({
   currentBlockNumber,
   paths,
@@ -58,16 +56,7 @@ const findTrade = ({
       return trade;
     }
 
-    /*
-      Rules for a trade to be counted as profitable:
-      1) Trade musts yield a profit that's equal or superior to the total gas
-         cost of the transaction
-      2) Total gas cost of the transaction can only go up to a given ETH maximum
-         (see config for the actual value)
-    */
-    // const isMostProfitable = profitWethAmount.gt(totalGasCost) && totalGasCost.lte(gasCostMaximumThresholdWei) && currentBestTrade.profitWethAmount.lt(profitWethAmount);
-    // TODO: remove once we start executing real trades
-    const isMostProfitable = profitWethAmount.gt(0) && currentBestTrade.profitWethAmount.lt(profitWethAmount);
+    const isMostProfitable = currentBestTrade.profitWethAmount.lt(profitWethAmount);
 
     if (isMostProfitable) {
       return trade;
@@ -76,7 +65,21 @@ const findTrade = ({
     return currentBestTrade;
   }, undefined);
 
-  return bestTrade;
+  /*
+    Rules for a trade to be counted as executable:
+    1) Trade musts yield a profit that's equal or superior to the total gas
+        cost of the transaction
+    2) Total gas cost of the transaction can only go up to a given ETH maximum
+        (see config for the actual value)
+  */
+  // TODO: uncomment once we start executing real trades
+  // const isExecutable =
+  //   bestTrade &&
+  //   bestTrade.profitWethAmount.gt(bestTrade.totalGasCost) &&
+  //   bestTrade.totalGasCost.lte(gasCostMaximumThresholdWei);
+  const isExecutable = bestTrade && bestTrade.profitWethAmount.gt(0);
+
+  return isExecutable ? bestTrade : undefined;
 };
 
 export default findTrade;

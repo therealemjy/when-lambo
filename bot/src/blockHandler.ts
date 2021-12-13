@@ -3,7 +3,6 @@ import { ContractTransaction } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { Strategy } from '@localTypes';
-import logger from '@logger';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import formatNestedBN from '@chainHandler/utils/formatNestedBN';
@@ -30,7 +29,7 @@ type BlockHandlerArgs = {
   TransactorContract: ITransactorContract;
 };
 
-const HEIGHT_SECONDS_IN_MS = 8000;
+const EIGHT_SECONDS_IN_MS = 8000;
 
 const executeStrategy = async (
   services: Services,
@@ -120,12 +119,10 @@ const blockHandler = async (
 
   // Check if gas fees aren't outdated
   const dateNow = new Date().getTime();
-  if (dateNow - services.state.lastGasPriceUpdateDateTime > HEIGHT_SECONDS_IN_MS) {
+  if (dateNow - services.state.lastGasPriceUpdateDateTime > EIGHT_SECONDS_IN_MS) {
     services.logger.log(`Block skipped: #${blockNumber} (gas fees outdated)`);
     return;
   }
-
-  logger.log('GAS FEES', services.state.gasFees);
 
   // Execute all strategies simultaneously
   const res = await Promise.allSettled(

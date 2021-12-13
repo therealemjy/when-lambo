@@ -25,12 +25,12 @@ const getContractWethBalance = async (contract: ITransactorContract): Promise<Bi
   return wethContract.balanceOf(contract.address);
 };
 
-describe('blockhandler', function () {
+describe.only('blockhandler', function () {
   it('should find opportunity, execute trade and yield profit', async function () {
     const { TransactorContract } = await setup();
 
     const fakeWorksheet = {
-      addRow: () => new Promise((resolve) => resolve(undefined)),
+      addRows: () => new Promise((resolve) => resolve(undefined)),
     };
 
     const fakeSpreadsheet = {
