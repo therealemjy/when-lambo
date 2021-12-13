@@ -1,7 +1,8 @@
-import { GasFees } from '@communicator/types';
 import { BigNumber } from 'ethers';
 
 import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
+
+import { GasFees } from '@communicator/types';
 
 import { Trade, Path } from '@bot/src/types';
 import calculateProfit from '@bot/src/utils/calculateProfit';

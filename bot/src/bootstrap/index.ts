@@ -1,19 +1,16 @@
-import { GasFees } from '@communicator/types';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import { ethers, Signer } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import http from 'http';
-import TypedEmitter from 'typed-emitter';
 
-import { Strategy } from '@localTypes';
 import logger from '@logger';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 
-import config, { EnvConfig } from '@bot/config';
-import eventEmitter, { MessageEvents } from '@bot/src/eventEmitter';
+import config from '@bot/config';
+import eventEmitter from '@bot/src/eventEmitter';
 import exchanges from '@bot/src/exchanges';
-import UniswapLikeExchange from '@bot/src/exchanges/UniswapLikeExchange';
+import { State, Services } from '@bot/src/types';
 
 import fetchSecrets from './fetchSecrets';
 import getAwsWSProvider from './getAwsWSProvider';
@@ -21,31 +18,12 @@ import getSpreadsheet from './getSpreadsheet';
 import getTransactorContract from './getTransactorContract';
 import Messenger from './messenger';
 
-export type State = {
-  isMonitoringActivated: boolean;
-  lastMonitoringDateTime?: number;
-  lastGasPriceUpdateDateTime?: number;
-  botExecutionMonitoringTick: number;
-  perfMonitoringRecords: number[];
-  gasFees?: GasFees;
-};
-
-export const defaultState: State = {
+const defaultState: State = {
   // safe guard if we found a trade
   isMonitoringActivated: true,
   // Set to the last date the bot checked prices
   botExecutionMonitoringTick: 0,
   perfMonitoringRecords: [],
-};
-
-export type Services = {
-  state: State;
-  config: EnvConfig;
-  logger: typeof logger;
-  exchanges: UniswapLikeExchange[];
-  eventEmitter: TypedEmitter<MessageEvents>;
-  strategies: Strategy[];
-  messenger?: Messenger;
 };
 
 const services: Services = {

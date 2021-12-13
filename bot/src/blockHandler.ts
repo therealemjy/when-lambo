@@ -7,11 +7,11 @@ import { Strategy } from '@localTypes';
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
-import { Services } from './bootstrap';
 import executeTrade from './executeTrade';
 import findBestPaths from './findBestPaths';
 import findTrade from './findTrade';
 import { WETH } from './tokens';
+import { Services } from './types';
 import registerExecutionTime from './utils/registerExecutionTime';
 
 type ExecuteStrategyArgs = {

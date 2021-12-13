@@ -7,8 +7,9 @@ import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 
 import botConfig from './config';
 import blockHandler from './src/blockHandler';
-import { bootstrap, Services } from './src/bootstrap';
+import { bootstrap } from './src/bootstrap';
 import eventEmitter from './src/eventEmitter';
+import { Services } from './src/types';
 import CancelablePromise from './src/utils/cancelablePromise';
 import handleError from './src/utils/handleError';
 

@@ -4,9 +4,9 @@ import logger from '@logger';
 import formatStrategies from '@utils/formatStrategies';
 
 import { EnvConfig } from '@bot/config';
-import { defaultState, Services } from '@bot/src/bootstrap';
 import eventEmitter from '@bot/src/eventEmitter';
 import exchanges from '@bot/src/exchanges';
+import { Services } from '@bot/src/types';
 
 const config: EnvConfig = {
   environment: 'test',
@@ -77,7 +77,9 @@ export const EXPECTED_REVENUE_WETH = '568270094198623164';
 
 export const mockedServices: Services = {
   state: {
-    ...defaultState,
+    isMonitoringActivated: true,
+    botExecutionMonitoringTick: 0,
+    perfMonitoringRecords: [],
     lastGasPriceUpdateDateTime: new Date().getTime(),
     gasFees: {
       maxPriorityFeePerGas: ethers.utils.parseUnits('4', 'gwei').toNumber(),
