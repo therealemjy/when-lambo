@@ -286,7 +286,7 @@ const baseEnvs = {
   GAS_LIMIT_MULTIPLICATOR: '1.3',
   GAS_COST_MAXIMUM_THRESHOLD_WEI: '50000000000000000',
   STRATEGY_BORROWED_AMOUNT_COUNT: 11,
-  COMMUNICATOR_WSS_URL: 'ws://ec2-52-91-212-133.compute-1.amazonaws.com:6969',
+  COMMUNICATOR_WSS_URL: 'ws://ec2-52-91-212-133.compute-1.amazonaws.com:80',
 };
 
 const baseOptions = {
@@ -369,7 +369,7 @@ module.exports = {
     six: {
       ...baseOptions,
       'post-deploy': getHookDeployCommand('six'),
-      host: ['ec2-54-152-29-33.compute-1.amazonaws.com	'],
+      host: ['ec2-54-152-29-33.compute-1.amazonaws.com'],
     },
   },
 };
