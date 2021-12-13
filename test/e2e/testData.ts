@@ -1,4 +1,4 @@
-import { ethers, BigNumber } from 'ethers';
+import { ethers } from 'ethers';
 
 import logger from '@logger';
 import formatStrategies from '@utils/formatStrategies';
@@ -14,6 +14,7 @@ const config: EnvConfig = {
   isDev: false,
   isProd: false,
   serverId: 'test',
+  communicationWssUrl: 'fake-communication-wss-url',
   aws: {
     mainnetWssRpcUrl: 'fake-mainnet-wss-rpc-url',
     accessKeyIdEthNode: 'fake-access-key-id-eth-node',
@@ -31,7 +32,9 @@ const config: EnvConfig = {
   },
   sentryDNS: 'fake-sentry-dns',
   slippageAllowancePercent: 0.5,
-  gasLimitMultiplicator: 1.3, // TODO: check why using any value lower than that makes the contract call fail
+  // Note: using anything lower than that will result in transactions failing.
+  // I couldn't find the actual reason for it :/
+  gasLimitMultiplicator: 1.3,
   gasCostMaximumThresholdWei: ethers.utils.parseUnits('0.063', 'ether'),
   gasEstimates: {
     // Uniswap V2
@@ -76,6 +79,7 @@ export const EXPECTED_REVENUE_WETH = '568270094198623164';
 export const mockedServices: Services = {
   state: {
     ...defaultState,
+    lastGasPriceUpdateDateTime: new Date().getTime(),
     gasFees: {
       maxPriorityFeePerGas: ethers.utils.parseUnits('4', 'gwei').toNumber(),
       maxFeePerGas: ethers.utils.parseUnits('101', 'gwei').toNumber(),

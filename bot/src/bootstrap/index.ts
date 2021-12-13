@@ -1,10 +1,10 @@
+import { GasFees } from '@communicator/types';
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import { ethers, Signer } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import http from 'http';
 import TypedEmitter from 'typed-emitter';
 
-import { GasFees } from '@communicator/types';
 import { Strategy } from '@localTypes';
 import logger from '@logger';
 
