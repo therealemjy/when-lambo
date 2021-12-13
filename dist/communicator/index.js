@@ -57878,9 +57878,9 @@ var formatStrategies = (parsedStrategies, borrowedAmountCount) => parsedStrategi
 var formatStrategies_default = formatStrategies;
 
 // dist/gasEstimates.json
-var _ = { "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e": "109509", "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f": "160230", "0xDDB3422497E61e13543BeA06989C0789117555c5": "109876", "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942": "112196", "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": "289395", "0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44": "109500" };
-var _2 = { "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e": "110446", "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f": "161167", "0xDDB3422497E61e13543BeA06989C0789117555c5": "110813", "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942": "113133", "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": "290332", "0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44": "110437" };
-var _3 = { "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e": "116931", "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f": "167652", "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": "296817" };
+var _ = { "0x6B175474E89094C44Da98b954EedeAC495271d0F": "109592" };
+var _2 = { "0x6B175474E89094C44Da98b954EedeAC495271d0F": "110529" };
+var _3 = { "0x6B175474E89094C44Da98b954EedeAC495271d0F": "117014" };
 var gasEstimates_default = { "0": _, "1": _2, "2": _3 };
 
 // bot/config.ts
@@ -59533,10 +59533,13 @@ var log = (...args) => {
   }
 };
 var error = (...args) => bunyanLogger.error(...args);
-var _convertToHumanReadableAmount = (amount, tokenDecimals) => amount.div(`${10 ** tokenDecimals}`).toString();
+var _convertToHumanReadableAmount = (amount, _tokenDecimals) => {
+  return amount.toString();
+};
 var transaction = async ({
   blockNumber,
   path,
+  maxFeePerGas,
   spreadsheet,
   transactionHash = "None"
 }) => {
@@ -59546,14 +59549,14 @@ var transaction = async ({
   const revenues = _convertToHumanReadableAmount(path[1].toTokenDecimalAmount, path[1].toToken.decimals);
   const bestSellingExchangeName = ExchangeIndex[path[0].exchangeIndex];
   const bestBuyingExchangeName = ExchangeIndex[path[1].exchangeIndex];
-  const gasCost = path[0].gasCostEstimate.add(path[1].gasCostEstimate).add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE).mul(config_default.gasLimitMultiplicator * 100).div(100);
+  const gasCost = path[0].gasEstimate.add(path[1].gasEstimate).add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE).mul(config_default.gasLimitMultiplicator * 100).div(100).mul(maxFeePerGas);
   const gasCostWETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);
   const [profitDec, profitPercent] = calculateProfit_default({
     revenueDec: path[1].toTokenDecimalAmount,
     expenseDec: path[0].fromTokenDecimalAmount.add(gasCost)
   });
   const profitInTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
-  if (!config_default.isDev) {
+  if (config_default.isDev) {
     const slackBlock = [
       {
         type: "section",
@@ -59640,6 +59643,7 @@ ${profitPercent}%`
       }, "deals"),
       worksheet.addRow(worksheetRow)
     ]);
+    console.log("res", res);
     res.forEach((result) => {
       if (result.status === "rejected") {
         eventEmitter_default.emit("error", result.reason);
