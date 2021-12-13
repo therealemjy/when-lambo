@@ -1,8 +1,8 @@
 module.exports = {
   apps: [
     {
-      name: 'when-lambo-bot',
-      script: './dist/bot/index.js',
+      name: 'when-lambo-communicator',
+      script: './dist/communicator/index.js',
       wait_ready: false,
       watch: false,
       env_prod: {
@@ -21,7 +21,7 @@ module.exports = {
       repo: 'git@github.com:peel-chat/when-lambo-bot.git',
       path: '/home/ubuntu/when-lambo',
       'post-deploy': 'pm2 start ./communicator.config.js --env prod',
-      host: ['ec2-54-174-159-107.compute-1.amazonaws.com'],
+      host: ['ec2-34-239-124-108.compute-1.amazonaws.com'],
     },
   },
 };
