@@ -25565,7 +25565,7 @@ var config2 = {
 var config_default2 = config2;
 
 // communicator/constant.ts
-var PORT = 6969;
+var PORT = 80;
 
 // communicator/index.ts
 var gasFees;
