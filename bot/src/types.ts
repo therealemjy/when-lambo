@@ -1,3 +1,4 @@
+import { GasFees } from '@communicator/types';
 import { BigNumber } from 'ethers';
 
 import { ExchangeIndex, Token } from '@localTypes';
@@ -19,6 +20,17 @@ export interface Deal {
 }
 
 export type Path = [Deal, Deal];
+
+export interface Trade {
+  blockNumber: number;
+  path: Path;
+  totalGasCost: BigNumber;
+  profitWethAmount: BigNumber;
+  profitPercentage: number;
+  gasSettings: GasFees & {
+    gasLimit: number;
+  };
+}
 
 export type UsedExchangeIndexes = {
   [fixedDecimalAmount: string]: ExchangeIndex;

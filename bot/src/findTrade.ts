@@ -1,39 +1,30 @@
+import { GasFees } from '@communicator/types';
 import { BigNumber } from 'ethers';
 
 import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 
-import { Path } from '@bot/src/types';
+import { Trade, Path } from '@bot/src/types';
 import calculateProfit from '@bot/src/utils/calculateProfit';
 
 // Go through paths and find the most profitable (if any of them is considered
 // profitable according to the rules)
-const getMostProfitablePath = ({
+const findTrade = ({
+  currentBlockNumber,
   paths,
-  maxFeePerGas,
+  gasFees,
   gasLimitMultiplicator,
   gasCostMaximumThresholdWei,
 }: {
+  currentBlockNumber: number;
   paths: Path[];
-  maxFeePerGas: number;
+  gasFees: GasFees;
   gasLimitMultiplicator: number;
   gasCostMaximumThresholdWei: BigNumber;
 }) => {
-  const res = paths.reduce<
-    | {
-        profitWethAmount: BigNumber;
-        path: Path;
-      }
-    | undefined
-  >((mostProfitablePath, path) => {
-    const tradeWithoutSwapsGasCostEstimate = BigNumber.from(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE).mul(
-      maxFeePerGas
-    );
-
-    const totalGasCost = path[0].gasCostEstimate
-      .add(path[1].gasCostEstimate)
-      // Add estimated gas to trade with Transactor (without accounting for the
-      // swap themselves)
-      .add(tradeWithoutSwapsGasCostEstimate)
+  const bestTrade = paths.reduce<Trade | undefined>((currentBestTrade, path) => {
+    const gasLimit = path[0].gasEstimate
+      .add(path[1].gasEstimate)
+      .add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
       // Add gasLimit margin. gasLimitMultiplicator being a decimal number
       // (which BigNumber does not support) with up to 2 decimal place, we
       // transform it into an integer, then back to its original value by first
@@ -41,12 +32,31 @@ const getMostProfitablePath = ({
       .mul(gasLimitMultiplicator * 100)
       .div(100);
 
-    const [profitWethAmount] = calculateProfit({
+    const totalGasCost = gasLimit.mul(gasFees.maxFeePerGas);
+
+    const [profitWethAmount, profitPercentage] = calculateProfit({
       revenueDec: path[1].toTokenDecimalAmount,
       // Add gas cost to expense. Note that this logic only works because we
       // start and end the path with WETH
       expenseDec: path[0].fromTokenDecimalAmount.add(totalGasCost),
     });
+
+    const trade: Trade = {
+      blockNumber: currentBlockNumber + 1,
+      path,
+      profitWethAmount,
+      profitPercentage,
+      totalGasCost,
+      gasSettings: {
+        gasLimit: gasLimit.toNumber(),
+        ...gasFees,
+      },
+    };
+
+    // Assign trade as best trade if none has been assigned yet
+    if (!currentBestTrade) {
+      return trade;
+    }
 
     /*
       Rules for a trade to be counted as profitable:
@@ -55,21 +65,18 @@ const getMostProfitablePath = ({
       2) Total gas cost of the transaction can only go up to a given ETH maximum
          (see config for the actual value)
     */
-    const isMostProfitable = !mostProfitablePath || mostProfitablePath.profitWethAmount.lt(profitWethAmount);
+    // const isMostProfitable = profitWethAmount.gt(totalGasCost) && totalGasCost.lte(gasCostMaximumThresholdWei) && currentBestTrade.profitWethAmount.lt(profitWethAmount);
+    // TODO: remove once we start executing real trades
+    const isMostProfitable = profitWethAmount.gt(0) && currentBestTrade.profitWethAmount.lt(profitWethAmount);
 
-    // if (profitWethAmount.gt(totalGasCost) && totalGasCost.lte(gasCostMaximumThresholdWei) && isMostProfitable) {
-    // TODO: check profit is positive (temporarily)
     if (isMostProfitable) {
-      return {
-        profitWethAmount,
-        path,
-      };
+      return trade;
     }
 
-    return mostProfitablePath;
+    return currentBestTrade;
   }, undefined);
 
-  return res?.path;
+  return bestTrade;
 };
 
-export default getMostProfitablePath;
+export default findTrade;

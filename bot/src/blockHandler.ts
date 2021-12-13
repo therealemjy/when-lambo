@@ -1,19 +1,19 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-// import { ContractTransaction } from 'ethers';
+import { ContractTransaction } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { Strategy } from '@localTypes';
+import logger from '@logger';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
+import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
-// import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 import { Services } from './bootstrap';
-// import executeTrade from './executeTrade';
+import executeTrade from './executeTrade';
 import findBestPaths from './findBestPaths';
-import getMostProfitablePath from './getMostProfitablePath';
+import findTrade from './findTrade';
 import { WETH } from './tokens';
 import registerExecutionTime from './utils/registerExecutionTime';
-import logger from '@logger';
 
 type ExecuteStrategyArgs = {
   strategy: Strategy;
@@ -59,9 +59,10 @@ const executeStrategy = async (
     });
 
     // Get the most profitable path, if any of them is considered profitable
-    const mostProfitablePath = getMostProfitablePath({
+    const trade = findTrade({
+      currentBlockNumber: blockNumber,
       paths,
-      maxFeePerGas: gasFees.maxFeePerGas,
+      gasFees,
       gasLimitMultiplicator: services.config.gasLimitMultiplicator,
       gasCostMaximumThresholdWei: services.config.gasCostMaximumThresholdWei,
     });
@@ -69,42 +70,37 @@ const executeStrategy = async (
     // TODO: uncomment once we're confident the script can start executing real
     // trades
 
-    // let transaction: ContractTransaction | undefined = undefined;
+    let transaction: ContractTransaction | undefined = undefined;
 
     // Execute trade, in production and test environments only
-    // if (mostProfitablePath && !services.config.isDev) {
-    //   // Deactivate the bot completely
-    //   services.state.isMonitoringActivated = false;
+    if (trade && !services.config.isDev) {
+      // Deactivate the bot completely
+      services.state.isMonitoringActivated = false;
 
-    //   transaction = await executeTrade({
-    //     blockNumber,
-    //     path: mostProfitablePath,
-    //     gasFees,
-    //     gasLimitMultiplicator: services.config.gasLimitMultiplicator,
-    //     TransactorContract,
-    //   });
-    // }
+      transaction = await executeTrade({
+        trade,
+        TransactorContract,
+      });
+    }
 
     // Log trade
-    if (mostProfitablePath) {
+    if (trade) {
       await services.logger.transaction({
-        blockNumber,
-        path: mostProfitablePath,
-        maxFeePerGas: gasFees.maxFeePerGas,
-        // transactionHash: transaction?.hash,
+        trade,
+        transactionHash: transaction?.hash,
         spreadsheet,
       });
     }
 
     // Watch transaction
-    // if (transaction) {
-    //   services.logger.log('Watching pending transaction...');
-    //   const receipt = await transaction.wait();
-    //   services.logger.log('Trade successfully executed! Human-readable receipt:');
-    //   services.logger.log(formatNestedBN(receipt));
-    //   services.logger.log('Stringified receipt:');
-    //   services.logger.log(JSON.stringify(receipt));
-    // }
+    if (transaction) {
+      services.logger.log('Watching pending transaction...');
+      const receipt = await transaction.wait();
+      services.logger.log('Trade successfully executed! Human-readable receipt:');
+      services.logger.log(formatNestedBN(receipt));
+      services.logger.log('Stringified receipt:');
+      services.logger.log(JSON.stringify(receipt));
+    }
   } catch (error: unknown) {
     services.eventEmitter.emit('error', error);
   }

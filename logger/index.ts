@@ -4,14 +4,12 @@ import 'console.table';
 import { BigNumber } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
-import { TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE } from '@constants';
 import { ExchangeIndex } from '@localTypes';
 
 import config from '@bot/config';
 import eventEmitter from '@bot/src/eventEmitter';
 import { WETH } from '@bot/src/tokens';
-import { Path } from '@bot/src/types';
-import calculateProfit from '@bot/src/utils/calculateProfit';
+import { Trade } from '@bot/src/types';
 import formatTimestamp from '@bot/src/utils/formatTimestamp';
 import sendSlackMessage from '@bot/src/utils/sendSlackMessage';
 
@@ -66,48 +64,30 @@ const _convertToHumanReadableAmount = (amount: BigNumber, _tokenDecimals: number
 };
 
 const transaction = async ({
-  blockNumber,
-  path,
-  maxFeePerGas,
+  trade,
   spreadsheet,
   transactionHash = 'None',
 }: {
-  blockNumber: number;
-  path: Path;
-  maxFeePerGas: number;
+  trade: Trade;
   spreadsheet: GoogleSpreadsheet;
   transactionHash?: string;
 }) => {
-  const timestamp = formatTimestamp(path[0].timestamp);
-  const borrowedTokens = _convertToHumanReadableAmount(path[0].fromTokenDecimalAmount, path[0].fromToken.decimals);
-  const boughtTokens = _convertToHumanReadableAmount(path[0].toTokenDecimalAmount, path[0].toToken.decimals);
-  const revenues = _convertToHumanReadableAmount(path[1].toTokenDecimalAmount, path[1].toToken.decimals);
+  const timestamp = formatTimestamp(trade.path[0].timestamp);
+  const borrowedTokens = _convertToHumanReadableAmount(
+    trade.path[0].fromTokenDecimalAmount,
+    trade.path[0].fromToken.decimals
+  );
+  const boughtTokens = _convertToHumanReadableAmount(
+    trade.path[0].toTokenDecimalAmount,
+    trade.path[0].toToken.decimals
+  );
+  const revenues = _convertToHumanReadableAmount(trade.path[1].toTokenDecimalAmount, trade.path[1].toToken.decimals);
 
-  const bestSellingExchangeName = ExchangeIndex[path[0].exchangeIndex];
-  const bestBuyingExchangeName = ExchangeIndex[path[1].exchangeIndex];
+  const bestSellingExchangeName = ExchangeIndex[trade.path[0].exchangeIndex];
+  const bestBuyingExchangeName = ExchangeIndex[trade.path[1].exchangeIndex];
 
-  // TODO: refactor so the gas cost is passed rather than calculated, since it's been calculated
-  // before already
-  const gasCost = path[0].gasEstimate
-    .add(path[1].gasEstimate)
-    // Add estimated gas to trade with Transactor (without accounting for the swap themselves)
-    .add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
-    // Add gasLimit margin
-    .mul(config.gasLimitMultiplicator * 100)
-    .div(100)
-    // Multiply by max fee per gas to get total gas cost
-    .mul(maxFeePerGas);
-
-  const gasCostETH = _convertToHumanReadableAmount(gasCost, WETH.decimals);
-
-  const [profitDec, profitPercent] = calculateProfit({
-    revenueDec: path[1].toTokenDecimalAmount,
-    // Add gas cost to expense. Note that this logic only works because we
-    // start and end the path with WETH
-    expenseDec: path[0].fromTokenDecimalAmount.add(gasCost),
-  });
-
-  const profitInTokens = _convertToHumanReadableAmount(profitDec, path[0].fromToken.decimals);
+  const gasCostETH = _convertToHumanReadableAmount(trade.totalGasCost, 18);
+  const profitInTokens = _convertToHumanReadableAmount(trade.profitWethAmount, WETH.decimals);
 
   // Log paths in Slack and Google Spreadsheet in production
   if (!config.isDev) {
@@ -124,7 +104,7 @@ const transaction = async ({
           },
           {
             type: 'mrkdwn',
-            text: `*Block number:*\n${blockNumber}`,
+            text: `*Block number:*\n${trade.blockNumber}`,
           },
           {
             type: 'mrkdwn',
@@ -132,7 +112,7 @@ const transaction = async ({
           },
           {
             type: 'mrkdwn',
-            text: `*${path[0].fromToken.symbol} borrowed:*\n${borrowedTokens}`,
+            text: `*${trade.path[0].fromToken.symbol} borrowed:*\n${borrowedTokens}`,
           },
           {
             type: 'mrkdwn',
@@ -140,7 +120,7 @@ const transaction = async ({
           },
           {
             type: 'mrkdwn',
-            text: `*${path[0].toToken.symbol} bought:*\n${boughtTokens}`,
+            text: `*${trade.path[0].toToken.symbol} bought:*\n${boughtTokens}`,
           },
           {
             type: 'mrkdwn',
@@ -148,7 +128,7 @@ const transaction = async ({
           },
           {
             type: 'mrkdwn',
-            text: `*${path[0].fromToken.symbol} bought back:*\n${revenues}`,
+            text: `*${trade.path[0].fromToken.symbol} bought back:*\n${revenues}`,
           },
           {
             type: 'mrkdwn',
@@ -156,7 +136,7 @@ const transaction = async ({
           },
           {
             type: 'mrkdwn',
-            text: `*Profit (in ${path[0].fromToken.symbol}):*\n${profitInTokens} (${profitPercent}%)`,
+            text: `*Profit (in ${trade.path[0].fromToken.symbol}):*\n${profitInTokens} (${trade.profitPercentage}%)`,
           },
         ],
       },
@@ -165,16 +145,16 @@ const transaction = async ({
     const worksheetRow: WorksheetRow = [
       timestamp,
       transactionHash,
-      blockNumber,
+      trade.blockNumber,
       +borrowedTokens,
       bestSellingExchangeName,
-      path[0].toToken.symbol,
+      trade.path[0].toToken.symbol,
       +boughtTokens,
       bestBuyingExchangeName,
       +revenues,
       +gasCostETH,
       +profitInTokens,
-      `${profitPercent}%`,
+      `${trade.profitPercentage}%`,
     ];
 
     // And update the Google Spreadsheet document
@@ -201,15 +181,15 @@ const transaction = async ({
   else {
     const tableRow = {
       Timestamp: timestamp,
-      'Block number': blockNumber,
-      [`${path[0].fromToken.symbol} borrowed`]: borrowedTokens,
+      'Block number': trade.blockNumber,
+      [`${trade.path[0].fromToken.symbol} borrowed`]: borrowedTokens,
       'Best selling exchange': bestSellingExchangeName,
-      [`${path[0].toToken.symbol} bought`]: boughtTokens,
+      [`${trade.path[0].toToken.symbol} bought`]: boughtTokens,
       'Best buying exchange': bestBuyingExchangeName,
-      [`${path[0].fromToken.symbol} bought back`]: revenues,
+      [`${trade.path[0].fromToken.symbol} bought back`]: revenues,
       'Gas cost (in ETH)': gasCostETH,
-      [`Profit (in ${path[0].fromToken.symbol})`]: profitInTokens,
-      'Profit (%)': profitPercent + '%',
+      [`Profit (in ${trade.path[0].fromToken.symbol})`]: profitInTokens,
+      'Profit (%)': trade.profitPercentage + '%',
     };
 
     console.table([tableRow]);

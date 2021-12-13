@@ -13,6 +13,7 @@ const config: EnvConfig = {
   isDev: false,
   isProd: false,
   serverId: 'test',
+  communicationWssUrl: 'fake-communication-wss-url',
   aws: {
     mainnetWssRpcUrl: 'fake-mainnet-wss-rpc-url',
     accessKeyIdEthNode: 'fake-access-key-id-eth-node',
@@ -28,11 +29,9 @@ const config: EnvConfig = {
   slackChannelsWebhooks: {
     deals: 'fake-channel-webhook',
   },
-  blocknativeApiKey: 'fake-blocknative-api-key',
   sentryDNS: 'fake-sentry-dns',
   slippageAllowancePercent: 0.5,
   gasLimitMultiplicator: 1.3, // TODO: check why using any value lower than that makes the contract call fail
-  maxPriorityFeePerGasMultiplicator: 1.1,
   gasCostMaximumThresholdWei: ethers.utils.parseUnits('0.063', 'ether'),
   gasEstimates: {
     // Uniswap V2
@@ -78,8 +77,8 @@ export const mockedServices: Services = {
   state: {
     ...defaultState,
     gasFees: {
-      maxPriorityFeePerGas: ethers.utils.parseUnits('4', 'gwei'),
-      maxFeePerGas: ethers.utils.parseUnits('101', 'gwei'),
+      maxPriorityFeePerGas: ethers.utils.parseUnits('4', 'gwei').toNumber(),
+      maxFeePerGas: ethers.utils.parseUnits('101', 'gwei').toNumber(),
     },
   },
   config,
