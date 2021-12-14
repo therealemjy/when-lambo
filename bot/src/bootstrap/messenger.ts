@@ -5,7 +5,7 @@ import logger from '@logger';
 import { GasFees, Message, StopMonitoringSignalMessage } from '@communicator/types';
 
 class Messenger {
-  wsClient: WebSocket;
+  wsClient: WebSocket | undefined;
   onStopMonitoringSignalMessage: () => void;
   onGasFeesUpdate: (gasFees: GasFees) => void;
 
@@ -41,10 +41,10 @@ class Messenger {
       logger.error('Messenger error', data);
 
       // Close faulty connection
-      this.wsClient.close();
+      this.wsClient?.close();
 
       // Remove listeners
-      this.wsClient.removeAllListeners();
+      this.wsClient?.removeAllListeners();
 
       // Try reconnection
       this.tryReconnect(communicatorWssUrl);
@@ -53,7 +53,7 @@ class Messenger {
     // Reacts on connection drops
     this.wsClient.on('close', () => {
       // Remove listeners
-      this.wsClient.removeAllListeners();
+      this.wsClient?.removeAllListeners();
 
       // Try reconnection
       this.tryReconnect(communicatorWssUrl);
@@ -82,7 +82,7 @@ class Messenger {
       type: 'stopMonitoringSignal',
     };
 
-    this.wsClient.send(JSON.stringify(message));
+    this.wsClient?.send(JSON.stringify(message));
   }
 }
 
