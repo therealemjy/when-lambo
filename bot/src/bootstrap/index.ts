@@ -48,7 +48,7 @@ const services: Services = {
 const server = http.createServer(function (req, res) {
   // GET /health
   if (req.url === '/health' && req.method === 'GET') {
-    if (!services.state.lastMonitoringDateTime) {
+    if (!services.state.lastMonitoringDateTime || !services.state.lastGasPriceUpdateDateTime) {
       res.writeHead(500);
       res.end('Monitoring not started yet');
       return;
@@ -57,14 +57,20 @@ const server = http.createServer(function (req, res) {
     const currentDateTime = new Date().getTime();
     const secondsElapsedSinceLastMonitoring = (currentDateTime - services.state.lastMonitoringDateTime) / 1000;
 
-    if (secondsElapsedSinceLastMonitoring >= 60) {
+    const sixtySecondsElapsedSinceLastMonitoring = secondsElapsedSinceLastMonitoring >= 60;
+    const lastGasPriceUpdate = currentDateTime - services.state.lastGasPriceUpdateDateTime;
+    const heightSecondsElapsedSinceLastGasPriceUpdate = lastGasPriceUpdate > 80000;
+
+    if (sixtySecondsElapsedSinceLastMonitoring || heightSecondsElapsedSinceLastGasPriceUpdate) {
       res.writeHead(500);
-      res.end(`Last monitoring was more than 60 seconds ago (${secondsElapsedSinceLastMonitoring}s)`);
+      res.end(
+        `Last monitoring was ${secondsElapsedSinceLastMonitoring}s ago and last gas price update was ${lastGasPriceUpdate}s ago`
+      );
       return;
     }
 
     res.writeHead(200);
-    res.end(`Last monitoring was ${secondsElapsedSinceLastMonitoring} seconds ago`);
+    res.end(`Monitoring: ${secondsElapsedSinceLastMonitoring}s ago - Gas price update: ${lastGasPriceUpdate}s ago`);
   }
 
   if (req.url === '/perf' && req.method === 'GET') {
