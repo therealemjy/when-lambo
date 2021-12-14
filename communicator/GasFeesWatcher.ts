@@ -15,8 +15,12 @@ class GasFeesWatcher {
 
   public async start(callback: (gasFees: GasFees) => void, interval: number) {
     const fn = async () => {
-      const prices = await this.getPrices();
-      callback(prices);
+      try {
+        const prices = await this.getGasFees();
+        callback(prices);
+      } catch (error) {
+        logger.error('Error while fetching gas fees', error);
+      }
     };
 
     await fn();
@@ -29,7 +33,7 @@ class GasFeesWatcher {
     return Math.ceil(gwei * 10 ** 9);
   }
 
-  private async getPrices(): Promise<GasFees> {
+  private async getGasFees(): Promise<GasFees> {
     const res = await axios.get<{
       system: string;
       network: string;
