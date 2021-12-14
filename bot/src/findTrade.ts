@@ -78,8 +78,7 @@ const findTrade = ({
   //   bestTrade &&
   //   bestTrade.profitWethAmount.gt(bestTrade.totalGasCost) &&
   //   bestTrade.totalGasCost.lte(gasCostMaximumThresholdWei);
-  // const isExecutable = !!bestTrade && bestTrade.profitWethAmount.gt(0);
-  const isExecutable = !!bestTrade;
+  const isExecutable = !!bestTrade && bestTrade.profitWethAmount.gt(0);
 
   return isExecutable ? bestTrade : undefined;
 };
