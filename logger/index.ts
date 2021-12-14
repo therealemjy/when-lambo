@@ -46,11 +46,11 @@ const log: typeof console.log = (...args) => {
   }
 };
 
-const error: typeof console.error = (...args) => {
-  bunyanLogger.error(...args);
+const error = (newError: unknown) => {
+  bunyanLogger.error(newError);
 
   if (config.isProd) {
-    Sentry.captureException(error, {
+    Sentry.captureException(newError, {
       tags: {
         serverId: config.serverId,
       },
@@ -112,9 +112,6 @@ const transaction = async ({
   if (config.isProd) {
     const slackBlock = [
       {
-        type: 'divider',
-      },
-      {
         type: 'section',
         fields: [
           {
@@ -158,6 +155,9 @@ const transaction = async ({
             text: `*Profit (in ${trade.path[0].fromToken.symbol}):*\n${profitInTokens} (${trade.profitPercentage}%)`,
           },
         ],
+      },
+      {
+        type: 'divider',
       },
     ];
 

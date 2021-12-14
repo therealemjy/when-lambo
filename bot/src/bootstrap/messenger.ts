@@ -43,7 +43,7 @@ class Messenger {
 
     // Handle and log errors
     this.wsClient.on('error', (data) => {
-      logger.error('Messenger error', data);
+      logger.error(data);
 
       // Close faulty connection
       this.wsClient?.close();
