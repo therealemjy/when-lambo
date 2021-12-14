@@ -116,9 +116,6 @@ export const bootstrap = async (): Promise<{
 
       const TransactorContract = getTransactorContract(services.config.isProd, ownerAccount);
 
-      const balance = await provider.getBalance(TransactorContract.address);
-      console.log('BALANCE OF CONTRACT', balance);
-
       // Get Google Spreadsheet
       const spreadsheet = await getSpreadsheet();
 
