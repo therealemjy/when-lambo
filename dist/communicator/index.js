@@ -25399,7 +25399,7 @@ var transaction = async ({
   const bestBuyingExchangeName = ExchangeIndex[trade.path[1].exchangeIndex];
   const gasCostETH = _convertToHumanReadableAmount(trade.totalGasCost, 18);
   const profitInTokens = _convertToHumanReadableAmount(trade.profitWethAmount, WETH.decimals);
-  if (config_default.isProd) {
+  if (!config_default.isProd) {
     const slackBlock = [
       {
         type: "divider"

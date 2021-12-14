@@ -84,14 +84,14 @@ const executeStrategy = async (
       // });
     }
 
-    // // Log trade
-    // if (trade) {
-    //   await services.logger.transaction({
-    //     trade,
-    //     transactionHash: transaction?.hash,
-    //     spreadsheet,
-    //   });
-    // }
+    // Log trade
+    if (trade) {
+      await services.logger.transaction({
+        trade,
+        // transactionHash: transaction?.hash,
+        spreadsheet,
+      });
+    }
 
     // // Watch transaction
     // if (transaction) {

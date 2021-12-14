@@ -68,32 +68,35 @@ const fetchGasEstimates = async () => {
 
       logger.log(`Token address: ${toTokenAddress}`);
 
-      // Skip if an estimate already exists for this token and exchange
+      let gasEstimate: string | undefined =
+        gasEstimates[exchange.index] && gasEstimates[exchange.index][toTokenAddress];
+
+      // Skip if an estimate already exists for this token on the exchange
       if (gasEstimates[exchange.index] && gasEstimates[exchange.index][toTokenAddress]) {
         logger.log(`Token skipped (estimate already exists)`);
-        break;
-      }
+      } else {
+        // Reset blockchain state
+        await setup();
 
-      // Reset blockchain state
-      await setup();
+        // Wrap ETH to WETH on signer account
+        await wrapEth(testOwnerSigner, testAmountIn, testOwnerAddress);
 
-      // Wrap ETH to WETH on signer account
-      await wrapEth(testOwnerSigner, testAmountIn, testOwnerAddress);
+        const gasEstimateBN = await exchange.estimateGetDecimalAmountOut({
+          signer: testOwnerSigner,
+          amountIn: testAmountIn,
+          toTokenAddress,
+          isProd,
+        });
 
-      const gasEstimate = await exchange.estimateGetDecimalAmountOut({
-        signer: testOwnerSigner,
-        amountIn: testAmountIn,
-        toTokenAddress,
-        isProd,
-      });
-
-      // Initialize exchange estimates if it has not been done yet
-      if (!gasEstimates[exchange.index]) {
-        gasEstimates[exchange.index] = {};
+        gasEstimate = gasEstimateBN?.toString();
       }
 
       if (gasEstimate) {
-        gasEstimates[exchange.index][toTokenAddress] = gasEstimate.toString();
+        gasEstimates[exchange.index] = {
+          // Initialize exchange estimates if it has not been done yet
+          ...(gasEstimates[exchange.index] || {}),
+          [toTokenAddress]: gasEstimate.toString(),
+        };
       }
     }
   }
