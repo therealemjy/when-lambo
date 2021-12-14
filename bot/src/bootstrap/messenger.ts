@@ -42,12 +42,6 @@ class Messenger {
 
       // Close faulty connection
       this.wsClient?.close();
-
-      // Remove listeners
-      this.wsClient?.removeAllListeners();
-
-      // Try reconnection
-      this.tryReconnect(communicatorWssUrl);
     });
 
     // Reacts on connection drops
