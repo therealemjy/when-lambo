@@ -58,8 +58,8 @@ const server = http.createServer(function (req, res) {
     const secondsElapsedSinceLastMonitoring = (currentDateTime - services.state.lastMonitoringDateTime) / 1000;
 
     const sixtySecondsElapsedSinceLastMonitoring = secondsElapsedSinceLastMonitoring >= 60;
-    const lastGasPriceUpdate = currentDateTime - services.state.lastGasPriceUpdateDateTime;
-    const heightSecondsElapsedSinceLastGasPriceUpdate = lastGasPriceUpdate > 80000;
+    const lastGasPriceUpdate = (currentDateTime - services.state.lastGasPriceUpdateDateTime) / 1000;
+    const heightSecondsElapsedSinceLastGasPriceUpdate = lastGasPriceUpdate > 8;
 
     if (sixtySecondsElapsedSinceLastMonitoring || heightSecondsElapsedSinceLastGasPriceUpdate) {
       res.writeHead(500);
