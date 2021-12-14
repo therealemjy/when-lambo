@@ -28,6 +28,11 @@ class Messenger {
   }
 
   private tryReconnect(communicatorWssUrl: string) {
+    // Remove listeners
+    this.wsClient?.removeAllListeners();
+
+    logger.error('Messenger connection closed, trying to reconnect in 5s');
+
     setTimeout(() => {
       this.connect(communicatorWssUrl);
     }, 5000);
@@ -46,13 +51,8 @@ class Messenger {
 
     // Reacts on connection drops
     this.wsClient.on('close', () => {
-      // Remove listeners
-      this.wsClient?.removeAllListeners();
-
       // Try reconnection
       this.tryReconnect(communicatorWssUrl);
-
-      logger.error('Messenger connection closed, trying to reconnect in 5s');
     });
 
     // Handle incoming messages
