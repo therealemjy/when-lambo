@@ -6,6 +6,8 @@ import { GasFees, Message, StopMonitoringSignalMessage } from '@communicator/typ
 
 class Messenger {
   wsClient: WebSocket;
+  onStopMonitoringSignalMessage: () => void;
+  onGasFeesUpdate: (gasFees: GasFees) => void;
 
   constructor({
     communicatorWssUrl,
@@ -16,24 +18,60 @@ class Messenger {
     onStopMonitoringSignalMessage: () => void;
     onGasFeesUpdate: (gasFees: GasFees) => void;
   }) {
+    // Set callbacks
+    this.onStopMonitoringSignalMessage = onStopMonitoringSignalMessage;
+    this.onGasFeesUpdate = onGasFeesUpdate;
+
+    // Setup connection
+    // This method calls itself after 5s if the connection drops
+    this.connect(communicatorWssUrl);
+  }
+
+  private tryReconnect(communicatorWssUrl: string) {
+    setTimeout(() => {
+      this.connect(communicatorWssUrl);
+    }, 5000);
+  }
+
+  private connect(communicatorWssUrl: string) {
     this.wsClient = new WebSocket(communicatorWssUrl);
 
-    this.wsClient.readyState;
-
+    // Handle and log errors
     this.wsClient.on('error', (data) => {
       logger.error('Messenger error', data);
+
+      // Close faulty connection
+      this.wsClient.close();
+
+      // Remove listeners
+      this.wsClient.removeAllListeners();
+
+      // Try reconnection
+      this.tryReconnect(communicatorWssUrl);
     });
 
+    // Reacts on connection drops
+    this.wsClient.on('close', () => {
+      // Remove listeners
+      this.wsClient.removeAllListeners();
+
+      // Try reconnection
+      this.tryReconnect(communicatorWssUrl);
+
+      logger.error('Messenger connection closed, trying to reconnect in 5s');
+    });
+
+    // Handle incoming messages
     this.wsClient.on('message', (data) => {
       const message = JSON.parse(data.toString()) as Message;
 
       switch (message.type) {
         case 'gasFeesUpdate':
-          onGasFeesUpdate(message.data);
+          this.onGasFeesUpdate(message.data);
           break;
 
         case 'stopMonitoringSignal':
-          onStopMonitoringSignalMessage();
+          this.onStopMonitoringSignalMessage();
           break;
       }
     });
