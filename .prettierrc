@@ -5,7 +5,7 @@
   "importOrder": [
     "./moduleAliases",
     "^@(localTypes|constants|utils|logger|resources|deployments)",
-    "^@tasks/(.*)$",
+    "^@(tasks|root)/(.*)$",
     "^@chainHandler/(.*)$",
     "^@communicator/(.*)$",
     "^@bot/(.*)$",

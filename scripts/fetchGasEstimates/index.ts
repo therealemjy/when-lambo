@@ -7,14 +7,15 @@ import logger from '@logger';
 import env from '@utils/env';
 import formatStrategies from '@utils/formatStrategies';
 
+// @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
+import { strategies as prodStrategies } from '@root/bot.config';
+import localGasEstimates from '@root/dist/gasEstimates.json';
+
 import wrapEth from '@chainHandler/utils/wrapEth';
 
 import exchanges from '@bot/src/exchanges';
 
 // @ts-ignore because this is the only JS file we are using in the project
-import { strategies as prodStrategies } from '../../bot.config';
-
-// @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
 const ethers = hre.ethers;
 
 function getStrategies() {
@@ -49,7 +50,8 @@ const fetchGasEstimates = async () => {
 
   logger.log('Fetching gas estimates...');
 
-  const gasEstimates: GasEstimates = {};
+  // Initialize with existing gas estimates
+  const gasEstimates: GasEstimates = localGasEstimates;
 
   // Because this script will only ever be run locally on Hardhat's local
   // network, we can use the test owner account as signer
@@ -65,6 +67,12 @@ const fetchGasEstimates = async () => {
       const toTokenAddress = tokenAddresses[i];
 
       logger.log(`Token address: ${toTokenAddress}`);
+
+      // Skip if an estimate already exists for this token and exchange
+      if (gasEstimates[exchange.index] && gasEstimates[exchange.index][toTokenAddress]) {
+        logger.log(`Token skipped (estimate already exists)`);
+        break;
+      }
 
       // Reset blockchain state
       await setup();

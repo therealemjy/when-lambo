@@ -1,3 +1,4 @@
+import withdrawFromTransactorContract from '@tasks/withdrawTasks/withdrawFromTransactorContract';
 import { expect } from 'chai';
 import { BigNumber, Signer } from 'ethers';
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
@@ -5,8 +6,6 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 import { address as WETH_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/weth.json';
 import { abi as wethAbi } from '@resources/thirdPartyContracts/mainnet/weth.json';
-
-import withdrawFromTransactorContract from '@tasks/withdrawTasks/withdrawFromTransactorContract';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import wrapEth from '@chainHandler/utils/wrapEth';
