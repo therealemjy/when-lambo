@@ -1,30 +1,24 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import * as Sentry from '@sentry/node';
 import { ethers } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 
-import botConfig from './config';
+import logger from '@logger';
 import blockHandler from './src/blockHandler';
 import { bootstrap } from './src/bootstrap';
 import eventEmitter from './src/eventEmitter';
 import { Services } from './src/types';
 import CancelablePromise from './src/utils/cancelablePromise';
-import handleError from './src/utils/handleError';
-
-Sentry.init({
-  dsn: botConfig.sentryDNS,
-});
 
 // Catch unhandled exceptions
 process.on('uncaughtException', (error) => {
-  handleError(error, true);
+  logger.error(error);
   process.exit(1);
 });
 
 // Handle errors
-eventEmitter.on('error', handleError);
+eventEmitter.on('error', logger.error);
 
 const init = async ({
   services,

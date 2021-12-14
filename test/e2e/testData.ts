@@ -12,7 +12,6 @@ const config: EnvConfig = {
   environment: 'test',
   isDev: false,
   isProd: false,
-  serverId: 'test',
   communicationWssUrl: 'fake-communication-wss-url',
   aws: {
     mainnetWssRpcUrl: 'fake-mainnet-wss-rpc-url',
@@ -26,7 +25,6 @@ const config: EnvConfig = {
     clientEmail: 'fake-client-email',
     privateKeyBase64: 'fake-private-key-base-64',
   },
-  sentryDNS: 'fake-sentry-dns',
   slippageAllowancePercent: 0.5,
   // Note: using anything lower than that will result in transactions failing.
   // I couldn't find the actual reason for it :/
