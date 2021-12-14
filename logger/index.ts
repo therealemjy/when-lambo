@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import Bunyan from 'bunyan';
 import RotatingFileStream from 'bunyan-rotating-file-stream';
 import 'console.table';
@@ -32,6 +33,11 @@ if (config.isProd) {
       rotateExisting: true,
     }),
   });
+
+  Sentry.init({
+    dsn: config.sentryDNS,
+    environment: config.environment,
+  });
 }
 
 const log: typeof console.log = (...args) => {
@@ -40,7 +46,17 @@ const log: typeof console.log = (...args) => {
   }
 };
 
-const error: typeof console.error = (...args) => bunyanLogger.error(...args);
+const error: typeof console.error = (...args) => {
+  bunyanLogger.error(...args);
+
+  if (config.isProd) {
+    Sentry.captureException(error, {
+      tags: {
+        serverId: config.serverId,
+      },
+    });
+  }
+};
 
 const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) => {
   let sign = '';

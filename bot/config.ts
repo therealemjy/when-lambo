@@ -13,7 +13,6 @@ export interface EnvConfig {
   environment: Environment;
   isDev: boolean;
   isProd: boolean;
-  serverId: string;
   aws: {
     mainnetWssRpcUrl: string;
     accessKeyIdEthNode: string;
@@ -26,7 +25,6 @@ export interface EnvConfig {
     clientEmail: string;
     privateKeyBase64: string;
   };
-  sentryDNS: string;
   slippageAllowancePercent: number;
   gasLimitMultiplicator: number;
   gasEstimates: GasEstimates;
@@ -44,7 +42,6 @@ const config: EnvConfig = {
   environment: (process.env.NODE_ENV as Environment) || 'development',
   isProd: (process.env.NODE_ENV as Environment) === 'production',
   isDev: (process.env.NODE_ENV as Environment) === 'development',
-  serverId: env('SERVER_ID'),
   aws: {
     mainnetWssRpcUrl: env('AWS_WSS_RPC_URL'),
     accessKeyIdEthNode: env('AWS_ACCESS_KEY_ID_ETH_NODE'),
@@ -57,7 +54,6 @@ const config: EnvConfig = {
     clientEmail: env('GOOGLE_SPREADSHEET_CLIENT_EMAIL'),
     privateKeyBase64: env('GOOGLE_SPREADSHEET_PRIVATE_KEY_BASE_64'),
   },
-  sentryDNS: env('SENTRY_DNS_URL'),
   communicationWssUrl: env('COMMUNICATOR_WSS_URL'),
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
