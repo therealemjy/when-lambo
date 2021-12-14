@@ -25392,12 +25392,14 @@ var _convertToHumanReadableAmount = (amount, tokenDecimals) => {
   }
   if (amountString.length < tokenDecimals + 1) {
     const zerosToAddCount = tokenDecimals + 1 - amountString.length;
-    const zeros = new Array(zerosToAddCount).reduce((acc) => `${acc}0`, "");
-    console.log(amountString, zeros);
+    let zeros = "";
+    for (let z = 0; z < zerosToAddCount; z++) {
+      zeros += "0";
+    }
     amountString = zeros + amountString;
   }
   const periodIndex = amountString.length - tokenDecimals;
-  return sign + amountString.substring(0, periodIndex) + amountString.substr(periodIndex);
+  return sign + amountString.substring(0, periodIndex) + "." + amountString.substr(periodIndex);
 };
 var transaction = async ({
   trade,
@@ -25545,6 +25547,7 @@ var GasFeesWatcher = class {
   }
   getPrices() {
     return __async(this, null, function* () {
+      throw new Error("TEST");
       const res = yield import_axios2.default.get("https://api.blocknative.com/gasprices/blockprices?confidenceLevels=99", {
         headers: {
           Authorization: this.blocknativeApiKey
