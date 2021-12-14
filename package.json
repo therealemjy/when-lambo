@@ -22,7 +22,7 @@
     "communicator:build": "rm -rf ./dist/communicator/index.js && esbuild ./communicator/index.ts --bundle --outfile=./dist/communicator/index.js --platform=node",
     "communicator:dev": "npm run communicator:build && NODE_ENV=development node --inspect ./dist/communicator/index | ./node_modules/.bin/bunyan",
     "precommunicator:deploy": "npm run tsc && npm run lint && npm run test && npm run communicator:build && npm version patch --no-git-tag-version && PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git commit -a -m \"[COMMUNICATOR deployment] Publish version $PACKAGE_VERSION\" --no-verify && git push origin master && git checkout develop && git rebase master && git push origin develop && git checkout master",
-    "communicator:deploy": "npx pm2 deploy ./communicator.config.js prod update --force",
+    "communicator:deploy": "npx pm2 deploy ./communicator.config.js prod update --force && npm run bot:remote:reload",
     "communicator:tsc": "tsc --noEmit --project ./communicator/tsconfig.json",
     "prepare": "husky install"
   },
