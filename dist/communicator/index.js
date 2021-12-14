@@ -25383,8 +25383,21 @@ var log = (...args) => {
   }
 };
 var error = (...args) => bunyanLogger.error(...args);
-var _convertToHumanReadableAmount = (amount, _tokenDecimals) => {
-  return amount.toString();
+var _convertToHumanReadableAmount = (amount, tokenDecimals) => {
+  let sign = "";
+  let amountString = amount.toString();
+  if (amountString[0] === "-") {
+    sign = "-";
+    amountString = amountString.substring(1);
+  }
+  if (amountString.length < tokenDecimals + 1) {
+    const zerosToAddCount = tokenDecimals + 1 - amountString.length;
+    const zeros = new Array(zerosToAddCount).reduce((acc) => `${acc}0`, "");
+    console.log(amountString, zeros);
+    amountString = zeros + amountString;
+  }
+  const periodIndex = amountString.length - tokenDecimals;
+  return sign + amountString.substring(0, periodIndex) + amountString.substr(periodIndex);
 };
 var transaction = async ({
   trade,
@@ -25399,7 +25412,7 @@ var transaction = async ({
   const bestBuyingExchangeName = ExchangeIndex[trade.path[1].exchangeIndex];
   const gasCostETH = _convertToHumanReadableAmount(trade.totalGasCost, 18);
   const profitInTokens = _convertToHumanReadableAmount(trade.profitWethAmount, WETH.decimals);
-  if (!config_default.isProd) {
+  if (config_default.isProd) {
     const slackBlock = [
       {
         type: "divider"

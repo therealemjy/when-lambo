@@ -42,25 +42,28 @@ const log: typeof console.log = (...args) => {
 
 const error: typeof console.error = (...args) => bunyanLogger.error(...args);
 
-const _convertToHumanReadableAmount = (amount: BigNumber, _tokenDecimals: number) => {
-  // TODO: refactor
+const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number) => {
+  let sign = '';
+  let amountString = amount.toString();
 
-  return amount.toString();
-  // let amountString = amount.toString();
+  if (amountString[0] === '-') {
+    sign = '-';
+    amountString = amountString.substring(1);
+  }
 
-  // console.log('amountString', amountString);
-  // console.log('amountString.length', amountString.length);
-  // console.log('tokenDecimals', tokenDecimals);
-  // if (amountString.length < tokenDecimals + 1) {
-  //   const zerosToAddCount = tokenDecimals + 1 - amountString.length;
-  //   const zeros = new Array(zerosToAddCount).reduce((acc) => `${acc}0`, '');
-  //   console.log(amountString, zeros);
-  //   amountString = zeros + amountString;
-  // }
+  if (amountString.length < tokenDecimals + 1) {
+    const zerosToAddCount = tokenDecimals + 1 - amountString.length;
+    let zeros = '';
 
-  // const periodIndex = amountString.length - tokenDecimals;
+    for (let z = 0; z < zerosToAddCount; z++) {
+      zeros += '0';
+    }
 
-  // return amountString.substr(0, periodIndex) + amountString.substr(periodIndex);
+    amountString = zeros + amountString;
+  }
+
+  const periodIndex = amountString.length - tokenDecimals;
+  return sign + amountString.substring(0, periodIndex) + '.' + amountString.substr(periodIndex);
 };
 
 const transaction = async ({
