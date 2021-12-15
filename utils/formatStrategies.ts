@@ -39,8 +39,8 @@ const strategyToWeiAmounts = (
 const formatStrategies = (parsedStrategies: ParsedStrategy[], borrowedAmountCount: number) =>
   parsedStrategies.map((parsedStrategy: ParsedStrategy) => ({
     borrowedWethAmounts: strategyToWeiAmounts(
-      BigNumber.from(parsedStrategy.STRATEGY_BORROWED_MIDDLE_WEI_AMOUNT),
-      +parsedStrategy.STRATEGY_BORROWED_INCREMENT_PERCENT,
+      BigNumber.from(parsedStrategy.BORROWED_WETH_STARTING_MIDDLE_AMOUNT),
+      +parsedStrategy.BORROWED_WETH_AMOUNT_INCREMENT_PERCENT,
       borrowedAmountCount
     ),
     toToken: {
