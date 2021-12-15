@@ -30,7 +30,7 @@ const fetchSecrets = async ({ region, secretName }: IFetchSecretsInput): Promise
       ownerAccountPrivateKey: secret.ownerAccountPrivateKey,
     };
   } catch (err: unknown) {
-    logger.error('Error while decoding secrets', err);
+    logger.error(err);
     throw err;
   }
 };

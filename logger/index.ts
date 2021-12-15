@@ -46,11 +46,11 @@ const log: typeof console.log = (...args) => {
   }
 };
 
-const error: typeof console.error = (...args) => {
-  bunyanLogger.error(...args);
+const error = (newError: unknown) => {
+  bunyanLogger.error(newError);
 
   if (config.isProd) {
-    Sentry.captureException(error, {
+    Sentry.captureException(newError, {
       tags: {
         serverId: config.serverId,
       },
@@ -79,7 +79,7 @@ const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number)
   }
 
   const periodIndex = amountString.length - tokenDecimals;
-  return sign + amountString.substring(0, periodIndex) + '.' + amountString.substr(periodIndex);
+  return sign + amountString.substring(0, periodIndex) + '.' + amountString.substring(periodIndex);
 };
 
 const transaction = async ({
@@ -111,9 +111,6 @@ const transaction = async ({
   // Log paths in Slack and Google Spreadsheet in production
   if (config.isProd) {
     const slackBlock = [
-      {
-        type: 'divider',
-      },
       {
         type: 'section',
         fields: [
@@ -158,6 +155,9 @@ const transaction = async ({
             text: `*Profit (in ${trade.path[0].fromToken.symbol}):*\n${profitInTokens} (${trade.profitPercentage}%)`,
           },
         ],
+      },
+      {
+        type: 'divider',
       },
     ];
 

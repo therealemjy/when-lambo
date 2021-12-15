@@ -19,7 +19,7 @@ class GasFeesWatcher {
         const prices = await this.getGasFees();
         callback(prices);
       } catch (error) {
-        logger.error('Error while fetching gas fees', error);
+        logger.error(error);
       }
     };
 

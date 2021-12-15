@@ -41,7 +41,7 @@ const findTrade = ({
     });
 
     const trade: Trade = {
-      blockNumber: currentBlockNumber + 1,
+      blockNumber: currentBlockNumber,
       path,
       profitWethAmount,
       profitPercentage,
@@ -73,12 +73,10 @@ const findTrade = ({
     2) Total gas cost of the transaction can only go up to a given ETH maximum
         (see config for the actual value)
   */
-  // TODO: uncomment once we start executing real trades
-  // const isExecutable =
-  //   bestTrade &&
-  //   bestTrade.profitWethAmount.gt(bestTrade.totalGasCost) &&
-  //   bestTrade.totalGasCost.lte(gasCostMaximumThresholdWei);
-  const isExecutable = !!bestTrade && bestTrade.profitWethAmount.gt(0);
+  const isExecutable =
+    bestTrade &&
+    bestTrade.profitWethAmount.gt(bestTrade.totalGasCost) &&
+    bestTrade.totalGasCost.lte(gasCostMaximumThresholdWei);
 
   return isExecutable ? bestTrade : undefined;
 };
