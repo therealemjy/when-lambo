@@ -13,6 +13,10 @@ const executeTrade = async ({
   trade: Trade;
   TransactorContract: ITransactorContract;
 }): Promise<ContractTransaction> => {
+  // The trade needs to be executed in the block that follows
+  // the one in which it was found
+  const expectedBlockNumber = trade.blockNumber + 1;
+
   const wethAmountToBorrow = trade.path[0].fromTokenDecimalAmount;
   const sellingExchangeIndex = trade.path[0].exchangeIndex;
   const tradedTokenAddress = trade.path[0].toToken.address;
@@ -26,7 +30,7 @@ const executeTrade = async ({
   const deadline = new Date(new Date().getTime() + 600000).getTime();
 
   const args: Parameters<ITransactorContract['trade']> = [
-    trade.blockNumber,
+    expectedBlockNumber,
     wethAmountToBorrow,
     sellingExchangeIndex,
     tradedTokenAddress,

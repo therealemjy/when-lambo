@@ -79,7 +79,7 @@ const _convertToHumanReadableAmount = (amount: BigNumber, tokenDecimals: number)
   }
 
   const periodIndex = amountString.length - tokenDecimals;
-  return sign + amountString.substring(0, periodIndex) + '.' + amountString.substr(periodIndex);
+  return sign + amountString.substring(0, periodIndex) + '.' + amountString.substring(periodIndex);
 };
 
 const transaction = async ({

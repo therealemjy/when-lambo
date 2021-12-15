@@ -41,7 +41,7 @@ const findTrade = ({
     });
 
     const trade: Trade = {
-      blockNumber: currentBlockNumber + 1,
+      blockNumber: currentBlockNumber,
       path,
       profitWethAmount,
       profitPercentage,
