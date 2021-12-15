@@ -6,7 +6,7 @@ module.exports = {
       wait_ready: false,
       watch: false,
       env_prod: {
-        SERVER_ID: 0,
+        SERVER_ID: 'Communicator',
         NODE_ENV: 'production',
         BLOCKNATIVE_API_KEY: '6856435a-21ea-4468-8c53-f53db987a448',
         MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR: '1.1',
