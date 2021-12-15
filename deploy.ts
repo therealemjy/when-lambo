@@ -107,12 +107,13 @@ const executeAction = async (action: Actions) => {
 
       console.log('- Reload bots');
       await runCommandOnBots('pm2 reload all');
-
       break;
+
     case Actions.ReloadBots:
       console.log('- Reload bots');
       await runCommandOnBots('pm2 reload all');
       break;
+
     case Actions.StopBots:
       console.log('- Stop bots');
       await runCommandOnBots('pm2 stop all');
