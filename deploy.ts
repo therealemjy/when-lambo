@@ -3,7 +3,7 @@ import inquirer from 'inquirer';
 import util from 'util';
 
 // @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
-import { deploy } from '@root/bot.config';
+import { deploy } from './bot.config';
 
 enum Actions {
   DeployCommunicator = 'Communicator',
