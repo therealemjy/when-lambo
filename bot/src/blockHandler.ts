@@ -8,8 +8,7 @@ import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
 import executeTrade from './executeTrade';
-import findBestPaths from './findBestPaths';
-import findTrade from './findTrade';
+import findBestTrade from './findBestTrade';
 import { WETH } from './tokens';
 import { Services } from './types';
 import registerExecutionTime from './utils/registerExecutionTime';
@@ -42,8 +41,9 @@ const executeStrategy = async (
       throw new Error('Gas fees missing');
     }
 
-    const paths = await findBestPaths({
+    const trade = await findBestTrade({
       multicall,
+      currentBlockNumber: blockNumber,
       fromTokenDecimalAmounts: strategy.borrowedWethAmounts,
       fromToken: WETH,
       toToken: {
@@ -54,17 +54,26 @@ const executeStrategy = async (
       exchanges: services.exchanges,
       slippageAllowancePercent: services.config.slippageAllowancePercent,
       gasEstimates: services.config.gasEstimates,
-      maxFeePerGas: gasFees.maxFeePerGas,
-    });
-
-    // Get the most profitable path, if any of them is considered profitable
-    const trade = findTrade({
-      currentBlockNumber: blockNumber,
-      paths,
       gasFees,
       gasLimitMultiplicator: services.config.gasLimitMultiplicator,
-      gasCostMaximumThresholdWei: services.config.gasCostMaximumThresholdWei,
     });
+
+    /*
+      Check if trade follows our rules.
+      Rules for a trade to be counted as executable:
+      1) Trade musts yield a profit that's equal or superior to the total gas
+          cost of the transaction
+      2) Total gas cost of the transaction can only go up to a given ETH maximum
+          (see config for the actual value)
+    */
+    const isTradeExecutable =
+      trade &&
+      trade.profitWethAmount.gt(trade.totalGasCost) &&
+      trade.totalGasCost.lte(services.config.gasCostMaximumThresholdWei);
+
+    if (!isTradeExecutable) {
+      return;
+    }
 
     let transaction: ContractTransaction | undefined = undefined;
 

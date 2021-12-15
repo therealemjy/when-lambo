@@ -21,6 +21,10 @@ export type GasEstimates = {
   };
 };
 
+export type LoanAmounts = {
+  [key: string]: string;
+};
+
 export interface ParsedTradedToken {
   ADDRESS: string;
   SYMBOL: string;

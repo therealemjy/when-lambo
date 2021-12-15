@@ -10,7 +10,7 @@ export interface EnvConfig {
 }
 
 const config: EnvConfig = {
-  blocknativeApiKey: env('BLOCKNATIVE_API_KEY'),
+  blocknativeApiKey: env('BLOCKNATIVE_API_KEY_COMMUNICATOR'),
   maxPriorityFeePerGasMultiplicator: +env('MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR'),
 };
 
