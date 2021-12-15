@@ -8,6 +8,7 @@
     "^@(tasks|root)/(.*)$",
     "^@chainHandler/(.*)$",
     "^@communicator/(.*)$",
+    "^@scripts/(.*)$",
     "^@bot/(.*)$",
     "^@dist/(.*)$",
     "^[./]"

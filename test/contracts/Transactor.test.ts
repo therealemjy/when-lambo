@@ -7,9 +7,10 @@ import { address as SUSHISWAP_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPar
 import { address as UNISWAP_V2_ROUTER_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/uniswapV2Router.json';
 import wethMainnetContractInfo from '@resources/thirdPartyContracts/mainnet/weth.json';
 
+import wrapEth from '@root/utils/wrapEth';
+
 import config from '@chainHandler/config';
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
-import wrapEth from '@chainHandler/utils/wrapEth';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['Transactor']);

@@ -23,13 +23,15 @@
       "@deployments/*": ["./deployments/*"],
       "@chainHandler/*": ["./chainHandler/*"],
       "@bot/*": ["./bot/*"],
-      "@communicator/*": ["./communicator/*"]
+      "@communicator/*": ["./communicator/*"],
+      "@scripts/*": ["./scripts/*"]
     }
   },
   "include": [
     "./hardhat.config.ts",
     "./logger",
     "./communicator",
+    "./scripts",
     "./test",
     "./scripts",
     "./utils",

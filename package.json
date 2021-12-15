@@ -104,6 +104,7 @@
     "@deployments": "./deployments",
     "@chainHandler": "./chainHandler",
     "@bot": "./bot",
-    "@communicator": "./communicator"
+    "@communicator": "./communicator",
+    "@scripts": "./scripts"
   }
 }

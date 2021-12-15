@@ -21,12 +21,10 @@ export type GasEstimates = {
   };
 };
 
-export interface ParsedStrategy {
-  TRADED_TOKEN_ADDRESS: string;
-  TRADED_TOKEN_SYMBOL: string;
-  TRADED_TOKEN_DECIMALS: string;
-  BORROWED_WETH_STARTING_BASE_AMOUNT: string;
-  BORROWED_WETH_AMOUNT_INCREMENT_PERCENT: string;
+export interface ParsedTradedToken {
+  ADDRESS: string;
+  SYMBOL: string;
+  DECIMALS: string;
 }
 
 export interface Strategy {

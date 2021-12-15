@@ -2,7 +2,6 @@ import { BigNumber } from 'ethers';
 import TypedEmitter from 'typed-emitter';
 
 import { ExchangeIndex, Token } from '@localTypes';
-import { Strategy } from '@localTypes';
 import logger from '@logger';
 
 import { GasFees } from '@communicator/types';
@@ -22,7 +21,6 @@ export type Services = {
   logger: typeof logger;
   exchanges: UniswapLikeExchange[];
   eventEmitter: TypedEmitter<MessageEvents>;
-  strategies: Strategy[];
   messenger?: Messenger;
 };
 

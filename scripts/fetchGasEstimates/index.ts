@@ -4,40 +4,21 @@ import 'hardhat-deploy';
 
 import { GasEstimates } from '@localTypes';
 import logger from '@logger';
-import env from '@utils/env';
-import formatStrategies from '@utils/formatStrategies';
 
-// @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
-import { strategies as prodStrategies } from '@root/bot.config';
 import localGasEstimates from '@root/dist/gasEstimates.json';
+import wrapEth from '@root/utils/wrapEth';
 
-import wrapEth from '@chainHandler/utils/wrapEth';
+import { DIST_FOLDER_PATH } from '@scripts/constants';
+import getTradedTokenAddresses from '@scripts/utils/getTradedTokenAddresses';
 
 import exchanges from '@bot/src/exchanges';
 
 // @ts-ignore because this is the only JS file we are using in the project
 const ethers = hre.ethers;
 
-function getStrategies() {
-  return formatStrategies(
-    process.env.USE_PROD_STRATEGIES ? prodStrategies.flat() : JSON.parse(env('STRINGIFIED_STRATEGIES')),
-    +env('STRATEGY_BORROWED_AMOUNT_COUNT')
-  );
-}
-
-const DIST_FOLDER_PATH = `${process.cwd()}/dist`;
-const SWAP_GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/gasEstimates.json`;
-
-const strategies = getStrategies();
+const GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/gasEstimates.json`;
 const isProd = process.env.NODE_ENV === 'production';
-
-const tokenAddresses = strategies.reduce((allTokenAddresses, formattedStrategy) => {
-  if (allTokenAddresses.find((tokenAddress) => tokenAddress === formattedStrategy.toToken.address)) {
-    return allTokenAddresses;
-  }
-
-  return [...allTokenAddresses, formattedStrategy.toToken.address];
-}, [] as string[]);
+const tradedTokenAddresses = getTradedTokenAddresses(!!process.env.USE_PROD_TRADED_TOKENS);
 
 const setup = deployments.createFixture(() => deployments.fixture());
 
@@ -63,8 +44,8 @@ const fetchGasEstimates = async () => {
     const exchange = exchanges[e];
     logger.log(`Exchange #${exchange.index}: ${exchange.name}`);
 
-    for (let i = 0; i < tokenAddresses.length; i++) {
-      const toTokenAddress = tokenAddresses[i];
+    for (let i = 0; i < tradedTokenAddresses.length; i++) {
+      const toTokenAddress = tradedTokenAddresses[i];
 
       logger.log(`Token address: ${toTokenAddress}`);
 
@@ -107,13 +88,13 @@ const fetchGasEstimates = async () => {
   }
 
   // Write gas estimates inside a JSON file
-  fs.writeFileSync(SWAP_GAS_ESTIMATES_FILE_PATH, JSON.stringify(gasEstimates));
+  fs.writeFileSync(GAS_ESTIMATES_FILE_PATH, JSON.stringify(gasEstimates));
 
   // Go through estimates and throw error if a token is only present on one
   // exchange. Note that we do this check after writing the gas estimates inside
   // the JSON file, so that the results can be analyzed even if an error is
   // thrown.
-  tokenAddresses.forEach((tokenAddress) => {
+  tradedTokenAddresses.forEach((tokenAddress) => {
     let exchangeCount = 0;
 
     Object.keys(gasEstimates)

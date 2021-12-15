@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
 import { BigNumber } from 'ethers';
 
-import { Environment, ExchangeIndex, Strategy } from '@localTypes';
+import { Environment, ExchangeIndex, Token } from '@localTypes';
 import env from '@utils/env';
-import formatStrategies from '@utils/formatStrategies';
+
+import formatTradedTokens from '@root/utils/formatTradedTokens';
 
 dotenv.config();
 
@@ -12,7 +13,7 @@ export interface EnvConfig {
   isDev: boolean;
   isProd: boolean;
   startFromTestBlock: boolean;
-  strategies: Strategy[];
+  tradedTokens: Token[];
   networks: {
     hardhat: {
       rpcUrl: string;
@@ -66,10 +67,7 @@ export interface EnvConfig {
   };
 }
 
-const strategies: Strategy[] = formatStrategies(
-  JSON.parse(env('STRINGIFIED_STRATEGIES')),
-  +env('STRATEGY_BORROWED_AMOUNT_COUNT')
-);
+const tradedTokens: Token[] = formatTradedTokens(JSON.parse(env('STRINGIFIED_TRADED_TOKENS')));
 
 const mainnetAccounts = {
   owner: {
@@ -86,7 +84,7 @@ const config: EnvConfig = {
   isProd: (process.env.NODE_ENV as Environment) === 'production',
   isDev: (process.env.NODE_ENV as Environment) === 'development',
   startFromTestBlock: !!process.env.START_FROM_BLOCK,
-  strategies,
+  tradedTokens,
   networks: {
     hardhat: {
       rpcUrl: env('MAINNET_FORKING_RPC_URL'),
@@ -117,7 +115,7 @@ const config: EnvConfig = {
   testProfitableTrade: {
     wethAmountToBorrow: BigNumber.from(env('TEST_PROFITABLE_TRADE_WETH_AMOUNT_TO_BORROW')),
     sellingExchangeIndex: +env('TEST_PROFITABLE_TRADE_SELLING_EXCHANGE_INDEX') as ExchangeIndex,
-    tradedTokenAddress: env('TEST_PROFITABLE_TRADE_TRADED_TOKEN_ADDRESS'),
+    tradedTokenAddress: env('TEST_PROFITABLE_TRADE_ADDRESS'),
     tradedTokenAmountOutMin: BigNumber.from(env('TEST_PROFITABLE_TRADE_TRADED_TOKEN_AMOUNT_OUT_MIN')),
     tradedTokenAmountOutExpected: BigNumber.from(env('TEST_PROFITABLE_TRADE_TRADED_TOKEN_AMOUNT_OUT_EXPECTED')),
     buyingExchangeIndex: +env('TEST_PROFITABLE_TRADE_BUYING_EXCHANGE_INDEX') as ExchangeIndex,

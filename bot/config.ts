@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
 import { BigNumber } from 'ethers';
 
-import { Environment, GasEstimates, Strategy } from '@localTypes';
+import { Environment, GasEstimates, Token } from '@localTypes';
 import env from '@utils/env';
-import formatStrategies from '@utils/formatStrategies';
+
+import formatTradedTokens from '@root/utils/formatTradedTokens';
 
 import gasEstimates from '@dist/gasEstimates.json';
 
@@ -29,14 +30,11 @@ export interface EnvConfig {
   gasLimitMultiplicator: number;
   gasEstimates: GasEstimates;
   gasCostMaximumThresholdWei: BigNumber;
-  strategies: Strategy[];
+  tradedTokens: Token[];
   communicationWssUrl: string;
 }
 
-const strategies: Strategy[] = formatStrategies(
-  JSON.parse(env('STRINGIFIED_STRATEGIES')),
-  +env('STRATEGY_BORROWED_AMOUNT_COUNT')
-);
+const tradedTokens: Token[] = formatTradedTokens(JSON.parse(env('STRINGIFIED_TRADED_TOKENS')));
 
 const config: EnvConfig = {
   environment: (process.env.NODE_ENV as Environment) || 'development',
@@ -59,7 +57,7 @@ const config: EnvConfig = {
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
   gasEstimates: gasEstimates as GasEstimates,
   gasCostMaximumThresholdWei: BigNumber.from(env('GAS_COST_MAXIMUM_THRESHOLD_WEI')),
-  strategies,
+  tradedTokens,
 };
 
 export default config;

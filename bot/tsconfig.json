@@ -33,7 +33,8 @@
       "@deployments/*": ["../deployments/*"],
       "@chainHandler/*": ["../chainHandler/*"],
       "@bot/*": ["./*"],
-      "@communicator/*": ["../communicator/*"]
+      "@communicator/*": ["../communicator/*"],
+      "@scripts/*": ["../scripts/*"]
     },
     "lib": ["es2020"]
   }

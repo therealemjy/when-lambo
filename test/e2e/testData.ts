@@ -1,7 +1,8 @@
 import { ethers } from 'ethers';
 
 import logger from '@logger';
-import formatStrategies from '@utils/formatStrategies';
+
+import formatTradedTokens from '@root/utils/formatTradedTokens';
 
 import { EnvConfig } from '@bot/config';
 import eventEmitter from '@bot/src/eventEmitter';
@@ -47,25 +48,18 @@ const config: EnvConfig = {
       '0x6b175474e89094c44da98b954eedeac495271d0f': '117014',
     },
   },
-  strategies: formatStrategies(
-    [
-      {
-        TRADED_TOKEN_ADDRESS: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942',
-        TRADED_TOKEN_SYMBOL: 'MANA',
-        TRADED_TOKEN_DECIMALS: '18',
-        BORROWED_WETH_STARTING_BASE_AMOUNT: '4050000000000000000',
-        BORROWED_WETH_AMOUNT_INCREMENT_PERCENT: '10',
-      },
-      {
-        TRADED_TOKEN_ADDRESS: '0x6b175474e89094c44da98b954eedeac495271d0f',
-        TRADED_TOKEN_SYMBOL: 'DAI',
-        TRADED_TOKEN_DECIMALS: '18',
-        BORROWED_WETH_STARTING_BASE_AMOUNT: '40000000000000000000',
-        BORROWED_WETH_AMOUNT_INCREMENT_PERCENT: '10',
-      },
-    ],
-    10
-  ),
+  tradedTokens: formatTradedTokens([
+    {
+      ADDRESS: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942',
+      SYMBOL: 'MANA',
+      DECIMALS: '18',
+    },
+    {
+      ADDRESS: '0x6b175474e89094c44da98b954eedeac495271d0f',
+      SYMBOL: 'DAI',
+      DECIMALS: '18',
+    },
+  ]),
 };
 
 export const EXPECTED_REVENUE_WETH = '568270094198623164';
@@ -85,5 +79,4 @@ export const mockedServices: Services = {
   logger,
   exchanges,
   eventEmitter,
-  strategies: config.strategies,
 };
