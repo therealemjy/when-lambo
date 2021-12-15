@@ -40,7 +40,7 @@ const runCommandOnBots = async (pm2Command: string) => {
 const init = async () => {
   console.log(
     // prettier-ignore
-    `         __                   __                __
+    `          __                   __                __
 .--.--.--|  |--.-----.-----.  |  .---.-.--------|  |--.-----.
 |  |  |  |     |  -__|     |  |  |  _  |        |  _  |  _  |
 |________|__|__|_____|__|__|  |__|___._|__|__|__|_____|_____|
