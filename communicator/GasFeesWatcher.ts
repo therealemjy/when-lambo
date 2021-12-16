@@ -77,9 +77,8 @@ class GasFeesWatcher {
     // multiply the max priority fee per gas returned by blocknative by a given
     // multiplicator set in config
     const maxPriorityFeePerGas = Math.floor(maxPriorityFeePerGasWei * this.maxPriorityFeePerGasMultiplicator);
-
     const baseFeePerGasWei = this.convertGweiNumberToWei(baseFeePerGas);
-    const maxFeePerGas = baseFeePerGasWei + maxPriorityFeePerGas;
+    const maxFeePerGas = parseInt(baseFeePerGasWei as any) + parseInt(maxPriorityFeePerGas as any);
 
     return {
       maxPriorityFeePerGas,

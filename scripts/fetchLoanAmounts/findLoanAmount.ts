@@ -7,15 +7,13 @@ import multiplyAmounts from '@utils/multiplyAmounts';
 
 import findBestTrade from '@root/bot/src/findBestTrade';
 
-import formatNestedBN from '@chainHandler/utils/formatNestedBN';
-
 import { GasFees } from '@communicator/types';
 
 import { WETH } from '@bot/src/tokens';
 import { Exchange } from '@bot/src/types';
 
-const MAX_ITERATIONS = 20; // TODO: increase
-const PROFIT_PERCENTAGE_DELTA = 0.1;
+const MAX_ITERATIONS = 20;
+const PROFIT_PERCENTAGE_DELTA = 0.01;
 const LOAN_BASE_AMOUNT = ethers.utils.parseEther('10');
 const INCREMENT_PERCENTAGE = 1;
 const incrementCount = ((100 - INCREMENT_PERCENTAGE) / INCREMENT_PERCENTAGE) * 2 + 1;
@@ -54,8 +52,6 @@ const findLoanAmount = async ({
 
   const fromTokenDecimalAmounts = multiplyAmounts(lastBestLoanAmount, INCREMENT_PERCENTAGE, incrementCount);
 
-  console.log(`Iteration #${iterationCount}`, lastBestLoanAmount.toString());
-
   const { bestTradeByPercentage } = await findBestTrade({
     multicall,
     fromToken: WETH,
@@ -69,13 +65,23 @@ const findLoanAmount = async ({
     currentBlockNumber,
   });
 
+  logger.log(
+    `Iteration #${iterationCount}`,
+    `${bestTradeByPercentage.path[0].fromTokenDecimalAmount.toString()} wei (${
+      bestTradeByPercentage.profitPercentage
+    }% profit)`
+  );
+
   const bestTradeLoanAmount = bestTradeByPercentage.path[0].fromTokenDecimalAmount;
 
   if (
     lastBestTradeProfitPercentage &&
     Math.abs(lastBestTradeProfitPercentage - bestTradeByPercentage.profitPercentage) <= PROFIT_PERCENTAGE_DELTA
   ) {
-    console.log('Best trade loan amount found', bestTradeLoanAmount.toString());
+    logger.log(
+      'Best trade loan amount found',
+      `${bestTradeLoanAmount.toString()} wei (${bestTradeByPercentage.profitPercentage}% profit)`
+    );
     return bestTradeLoanAmount.toString();
   }
 

@@ -75,6 +75,9 @@ const executeAction = async (action: Actions) => {
       console.log('- Fetch gas estimates');
       await runCommand('USE_PROD_ENV_VARIABLES=true npm run fetch-gas-estimates');
 
+      console.log('- Fetch loan amounts');
+      await runCommand('USE_PROD_ENV_VARIABLES=true npm run fetch-loan-amounts');
+
       console.log('- Build bot');
       await runCommand('npm run bot:build');
 

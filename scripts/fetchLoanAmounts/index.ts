@@ -9,17 +9,15 @@ import { address as MULTICALL_CONTRACT_MAINNET_ADDRESS } from '@resources/thirdP
 import env from '@utils/env';
 
 // @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
-import { baseEnvs as prodBaseEnvs, tradedTokens as prodTradedTokens } from '@root/bot.config';
-
-import formatNestedBN from '@chainHandler/utils/formatNestedBN';
+import { baseEnvs as prodBotBaseEnvs, tradedTokens as prodTradedTokens } from '@root/bot.config';
+// @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
+import { baseEnvs as prodCommunicatorEnvs } from '@root/communicator.config';
 
 import GasFeesWatcher from '@communicator/GasFeesWatcher';
 
 import { DIST_FOLDER_PATH } from '@scripts/constants';
-import getTradedTokenAddresses from '@scripts/utils/getTradedTokenAddresses';
 
 import exchanges from '@bot/src/exchanges';
-import findBestTrade from '@bot/src/findBestTrade';
 
 import gasEstimates from '@dist/gasEstimates.json';
 
@@ -39,22 +37,20 @@ const tradedTokens: Token[] = unformattedTokens.map((parsedTradedToken) => ({
 }));
 
 const gasLimitMultiplicator = process.env.USE_PROD_ENV_VARIABLES
-  ? prodBaseEnvs.GAS_LIMIT_MULTIPLICATOR
+  ? prodBotBaseEnvs.GAS_LIMIT_MULTIPLICATOR
   : env('GAS_LIMIT_MULTIPLICATOR');
 
 const slippageAllowancePercent = process.env.USE_PROD_ENV_VARIABLES
-  ? prodBaseEnvs.SLIPPAGE_ALLOWANCE_PERCENT
+  ? prodBotBaseEnvs.SLIPPAGE_ALLOWANCE_PERCENT
   : env('SLIPPAGE_ALLOWANCE_PERCENT');
+
+const maxPriorityFeePerGasMultiplicator = process.env.USE_PROD_ENV_VARIABLES
+  ? prodCommunicatorEnvs.MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR
+  : env('MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR');
 
 const LOAN_AMOUNTS_FILE_PATH = `${DIST_FOLDER_PATH}/loanAmounts.json`;
 
-const blocknativeApiKey = process.env.USE_PROD_ENV_VARIABLES
-  ? prodBaseEnvs.BLOCKNATIVE_API_KEY
-  : env('BLOCKNATIVE_API_KEY');
-
-const maxPriorityFeePerGasMultiplicator = process.env.USE_PROD_ENV_VARIABLES
-  ? prodBaseEnvs.BLOCKNATIVE_API_KEY
-  : env('MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR');
+const blocknativeApiKey = env('BLOCKNATIVE_API_KEY_SCRIPTS');
 
 const gasFeesWatcher = new GasFeesWatcher(blocknativeApiKey, maxPriorityFeePerGasMultiplicator);
 
@@ -75,6 +71,8 @@ const fetchLoanAmounts = async () => {
   // Find loan amount for each token
   for (let t = 0; t < tradedTokens.length; t++) {
     const tradedToken = tradedTokens[t];
+
+    logger.log(`Searching for best loan amount for ${tradedToken.symbol} token`);
 
     loanAmounts[tradedToken.address] = await findLoanAmount({
       multicall,
@@ -97,7 +95,7 @@ const fetchLoanAmounts = async () => {
   fs.writeFileSync(LOAN_AMOUNTS_FILE_PATH, JSON.stringify(loanAmounts));
 
   logger.log('Loan amounts fetched successfully.');
-  logger.log(formatNestedBN(loanAmounts));
+  logger.log(loanAmounts);
 };
 
 // Note: we voluntarily don't catch errors so that execution stops if this
