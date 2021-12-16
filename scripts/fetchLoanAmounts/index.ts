@@ -11,6 +11,8 @@ import env from '@utils/env';
 // @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
 import { baseEnvs as prodBaseEnvs, tradedTokens as prodTradedTokens } from '@root/bot.config';
 
+import GasFeesWatcher from '@communicator/GasFeesWatcher';
+
 import { DIST_FOLDER_PATH } from '@scripts/constants';
 import getTradedTokenAddresses from '@scripts/utils/getTradedTokenAddresses';
 
@@ -38,6 +40,16 @@ const slippageAllowancePercent = process.env.USE_PROD_ENV_VARIABLES
 
 const LOAN_AMOUNTS_FILE_PATH = `${DIST_FOLDER_PATH}/loanAmounts.json`;
 
+const blocknativeApiKey = process.env.USE_PROD_ENV_VARIABLES
+  ? prodBaseEnvs.BLOCKNATIVE_API_KEY
+  : env('BLOCKNATIVE_API_KEY');
+
+const maxPriorityFeePerGasMultiplicator = process.env.USE_PROD_ENV_VARIABLES
+  ? prodBaseEnvs.BLOCKNATIVE_API_KEY
+  : env('MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR');
+
+const gasFeesWatcher = new GasFeesWatcher(blocknativeApiKey, maxPriorityFeePerGasMultiplicator);
+
 const fetchLoanAmounts = async () => {
   logger.log('Fetching loan amounts...');
 
@@ -49,11 +61,9 @@ const fetchLoanAmounts = async () => {
     tryAggregate: true,
   });
 
-  // TODO: fetch gas fees
-  const gasFees = {
-    maxPriorityFeePerGas: 1,
-    maxFeePerGas: 1,
-  };
+  const gasFees = await gasFeesWatcher.getGasFees();
+
+  console.log(gasFees);
 
   const currentBlockNumber = await ethers.provider.getBlockNumber();
 

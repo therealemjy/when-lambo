@@ -33,7 +33,7 @@ class GasFeesWatcher {
     return Math.ceil(gwei * 10 ** 9);
   }
 
-  private async getGasFees(): Promise<GasFees> {
+  public async getGasFees(): Promise<GasFees> {
     const res = await axios.get<{
       system: string;
       network: string;
