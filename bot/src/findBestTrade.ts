@@ -47,8 +47,11 @@ const findBestTrade = async ({
     gasEstimates,
   });
 
+  let bestTradeByAmount!: Trade;
+  let bestTradeByPercentage!: Trade;
+
   // Get the most profitable path
-  const bestTrade = paths.reduce<Trade | undefined>((currentBestTrade, path) => {
+  for (const path of paths) {
     const gasLimit = path[0].gasEstimate
       .add(path[1].gasEstimate)
       .add(TRANSACTOR_TRADE_WITHOUT_SWAPS_GAS_ESTIMATE)
@@ -81,20 +84,29 @@ const findBestTrade = async ({
     };
 
     // Assign trade as best trade if none has been assigned yet
-    if (!currentBestTrade) {
-      return trade;
+    if (!bestTradeByAmount) {
+      bestTradeByAmount = trade;
     }
 
-    const isMostProfitable = currentBestTrade.profitWethAmount.lt(profitWethAmount);
-
-    if (isMostProfitable) {
-      return trade;
+    if (!bestTradeByPercentage) {
+      bestTradeByPercentage = trade;
     }
 
-    return currentBestTrade;
-  }, undefined);
+    // Check if trade is more profitable in terms of amount yielded
+    if (trade.profitWethAmount.gt(bestTradeByAmount.profitWethAmount)) {
+      bestTradeByAmount = trade;
+    }
 
-  return bestTrade;
+    // Check if trade is more profitable in terms of profit percentage
+    if (trade.profitPercentage > bestTradeByPercentage.profitPercentage) {
+      bestTradeByPercentage = trade;
+    }
+  }
+
+  return {
+    bestTradeByAmount,
+    bestTradeByPercentage,
+  };
 };
 
 export default findBestTrade;

@@ -41,7 +41,7 @@ const executeStrategy = async (
       throw new Error('Gas fees missing');
     }
 
-    const trade = await findBestTrade({
+    const { bestTradeByAmount, bestTradeByPercentage } = await findBestTrade({
       multicall,
       currentBlockNumber: blockNumber,
       fromTokenDecimalAmounts: strategy.borrowedWethAmounts,
@@ -58,18 +58,24 @@ const executeStrategy = async (
       gasLimitMultiplicator: services.config.gasLimitMultiplicator,
     });
 
+    // TODO: update state base loan amount using bestTradeByPercentage
+
     /*
-      Check if trade follows our rules.
-      Rules for a trade to be counted as executable:
+      Check if trade follows our rules. Rules for a trade to be counted as
+      executable:
       1) Trade musts yield a profit that's equal or superior to the total gas
           cost of the transaction
       2) Total gas cost of the transaction can only go up to a given ETH maximum
           (see config for the actual value)
+
+      Note that we use the best trade by amount of profit yielded for trade
+      executions. The best trade by percentage is used to define the base loan
+      amount to use for the next block
     */
     const isTradeExecutable =
-      trade &&
-      trade.profitWethAmount.gt(trade.totalGasCost) &&
-      trade.totalGasCost.lte(services.config.gasCostMaximumThresholdWei);
+      bestTradeByAmount &&
+      bestTradeByAmount.profitWethAmount.gt(bestTradeByAmount.totalGasCost) &&
+      bestTradeByAmount.totalGasCost.lte(services.config.gasCostMaximumThresholdWei);
 
     if (!isTradeExecutable) {
       return;
@@ -78,26 +84,24 @@ const executeStrategy = async (
     let transaction: ContractTransaction | undefined = undefined;
 
     // Execute trade, in production and test environments only
-    if (trade && !services.config.isDev) {
+    if (!services.config.isDev) {
       // Deactivate the bot completely
       services.state.isMonitoringActivated = false;
       // Stop all monitoring servers
       services.messenger?.sendStopMonitoringSignal();
 
       transaction = await executeTrade({
-        trade,
+        trade: bestTradeByAmount,
         TransactorContract,
       });
     }
 
     // Log trade
-    if (trade) {
-      await services.logger.transaction({
-        trade,
-        transactionHash: transaction?.hash,
-        spreadsheet,
-      });
-    }
+    await services.logger.transaction({
+      trade: bestTradeByAmount,
+      transactionHash: transaction?.hash,
+      spreadsheet,
+    });
 
     // Watch transaction
     if (transaction) {

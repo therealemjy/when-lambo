@@ -1,10 +1,6 @@
-export interface ConfigToken {
-  ADDRESS: string;
-  SYMBOL: string;
-  DECIMALS: string;
-}
+import { ParsedTradedToken } from '@localTypes';
 
-const getTradedTokenAddresses = (stringifiedTradedTokens: ConfigToken[]) => {
+const getTradedTokenAddresses = (stringifiedTradedTokens: ParsedTradedToken[]) => {
   const tradedTokenAddresses = stringifiedTradedTokens.reduce<string[]>((allTokenAddresses, tradedToken) => {
     if (allTokenAddresses.find((tokenAddress) => tokenAddress === tradedToken.ADDRESS)) {
       return allTokenAddresses;

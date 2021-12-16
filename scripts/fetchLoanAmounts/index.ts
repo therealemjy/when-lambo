@@ -3,13 +3,15 @@ import fs from 'fs';
 import hre from 'hardhat';
 import 'hardhat-deploy';
 
-import { LoanAmounts } from '@localTypes';
+import { LoanAmounts, Token, ParsedTradedToken } from '@localTypes';
 import logger from '@logger';
 import { address as MULTICALL_CONTRACT_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/multicall2.json';
 import env from '@utils/env';
 
 // @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
 import { baseEnvs as prodBaseEnvs, tradedTokens as prodTradedTokens } from '@root/bot.config';
+
+import formatNestedBN from '@chainHandler/utils/formatNestedBN';
 
 import GasFeesWatcher from '@communicator/GasFeesWatcher';
 
@@ -26,9 +28,15 @@ import findLoanAmount from './findLoanAmount';
 // @ts-ignore because this is the only JS file we are using in the project
 const ethers = hre.ethers;
 
-const tradedTokenAddresses = getTradedTokenAddresses(
+const unformattedTokens = (
   process.env.USE_PROD_ENV_VARIABLES ? prodTradedTokens.flat() : JSON.parse(env('STRINGIFIED_TRADED_TOKENS'))
-);
+) as ParsedTradedToken[];
+
+const tradedTokens: Token[] = unformattedTokens.map((parsedTradedToken) => ({
+  address: parsedTradedToken.ADDRESS,
+  symbol: parsedTradedToken.SYMBOL,
+  decimals: +parsedTradedToken.DECIMALS,
+}));
 
 const gasLimitMultiplicator = process.env.USE_PROD_ENV_VARIABLES
   ? prodBaseEnvs.GAS_LIMIT_MULTIPLICATOR
@@ -62,18 +70,16 @@ const fetchLoanAmounts = async () => {
   });
 
   const gasFees = await gasFeesWatcher.getGasFees();
-
-  console.log(gasFees);
-
   const currentBlockNumber = await ethers.provider.getBlockNumber();
 
   // Find loan amount for each token
-  for (let t = 0; t < tradedTokenAddresses.length; t++) {
-    const tradedTokenAddress = tradedTokenAddresses[t];
-    loanAmounts[tradedTokenAddress] = findLoanAmount({
+  for (let t = 0; t < tradedTokens.length; t++) {
+    const tradedToken = tradedTokens[t];
+
+    loanAmounts[tradedToken.address] = await findLoanAmount({
       multicall,
       currentBlockNumber,
-      tradedTokenAddress,
+      tradedToken,
       slippageAllowancePercent,
       gasFees,
       gasLimitMultiplicator,
@@ -91,7 +97,7 @@ const fetchLoanAmounts = async () => {
   fs.writeFileSync(LOAN_AMOUNTS_FILE_PATH, JSON.stringify(loanAmounts));
 
   logger.log('Loan amounts fetched successfully.');
-  logger.log(loanAmounts);
+  logger.log(formatNestedBN(loanAmounts));
 };
 
 // Note: we voluntarily don't catch errors so that execution stops if this
