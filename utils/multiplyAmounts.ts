@@ -32,7 +32,7 @@ const multiplyAmounts = ({
         ? 100 - (baseIndex - index) * incrementPercentage
         : 100 + (index - baseIndex) * incrementPercentage;
 
-    amounts[index] = baseAmount.mul(percentage).div(100);
+    amounts[index] = baseAmount.mul(percentage * 100).div(10000);
   }
 
   return amounts;

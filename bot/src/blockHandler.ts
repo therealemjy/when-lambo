@@ -62,11 +62,6 @@ const executeStrategy = async (
     // towards 0 for trade with a a negative profitability.
     services.state.loanAmounts[tradedToken.address] = bestTradeByPercentage.path[0].fromTokenDecimalAmount.toString();
 
-    services.logger.log(
-      `New base loan amount for ${tradedToken.symbol} token (${tradedToken.address}): `,
-      services.state.loanAmounts[tradedToken.address]
-    );
-
     /*
       Check if trade follows our rules. Rules for a trade to be counted as
       executable are as follows:

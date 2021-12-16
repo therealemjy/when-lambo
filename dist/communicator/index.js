@@ -34806,7 +34806,7 @@ var GasFeesWatcher = class {
       const maxPriorityFeePerGasWei = this.convertGweiNumberToWei(pendingBlock.estimatedPrices[0].maxPriorityFeePerGas);
       const maxPriorityFeePerGas = Math.floor(maxPriorityFeePerGasWei * this.maxPriorityFeePerGasMultiplicator);
       const baseFeePerGasWei = this.convertGweiNumberToWei(baseFeePerGas);
-      const maxFeePerGas = baseFeePerGasWei + maxPriorityFeePerGas;
+      const maxFeePerGas = parseInt(baseFeePerGasWei) + parseInt(maxPriorityFeePerGas);
       return {
         maxPriorityFeePerGas,
         maxFeePerGas
@@ -34820,7 +34820,7 @@ var GasFeesWatcher_default = GasFeesWatcher;
 var import_dotenv2 = __toModule(require_main());
 import_dotenv2.default.config();
 var config2 = {
-  blocknativeApiKey: env_default("BLOCKNATIVE_API_KEY"),
+  blocknativeApiKey: env_default("BLOCKNATIVE_API_KEY_COMMUNICATOR"),
   maxPriorityFeePerGasMultiplicator: +env_default("MAX_PRIORITY_FEE_PER_GAS_MULTIPLICATOR")
 };
 var config_default2 = config2;
