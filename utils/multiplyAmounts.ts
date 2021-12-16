@@ -14,7 +14,15 @@ import { BigNumber } from 'ethers';
   will output:
   [8, 9, baseAmount (10), 11, 12];
 */
-const multiplyAmounts = (baseAmount: BigNumber, incrementPercentage: number, incrementCount: number): BigNumber[] => {
+const multiplyAmounts = ({
+  baseAmount,
+  incrementPercentage,
+  incrementCount,
+}: {
+  baseAmount: BigNumber;
+  incrementPercentage: number;
+  incrementCount: number;
+}): BigNumber[] => {
   const amounts: BigNumber[] = [];
   const baseIndex = Math.floor((incrementCount - 1) / 2);
 

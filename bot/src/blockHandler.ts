@@ -1,8 +1,9 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
-import { ContractTransaction } from 'ethers';
+import { ContractTransaction, BigNumber } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
-import { Strategy } from '@localTypes';
+import { Token } from '@localTypes';
+import multiplyAmounts from '@utils/multiplyAmounts';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 import formatNestedBN from '@chainHandler/utils/formatNestedBN';
@@ -14,7 +15,8 @@ import { Services } from './types';
 import registerExecutionTime from './utils/registerExecutionTime';
 
 type ExecuteStrategyArgs = {
-  strategy: Strategy;
+  tradedToken: Token;
+  loanAmounts: BigNumber[];
   blockNumber: number;
   multicall: Multicall;
   spreadsheet: GoogleSpreadsheet;
@@ -32,7 +34,7 @@ const EIGHT_SECONDS_IN_MS = 8000;
 
 const executeStrategy = async (
   services: Services,
-  { blockNumber, multicall, strategy, TransactorContract, spreadsheet }: ExecuteStrategyArgs
+  { blockNumber, multicall, tradedToken, loanAmounts, TransactorContract, spreadsheet }: ExecuteStrategyArgs
 ) => {
   try {
     const gasFees = services.state.gasFees;
@@ -44,13 +46,9 @@ const executeStrategy = async (
     const { bestTradeByAmount, bestTradeByPercentage } = await findBestTrade({
       multicall,
       currentBlockNumber: blockNumber,
-      fromTokenDecimalAmounts: strategy.borrowedWethAmounts,
+      fromTokenDecimalAmounts: loanAmounts,
       fromToken: WETH,
-      toToken: {
-        symbol: strategy.toToken.symbol,
-        address: strategy.toToken.address,
-        decimals: strategy.toToken.decimals,
-      },
+      toToken: tradedToken,
       exchanges: services.exchanges,
       slippageAllowancePercent: services.config.slippageAllowancePercent,
       gasEstimates: services.config.gasEstimates,
@@ -58,19 +56,27 @@ const executeStrategy = async (
       gasLimitMultiplicator: services.config.gasLimitMultiplicator,
     });
 
-    // TODO: update state base loan amount using bestTradeByPercentage
+    // Update state base loan amount using bestTradeByPercentage. Note that we
+    // use the best trade by percentage is used to define the base loan amount
+    // to use for the next block. This is so loan amounts won't infinitely go
+    // towards 0 for trade with a a negative profitability.
+    services.state.loanAmounts[tradedToken.address] = bestTradeByPercentage.path[0].fromTokenDecimalAmount.toString();
+
+    services.logger.log(
+      `New base loan amount for ${tradedToken.symbol} token (${tradedToken.address}): `,
+      services.state.loanAmounts[tradedToken.address]
+    );
 
     /*
       Check if trade follows our rules. Rules for a trade to be counted as
-      executable:
+      executable are as follows:
       1) Trade musts yield a profit that's equal or superior to the total gas
-          cost of the transaction
-      2) Total gas cost of the transaction can only go up to a given ETH maximum
-          (see config for the actual value)
+         cost of the transaction
+      2) Total gas cost of the transaction can not go higher than given ETH
+         amount (see config for the actual value)
 
       Note that we use the best trade by amount of profit yielded for trade
-      executions. The best trade by percentage is used to define the base loan
-      amount to use for the next block
+      executions.
     */
     const isTradeExecutable =
       bestTradeByAmount &&
@@ -84,7 +90,7 @@ const executeStrategy = async (
     let transaction: ContractTransaction | undefined = undefined;
 
     // Execute trade, in production and test environments only
-    if (!services.config.isDev) {
+    if (services.config.isProd || services.config.environment === 'test') {
       // Deactivate the bot completely
       services.state.isMonitoringActivated = false;
       // Stop all monitoring servers
@@ -138,15 +144,32 @@ const blockHandler = async (
 
   // Execute all strategies simultaneously
   const res = await Promise.allSettled(
-    services.strategies.map((strategy) =>
-      executeStrategy(services, {
+    services.config.tradedTokens.map((tradedToken) => {
+      // Get base loan amount
+      const baseLoanAmount = services.state.loanAmounts[tradedToken.address];
+
+      if (!baseLoanAmount) {
+        throw new Error(
+          `Loan amount missing for ${tradedToken.symbol}. This most likely means loan amounts have not been updated, running "npm run fetch-loan-amounts" should fix the issue.`
+        );
+      }
+
+      // Generate loan amounts from base loan amount
+      const loanAmounts = multiplyAmounts({
+        baseAmount: BigNumber.from(baseLoanAmount),
+        incrementPercentage: services.config.loanAmountsIncrementPercent,
+        incrementCount: services.config.loanAmountsCount,
+      });
+
+      return executeStrategy(services, {
         blockNumber,
-        strategy,
+        tradedToken,
+        loanAmounts,
         TransactorContract,
         multicall,
         spreadsheet,
-      })
-    )
+      });
+    })
   );
 
   // Log eventual errors

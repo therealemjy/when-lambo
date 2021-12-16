@@ -1,12 +1,10 @@
 import dotenv from 'dotenv';
 import { BigNumber } from 'ethers';
 
+import gasEstimates from '@dist/gasEstimates.json';
 import { Environment, GasEstimates, Token } from '@localTypes';
 import env from '@utils/env';
-
-import formatTradedTokens from '@root/utils/formatTradedTokens';
-
-import gasEstimates from '@dist/gasEstimates.json';
+import formatTradedTokens from '@utils/formatTradedTokens';
 
 dotenv.config();
 
@@ -27,6 +25,8 @@ export interface EnvConfig {
     privateKeyBase64: string;
   };
   slippageAllowancePercent: number;
+  loanAmountsCount: number;
+  loanAmountsIncrementPercent: number;
   gasLimitMultiplicator: number;
   gasEstimates: GasEstimates;
   gasCostMaximumThresholdWei: BigNumber;
@@ -54,8 +54,10 @@ const config: EnvConfig = {
   },
   communicationWssUrl: env('COMMUNICATOR_WSS_URL'),
   slippageAllowancePercent: +env('SLIPPAGE_ALLOWANCE_PERCENT'),
+  loanAmountsCount: +env('LOAN_AMOUNTS_COUNT'),
+  loanAmountsIncrementPercent: +env('LOAN_AMOUNTS_INCREMENT_PERCENT'),
   gasLimitMultiplicator: +env('GAS_LIMIT_MULTIPLICATOR'),
-  gasEstimates: gasEstimates as GasEstimates,
+  gasEstimates,
   gasCostMaximumThresholdWei: BigNumber.from(env('GAS_COST_MAXIMUM_THRESHOLD_WEI')),
   tradedTokens,
 };

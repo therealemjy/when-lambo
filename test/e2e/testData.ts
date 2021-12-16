@@ -1,8 +1,7 @@
 import { ethers } from 'ethers';
 
 import logger from '@logger';
-
-import formatTradedTokens from '@root/utils/formatTradedTokens';
+import formatTradedTokens from '@utils/formatTradedTokens';
 
 import { EnvConfig } from '@bot/config';
 import eventEmitter from '@bot/src/eventEmitter';
@@ -27,8 +26,8 @@ const config: EnvConfig = {
     privateKeyBase64: 'fake-private-key-base-64',
   },
   slippageAllowancePercent: 0.5,
-  // Note: using anything lower than that will result in transactions failing.
-  // I couldn't find the actual reason for it :/
+  loanAmountsCount: 11,
+  loanAmountsIncrementPercent: 10,
   gasLimitMultiplicator: 1.3,
   gasCostMaximumThresholdWei: ethers.utils.parseUnits('0.063', 'ether'),
   gasEstimates: {
@@ -73,6 +72,10 @@ export const mockedServices: Services = {
     gasFees: {
       maxPriorityFeePerGas: ethers.utils.parseUnits('4', 'gwei').toNumber(),
       maxFeePerGas: ethers.utils.parseUnits('101', 'gwei').toNumber(),
+    },
+    loanAmounts: {
+      '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942': '4050000000000000000',
+      '0x6b175474e89094c44da98b954eedeac495271d0f': '40000000000000000000',
     },
   },
   config,

@@ -1,10 +1,8 @@
 import { BigNumber } from 'ethers';
 import TypedEmitter from 'typed-emitter';
 
-import { ExchangeIndex, Token } from '@localTypes';
+import { ExchangeIndex, Token, LoanAmounts, GasFees } from '@localTypes';
 import logger from '@logger';
-
-import { GasFees } from '@communicator/types';
 
 import { EnvConfig } from '@bot/config';
 import { MessageEvents } from '@bot/src/eventEmitter';
@@ -30,6 +28,7 @@ export type State = {
   lastGasPriceUpdateDateTime?: number;
   botExecutionMonitoringTick: number;
   perfMonitoringRecords: number[];
+  loanAmounts: LoanAmounts;
   gasFees?: GasFees;
 };
 

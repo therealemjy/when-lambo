@@ -4,13 +4,11 @@
   "tabWidth": 2,
   "importOrder": [
     "./moduleAliases",
-    "^@(localTypes|constants|utils|logger|resources|deployments)",
-    "^@(tasks|root)/(.*)$",
+    "^@(localTypes|constants|utils|logger|resources|dist|deployments)",
+    "^@(root|tasks|scripts)/(.*)$",
     "^@chainHandler/(.*)$",
     "^@communicator/(.*)$",
-    "^@scripts/(.*)$",
     "^@bot/(.*)$",
-    "^@dist/(.*)$",
     "^[./]"
   ],
   "importOrderSeparation": true,

@@ -2,9 +2,10 @@ import { Multicall } from '@maxime.julian/ethereum-multicall';
 import { ethers } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
+import logger from '@logger';
+
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
 
-import logger from '@logger';
 import blockHandler from './src/blockHandler';
 import { bootstrap } from './src/bootstrap';
 import eventEmitter from './src/eventEmitter';

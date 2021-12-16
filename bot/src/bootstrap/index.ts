@@ -3,6 +3,7 @@ import { ethers, Signer } from 'ethers';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import http from 'http';
 
+import loanAmounts from '@dist/loanAmounts.json';
 import logger from '@logger';
 
 import { Transactor as ITransactorContract } from '@chainHandler/typechain';
@@ -24,6 +25,7 @@ const defaultState: State = {
   // Set to the last date the bot checked prices
   botExecutionMonitoringTick: 0,
   perfMonitoringRecords: [],
+  loanAmounts,
 };
 
 const services: Services = {
@@ -32,7 +34,6 @@ const services: Services = {
   logger,
   exchanges,
   eventEmitter,
-  strategies: config.strategies,
   messenger: new Messenger({
     communicatorWssUrl: config.communicationWssUrl,
     onGasFeesUpdate: (gasFees) => {

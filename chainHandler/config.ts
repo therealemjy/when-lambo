@@ -3,8 +3,7 @@ import { BigNumber } from 'ethers';
 
 import { Environment, ExchangeIndex, Token } from '@localTypes';
 import env from '@utils/env';
-
-import formatTradedTokens from '@root/utils/formatTradedTokens';
+import formatTradedTokens from '@utils/formatTradedTokens';
 
 dotenv.config();
 

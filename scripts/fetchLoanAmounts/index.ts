@@ -3,6 +3,7 @@ import fs from 'fs';
 import hre from 'hardhat';
 import 'hardhat-deploy';
 
+import gasEstimates from '@dist/gasEstimates.json';
 import { LoanAmounts, Token, ParsedTradedToken } from '@localTypes';
 import logger from '@logger';
 import { address as MULTICALL_CONTRACT_MAINNET_ADDRESS } from '@resources/thirdPartyContracts/mainnet/multicall2.json';
@@ -12,14 +13,11 @@ import env from '@utils/env';
 import { baseEnvs as prodBotBaseEnvs, tradedTokens as prodTradedTokens } from '@root/bot.config';
 // @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
 import { baseEnvs as prodCommunicatorEnvs } from '@root/communicator.config';
+import { DIST_FOLDER_PATH } from '@scripts/constants';
 
 import GasFeesWatcher from '@communicator/GasFeesWatcher';
 
-import { DIST_FOLDER_PATH } from '@scripts/constants';
-
 import exchanges from '@bot/src/exchanges';
-
-import gasEstimates from '@dist/gasEstimates.json';
 
 import findLoanAmount from './findLoanAmount';
 

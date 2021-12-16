@@ -1,8 +1,9 @@
 import WebSocket from 'ws';
 
+import { GasFees } from '@localTypes';
 import logger from '@logger';
 
-import { GasFees, Message, StopMonitoringSignalMessage } from '@communicator/types';
+import { Message, StopMonitoringSignalMessage } from '@communicator/types';
 
 class Messenger {
   wsClient: WebSocket | undefined;

@@ -1,11 +1,12 @@
 import WebSocket, { WebSocketServer } from 'ws';
 
+import { GasFees } from '@localTypes';
 import logger from '@logger';
 
 import GasFeesWatcher from './GasFeesWatcher';
 import config from './config';
 import { PORT } from './constant';
-import { Message, GasFeesUpdateMessage, GasFees } from './types';
+import { Message, GasFeesUpdateMessage } from './types';
 
 let gasFees: GasFees;
 

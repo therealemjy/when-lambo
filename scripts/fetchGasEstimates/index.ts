@@ -2,15 +2,14 @@ import fs from 'fs';
 import hre from 'hardhat';
 import 'hardhat-deploy';
 
+import localGasEstimates from '@dist/gasEstimates.json';
 import { GasEstimates } from '@localTypes';
 import logger from '@logger';
 import env from '@utils/env';
+import wrapEth from '@utils/wrapEth';
 
 // @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
 import { baseEnvs as prodBaseEnvs, tradedTokens as prodTradedTokens } from '@root/bot.config';
-import localGasEstimates from '@root/dist/gasEstimates.json';
-import wrapEth from '@root/utils/wrapEth';
-
 import { DIST_FOLDER_PATH } from '@scripts/constants';
 import getTradedTokenAddresses from '@scripts/utils/getTradedTokenAddresses';
 

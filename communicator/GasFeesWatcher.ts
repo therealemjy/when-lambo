@@ -1,8 +1,7 @@
 import axios from 'axios';
 
+import { GasFees } from '@localTypes';
 import logger from '@logger';
-
-import { GasFees } from './types';
 
 class GasFeesWatcher {
   blocknativeApiKey: string;

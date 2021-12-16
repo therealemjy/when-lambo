@@ -1,12 +1,9 @@
+import { GasFees } from '@localTypes';
+
 export type Message = StopMonitoringSignalMessage | GasFeesUpdateMessage;
 
 export type StopMonitoringSignalMessage = {
   type: 'stopMonitoringSignal';
-};
-
-export type GasFees = {
-  maxPriorityFeePerGas: number;
-  maxFeePerGas: number;
 };
 
 export type GasFeesUpdateMessage = {

@@ -1,14 +1,11 @@
 import { Multicall } from '@maxime.julian/ethereum-multicall';
 import { ethers, BigNumber } from 'ethers';
 
-import { GasEstimates, Token } from '@localTypes';
+import { GasEstimates, Token, GasFees } from '@localTypes';
 import logger from '@logger';
 import multiplyAmounts from '@utils/multiplyAmounts';
 
-import findBestTrade from '@root/bot/src/findBestTrade';
-
-import { GasFees } from '@communicator/types';
-
+import findBestTrade from '@bot/src/findBestTrade';
 import { WETH } from '@bot/src/tokens';
 import { Exchange } from '@bot/src/types';
 
@@ -50,7 +47,11 @@ const findLoanAmount = async ({
     return lastBestLoanAmount.toString();
   }
 
-  const fromTokenDecimalAmounts = multiplyAmounts(lastBestLoanAmount, INCREMENT_PERCENTAGE, incrementCount);
+  const fromTokenDecimalAmounts = multiplyAmounts({
+    baseAmount: lastBestLoanAmount,
+    incrementPercentage: INCREMENT_PERCENTAGE,
+    incrementCount,
+  });
 
   const { bestTradeByPercentage } = await findBestTrade({
     multicall,

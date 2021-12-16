@@ -21,6 +21,11 @@ export type GasEstimates = {
   };
 };
 
+export type GasFees = {
+  maxPriorityFeePerGas: number;
+  maxFeePerGas: number;
+};
+
 export type LoanAmounts = {
   [key: string]: string;
 };
