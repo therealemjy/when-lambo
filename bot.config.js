@@ -198,6 +198,7 @@ const getHookDeployCommand = (envName) => `pm2 start ./bot.config.js --env ${env
 
 module.exports = {
   tradedTokens,
+  baseEnvs,
   apps: [
     {
       name: 'when-lambo-bot',

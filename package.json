@@ -13,6 +13,7 @@
     "format:json": "prettier --write \"**/*.json\"",
     "format:ts": "prettier --write \"**/*.ts\"",
     "fetch-gas-estimates": "NODE_ENV=development ts-node scripts/fetchGasEstimates/index.ts | ./node_modules/.bin/bunyan",
+    "fetch-loan-amounts": "NODE_ENV=development ts-node scripts/fetchLoanAmounts/index.ts | ./node_modules/.bin/bunyan",
     "bot:tsc": "tsc --noEmit --project ./bot/tsconfig.json",
     "bot:dev": "npm run bot:build && NODE_ENV=development node --inspect ./dist/bot/index | ./node_modules/.bin/bunyan",
     "bot:build": "rm -rf ./dist/bot/index.js && esbuild ./bot/index.ts --bundle --outfile=./dist/bot/index.js --platform=node",

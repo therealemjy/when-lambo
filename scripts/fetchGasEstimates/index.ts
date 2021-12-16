@@ -1,10 +1,13 @@
 import fs from 'fs';
-import hre, { deployments } from 'hardhat';
+import hre from 'hardhat';
 import 'hardhat-deploy';
 
 import { GasEstimates } from '@localTypes';
 import logger from '@logger';
+import env from '@utils/env';
 
+// @ts-ignore causes bug only on compilation for some reason, removing that would make the deployment fail
+import { baseEnvs as prodBaseEnvs, tradedTokens as prodTradedTokens } from '@root/bot.config';
 import localGasEstimates from '@root/dist/gasEstimates.json';
 import wrapEth from '@root/utils/wrapEth';
 
@@ -18,9 +21,9 @@ const ethers = hre.ethers;
 
 const GAS_ESTIMATES_FILE_PATH = `${DIST_FOLDER_PATH}/gasEstimates.json`;
 const isProd = process.env.NODE_ENV === 'production';
-const tradedTokenAddresses = getTradedTokenAddresses(!!process.env.USE_PROD_TRADED_TOKENS);
-
-const setup = deployments.createFixture(() => deployments.fixture());
+const tradedTokenAddresses = getTradedTokenAddresses(
+  process.env.USE_PROD_ENV_VARIABLES ? prodTradedTokens.flat() : JSON.parse(env('STRINGIFIED_TRADED_TOKENS'))
+);
 
 const fetchGasEstimates = async () => {
   if (isProd) {
@@ -56,9 +59,6 @@ const fetchGasEstimates = async () => {
       if (gasEstimates[exchange.index] && gasEstimates[exchange.index][toTokenAddress]) {
         logger.log(`Token skipped (estimate already exists)`);
       } else {
-        // Reset blockchain state
-        await setup();
-
         // Wrap ETH to WETH on signer account
         await wrapEth(testOwnerSigner, testAmountIn, testOwnerAddress);
 
