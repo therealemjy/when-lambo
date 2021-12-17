@@ -179,7 +179,7 @@ const baseEnvs = {
   SLIPPAGE_ALLOWANCE_PERCENT: '0.5',
   // Note: using anything lower than that will result in transactions failing.
   // I couldn't find the actual reason for it :/
-  GAS_LIMIT_MULTIPLICATOR: '1.3',
+  GAS_LIMIT_MULTIPLICATOR: '1.35',
   GAS_COST_MAXIMUM_THRESHOLD_WEI: '50000000000000000',
   LOAN_AMOUNTS_COUNT: '11',
   LOAN_AMOUNTS_INCREMENT_PERCENT: '10',

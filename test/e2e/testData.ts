@@ -28,7 +28,7 @@ const config: EnvConfig = {
   slippageAllowancePercent: 0.5,
   loanAmountsCount: 11,
   loanAmountsIncrementPercent: 10,
-  gasLimitMultiplicator: 1.3,
+  gasLimitMultiplicator: 1.35,
   gasCostMaximumThresholdWei: ethers.utils.parseUnits('0.063', 'ether'),
   gasEstimates: {
     // Uniswap V2
