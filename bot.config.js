@@ -135,7 +135,7 @@ const tradedTokens = [
     },
     {
       ADDRESS: '0xc944e90c64b2c07662a292be6244bdf05cda44a7',
-      SYMBOL: 'GTR',
+      SYMBOL: 'GRT',
       DECIMALS: '18',
     },
     {
