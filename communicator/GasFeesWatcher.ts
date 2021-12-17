@@ -77,7 +77,7 @@ class GasFeesWatcher {
     // multiplicator set in config
     const maxPriorityFeePerGas = Math.floor(maxPriorityFeePerGasWei * this.maxPriorityFeePerGasMultiplicator);
     const baseFeePerGasWei = this.convertGweiNumberToWei(baseFeePerGas);
-    const maxFeePerGas = parseInt(baseFeePerGasWei as any) + parseInt(maxPriorityFeePerGas as any);
+    const maxFeePerGas = baseFeePerGasWei + maxPriorityFeePerGas;
 
     return {
       maxPriorityFeePerGas,
