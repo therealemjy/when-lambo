@@ -274,7 +274,7 @@ contract Transactor is Owner, IDyDxCallee {
       tradedTokenAmountOut, // tradedToken amount received from selling the borrowed WETH
       tradeData.buyingExchangeIndex,
       address(weth),
-      tradeData.wethAmountOutMin, // Minimum WETH amount out for this deal to be profitable
+      tradeData.borrowedWethAmount, // Minimum WETH amount out for this deal to be profitable
       tradeData.deadline
     );
 
